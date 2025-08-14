@@ -1,0 +1,193 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  # Full release-specific name for the deployment
+  name: {{ include "incloud-web.fullname" . }}
+  namespace: {{ .Release.Namespace }}
+  labels:
+    # Standard Helm chart and application labels
+    {{- include "incloud-web.labels" . | nindent 4 }}
+spec:
+  # Desired number of replicas (controlled via .Values.replicaCount)
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      # Label selector to match pods of this deployment
+      {{- include "incloud-web.selectorLabels" . | nindent 6 }}
+  strategy:
+    # Rolling update strategy configuration
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 25%
+  template:
+    metadata:
+      labels:
+        # Base pod labels
+        {{- include "incloud-web.selectorLabels" . | nindent 8 }}
+        # Additional pod labels from values.yaml
+        {{- with .Values.podLabels }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+      annotations:
+        # Annotations from podAnnotations
+        {{- with .Values.podAnnotations }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+        # Additional annotations from extraTemplateMetadata
+        {{- with .Values.extraTemplateMetadata.annotations }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+      {{- with .Values.extraTemplateMetadata.labels }}
+      # Extra labels from extraTemplateMetadata.labels
+      {{- toYaml . | nindent 8 }}
+      {{- end }}
+    spec:
+      # ServiceAccount used by the pod
+      serviceAccountName: {{ include "incloud-web.serviceAccountName" . }}
+
+      # Priority class for scheduling
+      priorityClassName: {{ .Values.priorityClassName | quote }}
+
+      # Optional pod-level security context
+      {{- if .Values.podSecurityContext.enabled }}
+      securityContext:
+        {{- omit .Values.podSecurityContext "enabled" | toYaml | nindent 8 }}
+      {{- end }}
+
+      # Secrets for pulling container images
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+
+      # Networking and scheduling options
+      dnsPolicy: {{ .Values.dnsPolicy }}
+      hostNetwork: {{ .Values.hostNetwork }}
+      hostPID: {{ .Values.hostPID }}
+      hostIPC: {{ .Values.hostIPC }}
+      {{- if .Values.runtimeClassName }}
+      runtimeClassName: {{ .Values.runtimeClassName | quote }}
+      {{- end }}
+      enableServiceLinks: {{ .Values.enableServiceLinks }}
+      {{- if .Values.preemptionPolicy }}
+      preemptionPolicy: {{ .Values.preemptionPolicy | quote }}
+      {{- end }}
+      schedulerName: {{ .Values.schedulerName | quote }}
+
+      # Node placement configuration
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.topologySpreadConstraints }}
+      topologySpreadConstraints:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+
+      # Volumes to mount in the containers
+      {{- with .Values.volumes }}
+      volumes:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+
+      containers:
+        # --- BFF container configuration ---
+        {{- if .Values.bff.enabled }}
+        - name: {{ .Values.bff.name }}
+          image: "{{ .Values.bff.image.repository }}:{{ .Values.bff.image.tag }}"
+          imagePullPolicy: {{ .Values.bff.image.pullPolicy }}
+          ports:
+            - name: http
+              containerPort: {{ .Values.bff.containerPort }}
+              protocol: TCP
+            # Additional container ports if defined
+            {{- with .Values.bff.extraContainerPorts }}
+            {{- toYaml . | nindent 12 }}
+            {{- end }}
+          # Environment variables from values.yaml
+          env:
+            {{- include "incloud-web.env" .Values.bff.env | nindent 12 }}
+          # Environment sources (ConfigMap / Secret)
+          {{- with .Values.bff.envFrom }}
+          envFrom:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          # Health checks
+          {{- if .Values.bff.livenessProbe.enabled }}
+          livenessProbe:
+            {{- omit .Values.bff.livenessProbe "enabled" | toYaml | nindent 12 }}
+          {{- end }}
+          {{- if .Values.bff.readinessProbe.enabled }}
+          readinessProbe:
+            {{- omit .Values.bff.readinessProbe "enabled" | toYaml | nindent 12 }}
+          {{- end }}
+          # Container security context
+          {{- if .Values.bff.securityContext.enabled }}
+          securityContext:
+            {{- omit .Values.bff.securityContext "enabled" | toYaml | nindent 12 }}
+          {{- end }}
+          # Resource limits and requests
+          resources:
+            {{- toYaml .Values.bff.resources | nindent 12 }}
+          # Volume mounts
+          {{- with .Values.bff.volumeMounts }}
+          volumeMounts:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          terminationMessagePath: {{ .Values.bff.terminationMessagePath | quote }}
+          terminationMessagePolicy: {{ .Values.bff.terminationMessagePolicy | quote }}
+        {{- end }}
+
+        # --- WEB container configuration ---
+        {{- if .Values.web.enabled }}
+        - name: {{ .Values.web.name }}
+          image: "{{ .Values.web.image.repository }}:{{ .Values.web.image.tag }}"
+          imagePullPolicy: {{ .Values.web.image.pullPolicy }}
+          ports:
+            - name: http
+              containerPort: {{ .Values.web.containerPort }}
+              protocol: TCP
+            {{- with .Values.web.extraContainerPorts }}
+            {{- toYaml . | nindent 12 }}
+            {{- end }}
+          env:
+            {{- include "incloud-web.env" .Values.web.env | nindent 12 }}
+          {{- with .Values.web.envFrom }}
+          envFrom:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- if .Values.web.livenessProbe.enabled }}
+          livenessProbe:
+            {{- omit .Values.web.livenessProbe "enabled" | toYaml | nindent 12 }}
+          {{- end }}
+          {{- if .Values.web.readinessProbe.enabled }}
+          readinessProbe:
+            {{- omit .Values.web.readinessProbe "enabled" | toYaml | nindent 12 }}
+          {{- end }}
+          {{- if .Values.web.securityContext.enabled }}
+          securityContext:
+            {{- omit .Values.web.securityContext "enabled" | toYaml | nindent 12 }}
+          {{- end }}
+          resources:
+            {{- toYaml .Values.web.resources | nindent 12 }}
+          {{- with .Values.web.volumeMounts }}
+          volumeMounts:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          terminationMessagePath: {{ .Values.web.terminationMessagePath | quote }}
+          terminationMessagePolicy: {{ .Values.web.terminationMessagePolicy | quote }}
+        {{- end }}
+
+      # Optional raw PodSpec extensions (appended at the end)
+      {{- with .Values.extraPodSpec }}
+      {{- toYaml . | nindent 6 }}
+      {{- end }}

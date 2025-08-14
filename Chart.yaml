@@ -1,0 +1,52 @@
+apiVersion: v2
+name: incloud-web
+description: Chart for configuring Kubernetes Web UI InCloud
+
+type: application
+
+# Chart (packaging) version — semver. Bump on ANY template/values change.
+version: 0.1.0
+
+# Application version — free-form string. Tie it to app images/tags you ship.
+# Tip: keep it in sync with image tags from values.yaml.
+appVersion: "RELEASE"
+
+# Minimal supported Kubernetes version (features used: apps/v1, probes, fsGroupChangePolicy, etc.)
+kubeVersion: ">=1.22.0-0"
+
+# Helpful discoverability
+keywords:
+  - incloud
+  - openapi-ui
+  - bff
+  - web
+  - kubernetes
+  - helm
+
+home: https://example.com/incloud
+icon: https://example.com/incloud-icon.png
+
+sources:
+  - https://github.com/your-org/incloud-web
+  - https://github.com/your-org/openapi-ui-k8s-bff
+  - https://github.com/your-org/helm-charts
+
+maintainers:
+  - name: PRO-Robotech
+    email: info@prorobotech.ru
+    url: https://t.me/incloud_ru
+
+# Optional dependencies (uncomment if you add subcharts)
+# dependencies:
+#   - name: some-subchart
+#     version: 1.x.x
+#     repository: https://charts.example.com
+
+annotations:
+  # Artifact Hub metadata (optional but useful if you publish the chart)
+  artifacthub.io/category: infrastructure
+  artifacthub.io/links: |
+    - name: Source
+      url: https://github.com/PRO-Robotech/openapi-ui
+    - name: Issues
+      url: https://github.com/PRO-Robotech/openapi-ui/issues

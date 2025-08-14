@@ -1,0 +1,38 @@
+{{- if .Values.service.enabled }}
+apiVersion: v1
+kind: Service
+metadata:
+  # Service name will match the chart's fullname (can be overridden via values.yaml)
+  name: {{ include "incloud-web.fullname" . }}
+
+  # Base chart and application labels
+  labels:
+    {{- include "incloud-web.labels" . | nindent 4 }}
+    # Additional labels from values.yaml (service.labels)
+    {{- with .Values.service.labels }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
+
+  # Optional annotations for the Service (e.g., for monitoring, cloud integration)
+  {{- with .Values.service.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+
+spec:
+  # Service type: ClusterIP (default), NodePort, LoadBalancer, etc.
+  type: {{ .Values.service.type }}
+
+  # Selector that matches labels on target pods
+  selector:
+    {{- include "incloud-web.selectorLabels" . | nindent 4 }}
+
+  # List of exposed ports for the Service
+  ports:
+    {{- range .Values.service.ports }}
+    - name: {{ .name }}                  # Port name (must be DNS-compatible)
+      port: {{ .port }}                   # Port exposed by the Service
+      targetPort: {{ .targetPort | default .port }}  # Target port on the pod/container
+      protocol: {{ .protocol | default "TCP" }}      # Protocol (default is TCP)
+    {{- end }}
+{{- end }}

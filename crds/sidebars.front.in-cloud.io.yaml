@@ -1,0 +1,75 @@
+---
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  name: sidebars.front.in-cloud.io
+spec:
+  group: front.in-cloud.io
+  scope: Cluster
+  names:
+    plural: sidebars
+    singular: sidebar
+    kind: Sidebar
+    listKind: SidebarList
+  versions:
+    - name: v1alpha1
+      served: true
+      storage: true
+      schema:
+        openAPIV3Schema:
+          type: object
+          required: [spec]
+          properties:
+            apiVersion:
+              type: string
+            kind:
+              type: string
+            metadata:
+              type: object
+            spec:
+              type: object
+              required: [id, menuItems]
+              properties:
+                id:
+                  type: string
+                keysAndTags:
+                  type: object
+                  description: Arbitrary section tags like namespaces, projects, etc.
+                  additionalProperties:
+                    type: array
+                    items:
+                      type: string
+                menuItems:
+                  type: array
+                  items:
+                    type: object
+                    required: [key, label]
+                    properties:
+                      key:
+                        type: string
+                      label:
+                        type: string
+                      children:
+                        type: array
+                        items:
+                          type: object
+                          required: [key, label, link]
+                          properties:
+                            key:
+                              type: string
+                            label:
+                              type: string
+                            link:
+                              type: string
+                          additionalProperties: true
+                    additionalProperties: true
+              additionalProperties: true
+      subresources:
+        status: {}
+      additionalPrinterColumns:
+        - name: ID
+          type: string
+          jsonPath: .spec.id
+        - name: Age
+          type: date
+          jsonPath: .metadata.creationTimestamp

@@ -1,0 +1,232 @@
+# --- Global ----------------------------------------------------------------
+# Override chart name and full name
+nameOverride: ""         # Overrides chart name; leave empty to use default
+fullnameOverride: ""     # Overrides full release name; leave empty to use default
+
+# Number of pod replicas
+replicaCount: 1
+
+# Pull secrets for private registries
+imagePullSecrets: []     # e.g. [{ name: regcred }]
+
+# Priority class for the pod
+priorityClassName: system-cluster-critical
+
+# --- ServiceAccount --------------------------------------------------------
+serviceAccount:
+  create: true           # Create a ServiceAccount (true/false)
+  name: ""               # If empty, defaults to <release>-<chart>
+  annotations: {}        # Optional metadata annotations
+
+# --- Pod-level settings ----------------------------------------------------
+podAnnotations: {}       # Annotations applied to Pod
+podLabels: {}            # Extra labels applied to Pod
+
+podSecurityContext:
+  enabled: true
+  fsGroup: 101
+  fsGroupChangePolicy: "OnRootMismatch"
+
+# Node placement settings
+nodeSelector: {}         # Node selector labels
+tolerations: []          # Tolerations for scheduling
+affinity: {}             # Affinity rules (overridden below if set)
+topologySpreadConstraints: []  # Raw list; will be YAML-encoded
+
+# Networking-related pod spec
+dnsPolicy: ClusterFirst
+hostNetwork: false
+hostPID: false
+hostIPC: false
+schedulerName: default-scheduler
+runtimeClassName: ""
+enableServiceLinks: false
+preemptionPolicy: ""     # e.g. PreemptLowerPriority
+
+# Volumes (raw list; toYaml)
+volumes: []
+
+# --- Service ---------------------------------------------------------------
+service:
+  enabled: true          # Set to false if using an external Service manifest
+  type: ClusterIP
+  annotations: {}
+  labels: {}
+  ports:
+    - name: bff-http
+      port: 64231
+      targetPort: 64231
+      protocol: TCP
+    - name: web-http
+      port: 8080
+      targetPort: 8080
+      protocol: TCP
+
+# --- Container: bff --------------------------------------------------------
+bff:
+  enabled: true
+  name: bff
+  image:
+    repository: sgroups/openapi-ui-k8s-bff
+    tag: main-d5191413
+    pullPolicy: IfNotPresent
+  containerPort: 64231
+  extraContainerPorts: [] # Additional container ports [{name, containerPort, protocol}]
+  env:
+    BASE_API_GROUP: "front.in-cloud.io"
+    BASE_API_VERSION: "v1alpha1"
+    DEBUG_CONTAINER_IMAGE: "nicolaka/netshoot:v0.13"
+    LOGGER: "TRUE"
+    LOGGER_WITH_HEADERS: "TRUE"
+    PORT: "64231"
+  envFrom: []            # e.g. [{configMapRef: {name: my-cm}}, {secretRef: {name: my-secret}}]
+  resources:
+    limits:
+      cpu: "1"
+      memory: 1Gi
+    requests:
+      cpu: 100m
+      memory: 128Mi
+      ephemeral-storage: 50Mi
+  securityContext:
+    enabled: true
+    allowPrivilegeEscalation: false
+    capabilities:
+      add: ["CAP_CHOWN","CAP_NET_BIND_SERVICE","CAP_SETGID","CAP_SETUID"]
+      drop: ["ALL"]
+    privileged: false
+    readOnlyRootFilesystem: false
+    runAsGroup: 0
+    runAsNonRoot: true
+    runAsUser: 101
+  livenessProbe:
+    enabled: true
+    httpGet:
+      path: /healthcheck
+      port: 64231
+      scheme: HTTP
+    initialDelaySeconds: 3
+    periodSeconds: 10
+    timeoutSeconds: 2
+    successThreshold: 1
+    failureThreshold: 3
+  readinessProbe:
+    enabled: false
+    httpGet:
+      path: /ready
+      port: 64231
+      scheme: HTTP
+    initialDelaySeconds: 3
+    periodSeconds: 10
+    timeoutSeconds: 2
+    successThreshold: 1
+    failureThreshold: 3
+  volumeMounts: []       # Additional volume mounts (raw list; toYaml)
+  terminationMessagePath: /dev/termination-log
+  terminationMessagePolicy: File
+
+# --- Container: web --------------------------------------------------------
+web:
+  enabled: true
+  name: web
+  image:
+    repository: sgroups/openapi-ui
+    tag: main-0b206491
+    pullPolicy: IfNotPresent
+  containerPort: 8080
+  extraContainerPorts: []
+  env:
+    BASEPREFIX: "/openapi-ui"
+    CUSTOMIZATION_API_GROUP: "front.in-cloud.io"
+    CUSTOMIZATION_API_VERSION: "v1alpha1"
+    CUSTOMIZATION_NAVIGATION_RESOURCE: "navigation"
+    CUSTOMIZATION_NAVIGATION_RESOURCE_NAME: "navigations"
+    INSTANCES_API_GROUP: "in-cloud.io"
+    INSTANCES_RESOURCE_NAME: "instances"
+    INSTANCES_VERSION: "v1alpha1"
+    LOGIN_URL: "/oauth/token"
+    LOGIN_USERNAME_FIELD: "name"
+    LOGOUT_URL: "/oauth/logout"
+    MARKETPLACE_GROUP: "front.in-cloud.io"
+    MARKETPLACE_KIND: "MarketplacePanel"
+    MARKETPLACE_RESOURCE_NAME: "marketplacepanels"
+    MARKETPLACE_VERSION: "v1alpha1"
+    NAVIGATE_FROM_CLUSTERLIST: "/openapi-ui/clusters/~recordValue~"
+    NODE_TERMINAL_DEFAULT_PROFILE: "general"
+    PROJECTS_API_GROUP: "in-cloud.io"
+    PROJECTS_RESOURCE_NAME: "projects"
+    PROJECTS_VERSION: "v1alpha1"
+  envFrom: []
+  resources:
+    limits:
+      cpu: 200m
+      memory: 256Mi
+    requests:
+      cpu: 100m
+      memory: 128Mi
+      ephemeral-storage: 50Mi
+  securityContext:
+    enabled: true
+    allowPrivilegeEscalation: false
+    capabilities:
+      add: ["CAP_CHOWN","CAP_NET_BIND_SERVICE","CAP_SETGID","CAP_SETUID"]
+      drop: ["ALL"]
+    privileged: false
+    readOnlyRootFilesystem: false
+    runAsGroup: 0
+    runAsNonRoot: true
+    runAsUser: 101
+  livenessProbe:
+    enabled: true
+    httpGet:
+      path: /healthcheck
+      port: 8080
+      scheme: HTTP
+    initialDelaySeconds: 3
+    periodSeconds: 10
+    timeoutSeconds: 2
+    successThreshold: 1
+    failureThreshold: 3
+  readinessProbe:
+    enabled: false
+    httpGet:
+      path: /ready
+      port: 8080
+      scheme: HTTP
+    initialDelaySeconds: 3
+    periodSeconds: 10
+    timeoutSeconds: 2
+    successThreshold: 1
+    failureThreshold: 3
+  volumeMounts: []
+  terminationMessagePath: /dev/termination-log
+  terminationMessagePolicy: File
+
+# --- Labels/Selectors ------------------------------------------------------
+selectorLabels:
+  app.kubernetes.io/name: web
+  # app.kubernetes.io/instance is auto-derived from Release.Name
+
+# --- Extra customizations --------------------------------------------------
+extraPodSpec: {}         # Raw PodSpec additions
+extraTemplateMetadata:
+  annotations: {}
+  labels: {}
+
+# --- Default affinity (anti-affinity example) ------------------------------
+affinity:
+  podAntiAffinity:
+    preferredDuringSchedulingIgnoredDuringExecution:
+      - weight: 100
+        podAffinityTerm:
+          labelSelector:
+            matchExpressions:
+              - key: app.kubernetes.io/name
+                operator: In
+                values:
+                  - appSpec
+              - key: app.kubernetes.io/instance
+                operator: In
+                values:
+                  - release-name
+          topologyKey: kubernetes.io/hostname

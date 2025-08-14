@@ -1,0 +1,77 @@
+---
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  name: customcolumnsoverrides.front.in-cloud.io
+spec:
+  group: front.in-cloud.io
+  scope: Cluster
+  names:
+    plural: customcolumnsoverrides
+    singular: customcolumnsoverride
+    kind: CustomColumnsOverride
+    listKind: CustomColumnsOverrideList
+  versions:
+    - name: v1alpha1
+      served: true
+      storage: true
+      schema:
+        openAPIV3Schema:
+          type: object
+          required: [spec]
+          properties:
+            apiVersion:
+              type: string
+            kind:
+              type: string
+            metadata:
+              type: object
+            spec:
+              type: object
+              required: [id]
+              properties:
+                id:
+                  type: string
+                additionalPrinterColumns:
+                  type: array
+                  items:
+                    type: object
+                    required: [jsonPath, name]
+                    properties:
+                      jsonPath:
+                        type: string
+                      name:
+                        type: string
+                    additionalProperties: true
+                additionalPrinterColumnsTrimLengths:
+                  type: array
+                  items:
+                    type: object
+                    required: [key, value]
+                    properties:
+                      key:
+                        type: string
+                      value:
+                        type: integer
+                    additionalProperties: true
+                additionalPrinterColumnsUndefinedValues:
+                  type: array
+                  items:
+                    type: object
+                    required: [key, value]
+                    properties:
+                      key:
+                        type: string
+                      value:
+                        type: string
+                    additionalProperties: true
+
+      subresources:
+        status: {}
+      additionalPrinterColumns:
+        - name: ID
+          type: string
+          jsonPath: .spec.id
+        - name: Age
+          type: date
+          jsonPath: .metadata.creationTimestamp
