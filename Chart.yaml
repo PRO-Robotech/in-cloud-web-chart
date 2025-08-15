@@ -5,7 +5,7 @@ description: Chart for configuring Kubernetes Web UI InCloud
 type: application
 
 # Chart (packaging) version — semver. Bump on ANY template/values change.
-version: 0.1.1
+version: 0.1.2
 
 # Application version — free-form string. Tie it to app images/tags you ship.
 # Tip: keep it in sync with image tags from values.yaml.
@@ -27,9 +27,10 @@ home: https://example.com/incloud
 icon: https://example.com/incloud-icon.png
 
 sources:
-  - https://github.com/your-org/incloud-web
-  - https://github.com/your-org/openapi-ui-k8s-bff
-  - https://github.com/your-org/helm-charts
+  - https://github.com/PRO-Robotech/openapi-ui
+  - https://github.com/PRO-Robotech/openapi-ui-k8s-bff
+  - https://github.com/PRO-Robotech/incloud-web-chart
+  - https://github.com/PRO-Robotech/incloud-web-resources
 
 maintainers:
   - name: PRO-Robotech
