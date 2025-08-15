@@ -33,4 +33,4 @@ jobs:
       - name: Package & Push
         run: |
           pkg=$(helm package "${{ env.CHART_DIR }}" | awk '{print $NF}')
-          helm push "$pkg" oci://${{ env.REGISTRY }}/prorobotech/incloud-web-chart:{{ github.head_ref || github.ref_name }}-${{ steps.short-sha.outputs.sha }}
+          helm push "$pkg" oci://${{ env.REGISTRY }}/prorobotech/incloud-web-chart
