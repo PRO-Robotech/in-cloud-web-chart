@@ -30,8 +30,8 @@ spec:
   # List of exposed ports for the Service
   ports:
     {{- range .Values.service.ports }}
-    - name: {{ .name }}                  # Port name (must be DNS-compatible)
-      port: {{ .port }}                   # Port exposed by the Service
+    - name: {{ .name }}                              # Port name (must be DNS-compatible)
+      port: {{ .port }}                              # Port exposed by the Service
       targetPort: {{ .targetPort | default .port }}  # Target port on the pod/container
       protocol: {{ .protocol | default "TCP" }}      # Protocol (default is TCP)
     {{- end }}

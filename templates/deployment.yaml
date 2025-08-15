@@ -8,18 +8,21 @@ metadata:
     # Standard Helm chart and application labels
     {{- include "incloud-web.labels" . | nindent 4 }}
 spec:
-  # Desired number of replicas (controlled via .Values.replicaCount)
+  # Desired number of replicas
   replicas: {{ .Values.replicaCount }}
+
   selector:
     matchLabels:
       # Label selector to match pods of this deployment
       {{- include "incloud-web.selectorLabels" . | nindent 6 }}
+
   strategy:
     # Rolling update strategy configuration
     type: RollingUpdate
     rollingUpdate:
       maxSurge: 25%
       maxUnavailable: 25%
+
   template:
     metadata:
       labels:
@@ -29,19 +32,20 @@ spec:
         {{- with .Values.podLabels }}
         {{- toYaml . | nindent 8 }}
         {{- end }}
+        # Extra labels from extraTemplateMetadata.labels
+        {{- with .Values.extraTemplateMetadata.labels }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
       annotations:
-        # Annotations from podAnnotations
+        # Pod annotations
         {{- with .Values.podAnnotations }}
         {{- toYaml . | nindent 8 }}
         {{- end }}
-        # Additional annotations from extraTemplateMetadata
+        # Extra annotations from extraTemplateMetadata.annotations
         {{- with .Values.extraTemplateMetadata.annotations }}
         {{- toYaml . | nindent 8 }}
         {{- end }}
-      {{- with .Values.extraTemplateMetadata.labels }}
-      # Extra labels from extraTemplateMetadata.labels
-      {{- toYaml . | nindent 8 }}
-      {{- end }}
+
     spec:
       # ServiceAccount used by the pod
       serviceAccountName: {{ include "incloud-web.serviceAccountName" . }}
@@ -49,13 +53,13 @@ spec:
       # Priority class for scheduling
       priorityClassName: {{ .Values.priorityClassName | quote }}
 
-      # Optional pod-level security context
+      # Pod-level security context (render only when enabled; drop 'enabled' key)
       {{- if .Values.podSecurityContext.enabled }}
       securityContext:
         {{- omit .Values.podSecurityContext "enabled" | toYaml | nindent 8 }}
       {{- end }}
 
-      # Secrets for pulling container images
+      # Image pull secrets
       {{- with .Values.imagePullSecrets }}
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}
@@ -66,16 +70,16 @@ spec:
       hostNetwork: {{ .Values.hostNetwork }}
       hostPID: {{ .Values.hostPID }}
       hostIPC: {{ .Values.hostIPC }}
-      {{- if .Values.runtimeClassName }}
-      runtimeClassName: {{ .Values.runtimeClassName | quote }}
+      {{- with .Values.runtimeClassName }}
+      runtimeClassName: {{ . | quote }}
       {{- end }}
       enableServiceLinks: {{ .Values.enableServiceLinks }}
-      {{- if .Values.preemptionPolicy }}
-      preemptionPolicy: {{ .Values.preemptionPolicy | quote }}
+      {{- with .Values.preemptionPolicy }}
+      preemptionPolicy: {{ . | quote }}
       {{- end }}
       schedulerName: {{ .Values.schedulerName | quote }}
 
-      # Node placement configuration
+      # Node placement
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
@@ -93,35 +97,49 @@ spec:
         {{- toYaml . | nindent 8 }}
       {{- end }}
 
-      # Volumes to mount in the containers
-      {{- with .Values.volumes }}
+      # Volumes: user-defined + NGINX config (if enabled)
+      {{- if or .Values.volumes .Values.nginx.enabled }}
       volumes:
+        # User-defined volumes
+        {{- with .Values.volumes }}
         {{- toYaml . | nindent 8 }}
+        {{- end }}
+        # NGINX config from ConfigMap
+        {{- if .Values.nginx.enabled }}
+        - name: configuration-nginx-file
+          configMap:
+            defaultMode: 420
+            name: {{ default (printf "%s-nginx-config" (include "incloud-web.fullname" .)) .Values.nginx.configMapName }}
+        {{- end }}
       {{- end }}
 
       containers:
-        # --- BFF container configuration ---
+        # -------------------- BFF Container --------------------
         {{- if .Values.bff.enabled }}
         - name: {{ .Values.bff.name }}
           image: "{{ .Values.bff.image.repository }}:{{ .Values.bff.image.tag }}"
           imagePullPolicy: {{ .Values.bff.image.pullPolicy }}
+
+          # Ports
           ports:
             - name: http
               containerPort: {{ .Values.bff.containerPort }}
               protocol: TCP
-            # Additional container ports if defined
             {{- with .Values.bff.extraContainerPorts }}
             {{- toYaml . | nindent 12 }}
             {{- end }}
-          # Environment variables from values.yaml
+
+          # Env
+          {{- with .Values.bff.env }}
           env:
-            {{- include "incloud-web.env" .Values.bff.env | nindent 12 }}
-          # Environment sources (ConfigMap / Secret)
+            {{- include "incloud-web.env" . | nindent 12 }}
+          {{- end }}
           {{- with .Values.bff.envFrom }}
           envFrom:
             {{- toYaml . | nindent 12 }}
           {{- end }}
-          # Health checks
+
+          # Probes (enabled-gated, 'enabled' key stripped)
           {{- if .Values.bff.livenessProbe.enabled }}
           livenessProbe:
             {{- omit .Values.bff.livenessProbe "enabled" | toYaml | nindent 12 }}
@@ -130,28 +148,34 @@ spec:
           readinessProbe:
             {{- omit .Values.bff.readinessProbe "enabled" | toYaml | nindent 12 }}
           {{- end }}
-          # Container security context
+
+          # Security context (enabled-gated, 'enabled' key stripped)
           {{- if .Values.bff.securityContext.enabled }}
           securityContext:
             {{- omit .Values.bff.securityContext "enabled" | toYaml | nindent 12 }}
           {{- end }}
-          # Resource limits and requests
+
+          # Resources / mounts
+          {{- with .Values.bff.resources }}
           resources:
-            {{- toYaml .Values.bff.resources | nindent 12 }}
-          # Volume mounts
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
           {{- with .Values.bff.volumeMounts }}
           volumeMounts:
             {{- toYaml . | nindent 12 }}
           {{- end }}
+
           terminationMessagePath: {{ .Values.bff.terminationMessagePath | quote }}
           terminationMessagePolicy: {{ .Values.bff.terminationMessagePolicy | quote }}
         {{- end }}
 
-        # --- WEB container configuration ---
+        # -------------------- WEB Container --------------------
         {{- if .Values.web.enabled }}
         - name: {{ .Values.web.name }}
           image: "{{ .Values.web.image.repository }}:{{ .Values.web.image.tag }}"
           imagePullPolicy: {{ .Values.web.image.pullPolicy }}
+
+          # Ports
           ports:
             - name: http
               containerPort: {{ .Values.web.containerPort }}
@@ -159,12 +183,18 @@ spec:
             {{- with .Values.web.extraContainerPorts }}
             {{- toYaml . | nindent 12 }}
             {{- end }}
+
+          # Env
+          {{- with .Values.web.env }}
           env:
-            {{- include "incloud-web.env" .Values.web.env | nindent 12 }}
+            {{- include "incloud-web.env" . | nindent 12 }}
+          {{- end }}
           {{- with .Values.web.envFrom }}
           envFrom:
             {{- toYaml . | nindent 12 }}
           {{- end }}
+
+          # Probes (enabled-gated, 'enabled' key stripped)
           {{- if .Values.web.livenessProbe.enabled }}
           livenessProbe:
             {{- omit .Values.web.livenessProbe "enabled" | toYaml | nindent 12 }}
@@ -173,21 +203,88 @@ spec:
           readinessProbe:
             {{- omit .Values.web.readinessProbe "enabled" | toYaml | nindent 12 }}
           {{- end }}
+
+          # Security context (enabled-gated, 'enabled' key stripped)
           {{- if .Values.web.securityContext.enabled }}
           securityContext:
             {{- omit .Values.web.securityContext "enabled" | toYaml | nindent 12 }}
           {{- end }}
+
+          # Resources / mounts
+          {{- with .Values.web.resources }}
           resources:
-            {{- toYaml .Values.web.resources | nindent 12 }}
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
           {{- with .Values.web.volumeMounts }}
           volumeMounts:
             {{- toYaml . | nindent 12 }}
           {{- end }}
+
           terminationMessagePath: {{ .Values.web.terminationMessagePath | quote }}
           terminationMessagePolicy: {{ .Values.web.terminationMessagePolicy | quote }}
         {{- end }}
 
-      # Optional raw PodSpec extensions (appended at the end)
+        # -------------------- NGINX Container --------------------
+        {{- if .Values.nginx.enabled }}
+        - name: {{ .Values.nginx.name }}
+          image: "{{ .Values.nginx.image.repository }}:{{ .Values.nginx.image.tag }}"
+          imagePullPolicy: {{ .Values.nginx.image.pullPolicy }}
+
+          # Ports
+          ports:
+            - name: http
+              containerPort: {{ .Values.nginx.containerPort }}
+              protocol: TCP
+            {{- with .Values.nginx.extraContainerPorts }}
+            {{- toYaml . | nindent 12 }}
+            {{- end }}
+
+          # Mount NGINX configuration from ConfigMap
+          volumeMounts:
+            - mountPath: /etc/nginx/conf.d/default.conf
+              name: configuration-nginx-file
+              subPath: nginx-config
+            {{- with .Values.nginx.extraVolumeMounts }}
+            {{- toYaml . | nindent 12 }}
+            {{- end }}
+
+          # Env
+          {{- with .Values.nginx.env }}
+          env:
+            {{- include "incloud-web.env" . | nindent 12 }}
+          {{- end }}
+          {{- with .Values.nginx.envFrom }}
+          envFrom:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+
+          # Probes (enabled-gated, 'enabled' key stripped)
+          {{- if .Values.nginx.livenessProbe.enabled }}
+          livenessProbe:
+            {{- omit .Values.nginx.livenessProbe "enabled" | toYaml | nindent 12 }}
+          {{- end }}
+          {{- if .Values.nginx.readinessProbe.enabled }}
+          readinessProbe:
+            {{- omit .Values.nginx.readinessProbe "enabled" | toYaml | nindent 12 }}
+          {{- end }}
+
+          # Security context (enabled-gated, 'enabled' key stripped)
+          {{- if .Values.nginx.securityContext.enabled }}
+          securityContext:
+            {{- omit .Values.nginx.securityContext "enabled" | toYaml | nindent 12 }}
+          {{- end }}
+
+          # Resources
+          {{- with .Values.nginx.resources }}
+          resources:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+
+          terminationMessagePath: {{ .Values.nginx.terminationMessagePath | quote }}
+          terminationMessagePolicy: {{ .Values.nginx.terminationMessagePolicy | quote }}
+        {{- end }}
+
+      # Extra raw PodSpec fields (if provided)
       {{- with .Values.extraPodSpec }}
       {{- toYaml . | nindent 6 }}
       {{- end }}

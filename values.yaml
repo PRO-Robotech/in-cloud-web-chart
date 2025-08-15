@@ -1,37 +1,34 @@
 # --- Global ----------------------------------------------------------------
-# Override chart name and full name
-nameOverride: ""         # Overrides chart name; leave empty to use default
-fullnameOverride: ""     # Overrides full release name; leave empty to use default
+nameOverride: ""                  # Overrides chart name; leave empty to use default
+fullnameOverride: "" # Overrides full release name; leave empty to use default
 
 # Number of pod replicas
 replicaCount: 1
 
 # Pull secrets for private registries
-imagePullSecrets: []     # e.g. [{ name: regcred }]
+imagePullSecrets: []               # e.g. [{ name: regcred }]
 
 # Priority class for the pod
 priorityClassName: system-cluster-critical
 
 # --- ServiceAccount --------------------------------------------------------
 serviceAccount:
-  create: true           # Create a ServiceAccount (true/false)
-  name: ""               # If empty, defaults to <release>-<chart>
-  annotations: {}        # Optional metadata annotations
+  create: true
+  name: ""                         # Defaults to <release>-<chart>
+  annotations: {}
 
 # --- Pod-level settings ----------------------------------------------------
-podAnnotations: {}       # Annotations applied to Pod
-podLabels: {}            # Extra labels applied to Pod
-
+podAnnotations: {}
+podLabels: {}
 podSecurityContext:
   enabled: true
   fsGroup: 101
   fsGroupChangePolicy: "OnRootMismatch"
 
 # Node placement settings
-nodeSelector: {}         # Node selector labels
-tolerations: []          # Tolerations for scheduling
-affinity: {}             # Affinity rules (overridden below if set)
-topologySpreadConstraints: []  # Raw list; will be YAML-encoded
+nodeSelector: {}
+tolerations: []
+topologySpreadConstraints: []
 
 # Networking-related pod spec
 dnsPolicy: ClusterFirst
@@ -41,14 +38,15 @@ hostIPC: false
 schedulerName: default-scheduler
 runtimeClassName: ""
 enableServiceLinks: false
-preemptionPolicy: ""     # e.g. PreemptLowerPriority
+preemptionPolicy: ""
 
-# Volumes (raw list; toYaml)
+# Volumes (user-defined; appended with nginx config if enabled)
 volumes: []
+
 
 # --- Service ---------------------------------------------------------------
 service:
-  enabled: true          # Set to false if using an external Service manifest
+  enabled: true
   type: ClusterIP
   annotations: {}
   labels: {}
@@ -61,6 +59,10 @@ service:
       port: 8080
       targetPort: 8080
       protocol: TCP
+    - name: nginx-http
+      port: 8081
+      targetPort: 8081
+      protocol: TCP
 
 # --- Container: bff --------------------------------------------------------
 bff:
@@ -68,10 +70,10 @@ bff:
   name: bff
   image:
     repository: sgroups/openapi-ui-k8s-bff
-    tag: main-d5191413
+    tag: main-e188569a
     pullPolicy: IfNotPresent
   containerPort: 64231
-  extraContainerPorts: [] # Additional container ports [{name, containerPort, protocol}]
+  extraContainerPorts: []
   env:
     BASE_API_GROUP: "front.in-cloud.io"
     BASE_API_VERSION: "v1alpha1"
@@ -79,7 +81,8 @@ bff:
     LOGGER: "TRUE"
     LOGGER_WITH_HEADERS: "TRUE"
     PORT: "64231"
-  envFrom: []            # e.g. [{configMapRef: {name: my-cm}}, {secretRef: {name: my-secret}}]
+    KUBE_API_URL: https://kubernetes.default.svc
+  envFrom: []
   resources:
     limits:
       cpu: "1"
@@ -121,7 +124,7 @@ bff:
     timeoutSeconds: 2
     successThreshold: 1
     failureThreshold: 3
-  volumeMounts: []       # Additional volume mounts (raw list; toYaml)
+  volumeMounts: []
   terminationMessagePath: /dev/termination-log
   terminationMessagePolicy: File
 
@@ -131,7 +134,7 @@ web:
   name: web
   image:
     repository: sgroups/openapi-ui
-    tag: main-0b206491
+    tag: main-8d4a0651
     pullPolicy: IfNotPresent
   containerPort: 8080
   extraContainerPorts: []
@@ -151,11 +154,12 @@ web:
     MARKETPLACE_KIND: "MarketplacePanel"
     MARKETPLACE_RESOURCE_NAME: "marketplacepanels"
     MARKETPLACE_VERSION: "v1alpha1"
-    NAVIGATE_FROM_CLUSTERLIST: "/openapi-ui/clusters/~recordValue~"
+    NAVIGATE_FROM_CLUSTERLIST: "/openapi-ui/~recordValue~/builtin-table/pods"
     NODE_TERMINAL_DEFAULT_PROFILE: "general"
     PROJECTS_API_GROUP: "in-cloud.io"
     PROJECTS_RESOURCE_NAME: "projects"
     PROJECTS_VERSION: "v1alpha1"
+    USE_NAMESPACE_NAV: true
   envFrom: []
   resources:
     limits:
@@ -202,13 +206,72 @@ web:
   terminationMessagePath: /dev/termination-log
   terminationMessagePolicy: File
 
+# --- Container: nginx (reverse proxy) --------------------------------------
+nginx:
+  enabled: true
+  name: nginx
+  image:
+    repository: nginxinc/nginx-unprivileged
+    tag: "1.29-alpine"
+    pullPolicy: IfNotPresent
+  containerPort: 8081
+  extraContainerPorts: []
+  configMapName: ""        # Defaults to "<fullname>-nginx-config"
+  configKey: "nginx-config"
+  env: {}
+  envFrom: []
+  resources:
+    limits:
+      cpu: 200m
+      memory: 256Mi
+    requests:
+      cpu: 50m
+      memory: 64Mi
+      ephemeral-storage: 50Mi
+  securityContext:
+    allowPrivilegeEscalation: false
+    capabilities:
+      drop:
+      - ALL
+    privileged: false
+    readOnlyRootFilesystem: false
+    runAsGroup: 0
+    runAsNonRoot: true
+    runAsUser: 101
+    seccompProfile:
+      type: RuntimeDefault
+  livenessProbe:
+    enabled: true
+    httpGet:
+      path: /healthcheck
+      port: 8081
+      scheme: HTTP
+    initialDelaySeconds: 3
+    periodSeconds: 10
+    timeoutSeconds: 2
+    successThreshold: 1
+    failureThreshold: 3
+  readinessProbe:
+    enabled: false
+    httpGet:
+      path: /ready
+      port: 8081
+      scheme: HTTP
+    initialDelaySeconds: 3
+    periodSeconds: 10
+    timeoutSeconds: 2
+    successThreshold: 1
+    failureThreshold: 3
+  extraVolumeMounts: []
+  terminationMessagePath: /dev/termination-log
+  terminationMessagePolicy: File
+
 # --- Labels/Selectors ------------------------------------------------------
 selectorLabels:
   app.kubernetes.io/name: web
-  # app.kubernetes.io/instance is auto-derived from Release.Name
 
 # --- Extra customizations --------------------------------------------------
-extraPodSpec: {}         # Raw PodSpec additions
+extraPodSpec: {}
 extraTemplateMetadata:
   annotations: {}
   labels: {}
