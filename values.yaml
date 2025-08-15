@@ -1,3 +1,8 @@
+
+# --- Dependency ----------------------------------------------------------------
+incloudWebResources:
+  enabled: true
+
 # --- Global ----------------------------------------------------------------
 nameOverride: ""                  # Overrides chart name; leave empty to use default
 fullnameOverride: "" # Overrides full release name; leave empty to use default
