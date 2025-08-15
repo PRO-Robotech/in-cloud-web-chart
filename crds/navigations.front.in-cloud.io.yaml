@@ -29,7 +29,7 @@ spec:
               type: object
             spec:
               type: object
-              required: []
+              # required:
                 # - instances
                 # - namespaces
                 # - projects

@@ -51,10 +51,6 @@ service:
   annotations: {}
   labels: {}
   ports:
-    - name: bff-http
-      port: 64231
-      targetPort: 64231
-      protocol: TCP
     - name: web-http
       port: 8080
       targetPort: 8080
@@ -63,16 +59,20 @@ service:
       port: 8081
       targetPort: 8081
       protocol: TCP
+    - name: bff-http
+      port: 8082
+      targetPort: 8082
+      protocol: TCP
 
 # --- Container: bff --------------------------------------------------------
 bff:
   enabled: true
   name: bff
   image:
-    repository: sgroups/openapi-ui-k8s-bff
+    repository: prorobotech/openapi-ui-k8s-bff
     tag: main-e188569a
     pullPolicy: IfNotPresent
-  containerPort: 64231
+  containerPort: 8082
   extraContainerPorts: []
   env:
     BASE_API_GROUP: "front.in-cloud.io"
@@ -80,7 +80,7 @@ bff:
     DEBUG_CONTAINER_IMAGE: "nicolaka/netshoot:v0.13"
     LOGGER: "TRUE"
     LOGGER_WITH_HEADERS: "TRUE"
-    PORT: "64231"
+    PORT: "8082"
     KUBE_API_URL: https://kubernetes.default.svc
   envFrom: []
   resources:
@@ -106,7 +106,7 @@ bff:
     enabled: true
     httpGet:
       path: /healthcheck
-      port: 64231
+      port: 8082
       scheme: HTTP
     initialDelaySeconds: 3
     periodSeconds: 10
@@ -117,7 +117,7 @@ bff:
     enabled: false
     httpGet:
       path: /ready
-      port: 64231
+      port: 8082
       scheme: HTTP
     initialDelaySeconds: 3
     periodSeconds: 10
@@ -133,7 +133,7 @@ web:
   enabled: true
   name: web
   image:
-    repository: sgroups/openapi-ui
+    repository: prorobotech/openapi-ui
     tag: main-8d4a0651
     pullPolicy: IfNotPresent
   containerPort: 8080
