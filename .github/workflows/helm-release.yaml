@@ -22,5 +22,5 @@ jobs:
       - name: Package & Push
         run: |
           pkg=$(helm package "${{ env.CHART_DIR }}" | awk '{print $NF}')
-          helm registry login registry-1.docker.io -u prorobotech -p ${{ secrets.CUSTOM_DOCKERHUB_TOKEN }}
+          helm registry login registry-1.docker.io -u prorobotech -p ${{ secrets.DOCKERHUB_TOKEN }}
           helm push $pkg oci://registry-1.docker.io/prorobotech
