@@ -1,26 +1,28 @@
-### incloud-web — Helm chart for Kubernetes Web UI InCloud
+### incloud-web
 
-**Summary:**  
-The chart deploys two containers — `bff` and `web` — for the InCloud Web UI.  
-It supports flexible configuration via `values.yaml`, ships CRDs from the `crds/` directory, and includes production-ready settings such as probes, `securityContext`, and `affinity`/topology spread.  
-All templates are structured with Helm best practices and helpers.
+Helm chart for deploying the InCloud Web UI in Kubernetes.
+
+**Summary**  
+This chart provisions three containers: `bff` (backend-for-frontend), `web` (frontend UI), and `nginx` (reverse proxy), providing a complete web UI stack for InCloud.  
+It offers flexible configuration via `values.yaml`, supports CRDs from the `crds/` directory, and includes production-ready defaults for probes, security context, and scheduling.  
+All templates are structured according to Helm best practices and use helper templates.
 
 #### Requirements
 
-- Kubernetes `>= 1.22`  
-- Helm `>= 3.8`  
+- Kubernetes `>= 1.22`
+- Helm `>= 3.8`
 - (Optional) Access to a private container registry via `imagePullSecrets`
 
 #### Quick start
 
 ```bash
-# Install locally from the chart directory
+# Install from local chart directory
 helm install incloud-web ./incloud-web -n default
 
-# Preview rendered manifests
+# Render manifests without installing
 helm template incloud-web ./incloud-web --namespace default
 
-# Upgrade
+# Upgrade an existing release
 helm upgrade incloud-web ./incloud-web -n default
 ```
 
@@ -28,70 +30,86 @@ helm upgrade incloud-web ./incloud-web -n default
 
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
-| `nameOverride` | string | `""` | Override chart name (empty = default name) |
-| `fullnameOverride` | string | `""` | Override full release name (empty = default) |
-| `replicaCount` | int | `1` | Number of Pod replicas |
-| `imagePullSecrets` | list | `[]` | Secrets for pulling images from private registries |
-| `priorityClassName` | string | `"system-cluster-critical"` | Priority class for the pod |
-| `serviceAccount.create` | bool | `true` | Create ServiceAccount |
-| `serviceAccount.name` | string | `""` | ServiceAccount name (defaults to `<release>-<chart>`) |
-| `serviceAccount.annotations` | object | `{}` | Additional annotations for ServiceAccount |
-| `podAnnotations` | object | `{}` | Annotations for Pod |
-| `podLabels` | object | `{}` | Extra labels for Pod |
-| `podSecurityContext.enabled` | bool | `true` | Enable Pod-level security context |
-| `podSecurityContext.fsGroup` | int | `101` | Group ID for mounted volumes |
-| `podSecurityContext.fsGroupChangePolicy` | string | `"OnRootMismatch"` | Policy for changing fsGroup |
-| `nodeSelector` | object | `{}` | Node selector for scheduling |
-| `tolerations` | list | `[]` | Tolerations for scheduling |
-| `affinity` | object | `{}` | Pod affinity rules (overridden if explicitly set) |
-| `topologySpreadConstraints` | list | `[]` | Raw topology spread constraints |
-| `dnsPolicy` | string | `"ClusterFirst"` | DNS policy for Pod |
-| `hostNetwork` | bool | `false` | Use host network namespace |
-| `hostPID` | bool | `false` | Use host PID namespace |
-| `hostIPC` | bool | `false` | Use host IPC namespace |
-| `schedulerName` | string | `"default-scheduler"` | Scheduler to use |
-| `runtimeClassName` | string | `""` | RuntimeClass for Pod |
-| `enableServiceLinks` | bool | `false` | Inject service links into Pod |
-| `preemptionPolicy` | string | `""` | Pod preemption policy |
-| `volumes` | list | `[]` | Additional volumes |
-| `service.enabled` | bool | `true` | Create Service resource |
-| `service.type` | string | `"ClusterIP"` | Kubernetes Service type |
-| `service.annotations` | object | `{}` | Additional Service annotations |
-| `service.labels` | object | `{}` | Additional Service labels |
-| `service.ports` | list | See default | List of Service ports |
-| `bff.enabled` | bool | `true` | Deploy `bff` container |
-| `bff.name` | string | `"bff"` | Container name |
-| `bff.image.repository` | string | `"sgroups/openapi-ui-k8s-bff"` | BFF image repository |
-| `bff.image.tag` | string | `"main-d5191413"` | BFF image tag |
-| `bff.image.pullPolicy` | string | `"IfNotPresent"` | Image pull policy |
-| `bff.containerPort` | int | `64231` | Container port for BFF |
-| `bff.extraContainerPorts` | list | `[]` | Additional container ports |
-| `bff.env` | object | See default | Environment variables for BFF |
-| `bff.envFrom` | list | `[]` | ConfigMap/Secret references |
-| `bff.resources` | object | See default | Resource requests/limits |
-| `bff.securityContext.enabled` | bool | `true` | Enable security context |
-| `bff.livenessProbe.enabled` | bool | `true` | Enable liveness probe |
-| `bff.readinessProbe.enabled` | bool | `false` | Enable readiness probe |
-| `bff.volumeMounts` | list | `[]` | Additional volume mounts |
-| `bff.terminationMessagePath` | string | `"/dev/termination-log"` | Path for termination message |
-| `bff.terminationMessagePolicy` | string | `"File"` | Termination message policy |
-| `web.enabled` | bool | `true` | Deploy `web` container |
-| `web.name` | string | `"web"` | Container name |
-| `web.image.repository` | string | `"sgroups/openapi-ui"` | Web image repository |
-| `web.image.tag` | string | `"main-0b206491"` | Web image tag |
-| `web.image.pullPolicy` | string | `"IfNotPresent"` | Image pull policy |
-| `web.containerPort` | int | `8080` | Container port for Web UI |
-| `web.extraContainerPorts` | list | `[]` | Additional container ports |
-| `web.env` | object | See default | Environment variables for Web |
-| `web.envFrom` | list | `[]` | ConfigMap/Secret references |
-| `web.resources` | object | See default | Resource requests/limits |
-| `web.securityContext.enabled` | bool | `true` | Enable security context |
-| `web.livenessProbe.enabled` | bool | `true` | Enable liveness probe |
-| `web.readinessProbe.enabled` | bool | `false` | Enable readiness probe |
-| `web.volumeMounts` | list | `[]` | Additional volume mounts |
-| `web.terminationMessagePath` | string | `"/dev/termination-log"` | Path for termination message |
-| `web.terminationMessagePolicy` | string | `"File"` | Termination message policy |
-| `selectorLabels` | object | See default | Default selector labels |
-| `extraPodSpec` | object | `{}` | Raw extra PodSpec additions |
-| `extraTemplateMetadata.annotations` | object | `{}` | Extra template annotations |
-| `extraTemplateMetadata.labels` | object | `{}` | Extra template labels |
+| `nameOverride` | string | `""` | Override the chart name. |
+| `fullnameOverride` | string | `""` | Override the full release name. |
+| `replicaCount` | int | `1` | Number of Pod replicas. |
+| `imagePullSecrets` | list | `[]` | List of secrets for pulling images from private registries. |
+| `priorityClassName` | string | `"system-cluster-critical"` | Priority class name for the Pod. |
+| `serviceAccount.create` | bool | `true` | Whether to create a ServiceAccount. |
+| `serviceAccount.name` | string | `""` | Name of the ServiceAccount (defaults to `<release>-<chart>` if not set). |
+| `serviceAccount.annotations` | object | `{}` | Annotations to add to the ServiceAccount. |
+| `podAnnotations` | object | `{}` | Annotations to add to the Pod. |
+| `podLabels` | object | `{}` | Additional labels to add to the Pod. |
+| `podSecurityContext.enabled` | bool | `true` | Enable pod-level security context. |
+| `podSecurityContext.fsGroup` | int | `101` | Group ID for mounted volumes. |
+| `podSecurityContext.fsGroupChangePolicy` | string | `"OnRootMismatch"` | Policy for changing the fsGroup. |
+| `nodeSelector` | object | `{}` | Node selector for scheduling Pods. |
+| `tolerations` | list | `[]` | Tolerations for scheduling Pods. |
+| `affinity` | object | `{}` | Affinity rules for Pods (explicitly overrides defaults if set). |
+| `topologySpreadConstraints` | list | `[]` | Topology spread constraints for Pods. |
+| `dnsPolicy` | string | `"ClusterFirst"` | DNS policy for the Pod. |
+| `hostNetwork` | bool | `false` | Use the host's network namespace. |
+| `hostPID` | bool | `false` | Use the host's PID namespace. |
+| `hostIPC` | bool | `false` | Use the host's IPC namespace. |
+| `schedulerName` | string | `"default-scheduler"` | Scheduler name for the Pod. |
+| `runtimeClassName` | string | `""` | RuntimeClass for the Pod. |
+| `enableServiceLinks` | bool | `false` | Enable service links in the Pod. |
+| `preemptionPolicy` | string | `""` | Preemption policy for the Pod. |
+| `volumes` | list | `[]` | Additional volumes for the Pod. |
+| `service.enabled` | bool | `true` | Whether to create a Kubernetes Service resource. |
+| `service.type` | string | `"ClusterIP"` | Type of Kubernetes Service. |
+| `service.annotations` | object | `{}` | Annotations to add to the Service. |
+| `service.labels` | object | `{}` | Labels to add to the Service. |
+| `service.ports` | list | <!-- See default in values.yaml --> | List of ports for the Service. <!-- See default --> |
+| `bff.enabled` | bool | `true` | Enable the `bff` container. |
+| `bff.name` | string | `"bff"` | Name of the bff container. |
+| `bff.image.repository` | string | `"sgroups/openapi-ui-k8s-bff"` | bff image repository. |
+| `bff.image.tag` | string | `"main-d5191413"` | bff image tag. |
+| `bff.image.pullPolicy` | string | `"IfNotPresent"` | bff image pull policy. |
+| `bff.containerPort` | int | `64231` | Main port for the bff container. |
+| `bff.extraContainerPorts` | list | `[]` | Additional ports for the bff container. |
+| `bff.env` | object | <!-- See default in values.yaml --> | Environment variables for the bff container. <!-- See default --> |
+| `bff.envFrom` | list | `[]` | Environment variable sources (ConfigMap/Secret) for bff. |
+| `bff.resources` | object | <!-- See default in values.yaml --> | Resource requests and limits for the bff container. <!-- See default --> |
+| `bff.securityContext.enabled` | bool | `true` | Enable security context for the bff container. |
+| `bff.livenessProbe.enabled` | bool | `true` | Enable liveness probe for the bff container. |
+| `bff.readinessProbe.enabled` | bool | `false` | Enable readiness probe for the bff container. |
+| `bff.volumeMounts` | list | `[]` | Additional volume mounts for the bff container. |
+| `bff.terminationMessagePath` | string | `"/dev/termination-log"` | Path for the bff container's termination message. |
+| `bff.terminationMessagePolicy` | string | `"File"` | Termination message policy for the bff container. |
+| `web.enabled` | bool | `true` | Enable the `web` container. |
+| `web.name` | string | `"web"` | Name of the web container. |
+| `web.image.repository` | string | `"sgroups/openapi-ui"` | web image repository. |
+| `web.image.tag` | string | `"main-0b206491"` | web image tag. |
+| `web.image.pullPolicy` | string | `"IfNotPresent"` | web image pull policy. |
+| `web.containerPort` | int | `8080` | Main port for the web container. |
+| `web.extraContainerPorts` | list | `[]` | Additional ports for the web container. |
+| `web.env` | object | <!-- See default in values.yaml --> | Environment variables for the web container. <!-- See default --> |
+| `web.envFrom` | list | `[]` | Environment variable sources (ConfigMap/Secret) for web. |
+| `web.resources` | object | <!-- See default in values.yaml --> | Resource requests and limits for the web container. <!-- See default --> |
+| `web.securityContext.enabled` | bool | `true` | Enable security context for the web container. |
+| `web.livenessProbe.enabled` | bool | `true` | Enable liveness probe for the web container. |
+| `web.readinessProbe.enabled` | bool | `false` | Enable readiness probe for the web container. |
+| `web.volumeMounts` | list | `[]` | Additional volume mounts for the web container. |
+| `web.terminationMessagePath` | string | `"/dev/termination-log"` | Path for the web container's termination message. |
+| `web.terminationMessagePolicy` | string | `"File"` | Termination message policy for the web container. |
+| `nginx.enabled` | bool | `true` | Enable the `nginx` container. |
+| `nginx.name` | string | `"nginx"` | Name of the nginx container. |
+| `nginx.image.repository` | string |  | nginx image repository. <!-- See default --> |
+| `nginx.image.tag` | string |  | nginx image tag. <!-- See default --> |
+| `nginx.image.pullPolicy` | string |  | nginx image pull policy. <!-- See default --> |
+| `nginx.containerPort` | int |  | Main port for the nginx container. <!-- See default --> |
+| `nginx.extraContainerPorts` | list | `[]` | Additional ports for the nginx container. |
+| `nginx.env` | object | <!-- See default in values.yaml --> | Environment variables for the nginx container. <!-- See default --> |
+| `nginx.envFrom` | list | `[]` | Environment variable sources (ConfigMap/Secret) for nginx. |
+| `nginx.resources` | object | <!-- See default in values.yaml --> | Resource requests and limits for the nginx container. <!-- See default --> |
+| `nginx.securityContext.enabled` | bool | `true` | Enable security context for the nginx container. |
+| `nginx.livenessProbe.enabled` | bool | `true` | Enable liveness probe for the nginx container. |
+| `nginx.readinessProbe.enabled` | bool | `false` | Enable readiness probe for the nginx container. |
+| `nginx.volumeMounts` | list | `[]` | Additional volume mounts for the nginx container. |
+| `nginx.terminationMessagePath` | string |  | Path for the nginx container's termination message. <!-- See default --> |
+| `nginx.terminationMessagePolicy` | string |  | Termination message policy for the nginx container. <!-- See default --> |
+| `selectorLabels` | object | <!-- See default in values.yaml --> | Selector labels for the Pod. <!-- See default --> |
+| `extraPodSpec` | object | `{}` | Additional fields for the PodSpec. |
+| `extraTemplateMetadata.annotations` | object | `{}` | Additional annotations for the Pod template. |
+| `extraTemplateMetadata.labels` | object | `{}` | Additional labels for the Pod template. |

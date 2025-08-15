@@ -275,21 +275,3 @@ extraPodSpec: {}
 extraTemplateMetadata:
   annotations: {}
   labels: {}
-
-# --- Default affinity (anti-affinity example) ------------------------------
-affinity:
-  podAntiAffinity:
-    preferredDuringSchedulingIgnoredDuringExecution:
-      - weight: 100
-        podAffinityTerm:
-          labelSelector:
-            matchExpressions:
-              - key: app.kubernetes.io/name
-                operator: In
-                values:
-                  - appSpec
-              - key: app.kubernetes.io/instance
-                operator: In
-                values:
-                  - release-name
-          topologyKey: kubernetes.io/hostname
