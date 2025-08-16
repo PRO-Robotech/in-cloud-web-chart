@@ -5,11 +5,11 @@ description: Chart for configuring Kubernetes Web UI InCloud
 type: application
 
 # Chart (packaging) version — semver. Bump on ANY template/values change.
-version: 0.1.4
+version: 0.1.5
 
 # Application version — free-form string. Tie it to app images/tags you ship.
 # Tip: keep it in sync with image tags from values.yaml.
-appVersion: "RELEASE"
+appVersion: "main-8b17d640"
 
 # Minimal supported Kubernetes version (features used: apps/v1, probes, fsGroupChangePolicy, etc.)
 kubeVersion: ">=1.22.0-0"
@@ -40,9 +40,9 @@ maintainers:
 # Optional dependencies (uncomment if you add subcharts)
 dependencies:
   - name: incloud-web-resources
-    version: 0.1.0
+    version: 0.1.1
     repository: oci://registry-1.docker.io/prorobotech
-    condition: incloudWebResources.enabled
+    condition: incloud-web-resources.enabled
 
 annotations:
   # Artifact Hub metadata (optional but useful if you publish the chart)

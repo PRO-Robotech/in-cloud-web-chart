@@ -38,17 +38,11 @@ spec:
                 pathToNavigate:
                   type: string
                 keysToParse:
-                  type: array
-                  items:
-                    type: string
+                  x-kubernetes-preserve-unknown-fields: true
                 keysToParseSecond:
-                  type: array
-                  items:
-                    type: string
+                  x-kubernetes-preserve-unknown-fields: true
                 keysToParseThird:
-                  type: array
-                  items:
-                    type: string
+                  x-kubernetes-preserve-unknown-fields: true
       subresources:
         status: {}
       additionalPrinterColumns:
