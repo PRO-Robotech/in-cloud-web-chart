@@ -150,7 +150,7 @@ service:
 ingress:
   enabled: true
   # resourceType: allowed values [istio, ingress]
-  resourceType: istio
+  resourceType: ingress
 
   ingress:
     annotations: {}
@@ -168,7 +168,7 @@ ingress:
     virtualService:
       annotations: {}
       labels: {}
-  
+
   path: /
   # servicePort
   # if oauth2-proxy.enabled == true, set oauth2-proxy port
@@ -178,12 +178,12 @@ ingress:
   tls:
     # The source of the tls certificate. Set as "auto", "secret"
     # or "none" and fill the information in the corresponding section
-    # 1) auto: generate the tls certificate automatically
+    # 1) auto: generate the tls certificate automatically over CertManager
     # 2) secret: read the tls certificate from the specified secret.
     # The tls certificate can be generated manually or by cert manager
     # 3) none: configure no tls certificate for the ingress. If the default
     # tls certificate is configured in the ingress controller, choose this option
-    certSource: auto
+    certSource: none
     secret:
       # The name of secret which contains keys named:
       # "tls.crt" - the certificate
@@ -401,3 +401,5 @@ extraPodSpec: {}
 extraTemplateMetadata:
   annotations: {}
   labels: {}
+
+extraObjects: []

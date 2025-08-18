@@ -4,6 +4,7 @@ kind: Service
 metadata:
   # Service name will match the chart's fullname (can be overridden via values.yaml)
   name: {{ include "incloud-web.fullname" . }}
+  namespace: {{ .Release.Namespace }}
 
   # Base chart and application labels
   labels:
