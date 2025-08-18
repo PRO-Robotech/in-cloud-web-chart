@@ -1,0 +1,136 @@
+{{- $oauth    := index (index .Values "oauth2-proxy") "enabled" -}}
+{{- $istio    := .Values.ingress.istio -}}
+{{- $ingress  := .Values.ingress.ingress -}}
+{{- $tls      := .Values.ingress.tls -}}
+
+{{- if .Values.ingress.enabled -}}
+{{ if eq .Values.ingress.resourceType "istio" }}
+  {{- if $istio.gateway.enabled -}}
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: Gateway
+metadata:
+  name: {{ $istio.gateway.name }}
+  namespace: {{ .Release.Namespace }}
+  labels:
+  {{- include "incloud-web.selectorLabels" . | nindent 4 }}
+  {{- with $istio.gateway.labels }}
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+  {{- with $istio.gateway.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+spec:
+  selector:
+  {{- with $istio.gateway.istioLabelsSelector }}
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+  servers:
+    - port:
+        number: 80
+        name: http
+        protocol: HTTP
+      hosts:
+        - "{{ .Values.ingress.host }}"
+    {{ if or (eq $tls.certSource "auto") (eq $tls.certSource "secret") }}
+    - port:
+        number: 443
+        name: https
+        protocol: HTTPS
+      hosts:
+        - "{{ .Values.ingress.host }}"
+      tls:
+        mode: SIMPLE
+    {{ end }}
+    {{ if eq $tls.certSource "auto" }}
+        credentialName: {{ .Release.Name }}-cert-tls
+    {{ end }}
+    {{ if eq $tls.certSource "secret" }}
+        credentialName: {{ $tls.secret.secretName }}
+    {{ end }}
+  {{- end }}
+
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: {{ include "incloud-web.fullname" . }}
+  namespace: {{ .Release.Namespace }}
+  labels:
+  {{- include "incloud-web.selectorLabels" . | nindent 4 }}
+  {{- with $istio.virtualService.labels }}
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+  {{- with $istio.virtualService.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+spec:
+  hosts:
+    - "{{ .Values.ingress.host }}"
+  gateways:
+    - {{ $istio.gateway.name }}
+  http:
+  - name: {{ include "incloud-web.fullname" . }}
+    match:
+      - uri:
+          prefix: {{ .Values.ingress.path }}
+    route:
+    - destination:
+      {{ if $oauth }}
+        host: "{{ .Release.Name }}-oauth2-proxy"
+      {{ else }}
+        host: {{ include "incloud-web.fullname" . }}
+      {{ end }}
+        port:
+          number: {{ .Values.ingress.servicePort }}
+
+{{ else if eq .Values.ingress.resourceType "ingress" }}
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: {{ include "incloud-web.fullname" . }}
+  namespace: {{ .Release.Namespace }}
+  labels:
+  {{- include "incloud-web.selectorLabels" . | nindent 4 }}
+  {{- with $ingress.labels }}
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+  {{- with $ingress.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+spec:
+  {{- if $ingress.ingressClassName }}
+  ingressClassName: {{ $ingress.ingressClassName }}
+  {{- end }}
+  {{ if or (eq $tls.certSource "auto") (eq $tls.certSource "secret") }}
+  tls:
+    - hosts:
+        - "{{ .Values.ingress.host }}"
+    {{ if eq $tls.certSource "auto" }}
+      secretName: {{ .Release.Name }}-cert-tls
+    {{ end }}
+    {{ if eq $tls.certSource "secret" }}
+      secretName: {{ $tls.secret.secretName }}
+    {{ end }}
+  {{- end }}
+  rules:
+    - host: "{{ .Values.ingress.host }}"
+      http:
+        paths:
+        - path: {{ .Values.ingress.path }}
+          pathType: Prefix
+          backend:
+            service:
+            {{ if $oauth }}
+              name: "{{ .Release.Name }}-oauth2-proxy"
+            {{ else }}
+              name: {{ include "incloud-web.fullname" . }}
+            {{ end }}
+              port:
+                number: {{ .Values.ingress.servicePort }}
+{{- end }}
+{{- end }}
