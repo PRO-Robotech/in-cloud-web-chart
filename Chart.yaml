@@ -39,6 +39,11 @@ maintainers:
 
 # Optional dependencies (uncomment if you add subcharts)
 dependencies:
+  - name: oauth2-proxy
+    version: 7.18.0
+    repository: https://oauth2-proxy.github.io/manifests
+    condition: oauth2-proxy.enabled
+
   - name: incloud-web-resources
     version: 0.1.2
     repository: oci://registry-1.docker.io/prorobotech

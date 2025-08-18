@@ -9,6 +9,79 @@ incloud-web-resources:
     trivy:
       enabled: false
 
+oauth2-proxy:
+  enabled: true
+  priorityClassName: system-cluster-critical
+  config:
+    # OAuth Client ID and Client Secret issued by the identity provider (e.g., Dex, Keycloak, Google)
+    clientID: "XXXXX"
+    clientSecret: "YYYYY"
+    # Secret used to encrypt cookies. Must be a cryptographically strong value
+    # Create a new secret with the following command
+    # openssl rand -base64 32 | head -c 32 | base64
+    cookieSecret: "ZZZZZ"
+
+  extraArgs:
+    # Authentication provider type (e.g., oidc, google, github)
+    provider: oidc
+
+    # Display name shown on the login page for the provider
+    provider-display-name: Dex
+
+    # The backend application to proxy to after authentication
+    # Replace SVC and PORT with your internal Kubernetes service and port
+    upstream: "http://SVC:PORT"
+
+    # Callback URL where the identity provider redirects after login
+    # Must match the redirect URI configured in your IDP
+    redirect-url: "https://DOMAIN/oauth2/callback"
+
+    # Root URL of the OIDC identity provider (issuer)
+    # Should point to your IDP (e.g., Dex, Keycloak, Auth0)
+    oidc-issuer-url: "https://IDP_DOMAIN"
+
+    # Restrict login to specific email domains. Use "*" to allow all domains
+    # Example: "example.com" only allows users with @example.com
+    email-domain: "*"
+
+    # Forward the OAuth access token to the upstream application
+    # Passed in the 'X-Forwarded-Access-Token' header
+    pass-access-token: true
+
+    # Forward the Authorization header (e.g., Bearer token) to the upstream
+    # Useful if the backend application validates the token itself
+    pass-authorization-header: true
+
+    # How often to refresh the session cookie and revalidate the user
+    # Helps maintain active sessions without forcing re-login
+    cookie-refresh: 1h
+
+    # Name of the cookie used to store the authentication session
+    # Should be unique if multiple apps use the same domain
+    cookie-name: incloud
+
+    # Set the Secure flag on cookies — only send over HTTPS
+    # Should be true in production environments
+    cookie-secure: true
+
+    # Scopes requested from the identity provider
+    # Uncomment and customize if you need specific claims (e.g., groups)
+    # scope: "openid email profile groups offline_access"
+
+    # Skip showing the provider login button; redirect directly to IDP
+    # Enables seamless single sign-on experience
+    skip-provider-button: true
+
+    # OIDC prompt parameter. 'none' avoids login screen if session exists
+    # Enables silent authentication when possible
+    prompt: none
+
+    # URL prefix for oauth2-proxy endpoints (e.g., /oauth2/callback, /oauth2/sign_in)
+    proxy-prefix: /oauth2
+
+  service:
+    portNumber: 80
+
 # --- Global ----------------------------------------------------------------
 nameOverride: ""                  # Overrides chart name; leave empty to use default
 fullnameOverride: "" # Overrides full release name; leave empty to use default
@@ -73,6 +146,49 @@ service:
       port: 8082
       targetPort: 8082
       protocol: TCP
+
+ingress:
+  enabled: true
+  # resourceType: allowed values [istio, ingress]
+  resourceType: istio
+
+  ingress:
+    annotations: {}
+    labels: {}
+    ingressClassName: ""
+
+  istio:
+    gateway:
+      enabled: true
+      name: incloud-istio-gateway
+      istioLabelsSelector: {} # required value!
+        # istio: istio-ingressgateway
+      annotations: {}
+      labels: {}
+    virtualService:
+      annotations: {}
+      labels: {}
+  
+  path: /
+  # servicePort
+  # if oauth2-proxy.enabled == true, set oauth2-proxy port
+  # if oauth2-proxy.enabled == false, set incloud-web port
+  servicePort: 80
+  host: incloud.example.com
+  tls:
+    # The source of the tls certificate. Set as "auto", "secret"
+    # or "none" and fill the information in the corresponding section
+    # 1) auto: generate the tls certificate automatically
+    # 2) secret: read the tls certificate from the specified secret.
+    # The tls certificate can be generated manually or by cert manager
+    # 3) none: configure no tls certificate for the ingress. If the default
+    # tls certificate is configured in the ingress controller, choose this option
+    certSource: auto
+    secret:
+      # The name of secret which contains keys named:
+      # "tls.crt" - the certificate
+      # "tls.key" - the private key
+      secretName: ""
 
 # --- Container: bff --------------------------------------------------------
 bff:
@@ -157,9 +273,9 @@ web:
     INSTANCES_API_GROUP: "in-cloud.io"
     INSTANCES_RESOURCE_NAME: "instances"
     INSTANCES_VERSION: "v1alpha1"
-    LOGIN_URL: "/oauth/token"
+    LOGIN_URL: "/oauth2/sign_in"
     LOGIN_USERNAME_FIELD: "name"
-    LOGOUT_URL: "/oauth/logout"
+    LOGOUT_URL: "/oauth2/sign_out"
     MARKETPLACE_GROUP: "front.in-cloud.io"
     MARKETPLACE_KIND: "MarketplacePanel"
     MARKETPLACE_RESOURCE_NAME: "marketplacepanels"

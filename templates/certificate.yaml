@@ -1,0 +1,66 @@
+{{- if .Values.ingress.enabled -}}
+{{- if eq .Values.ingress.tls.certSource "auto" }}
+---
+apiVersion: cert-manager.io/v1
+kind: Issuer
+metadata:
+  name: {{ .Release.Name }}-selfsigned
+  namespace: {{ .Release.Namespace }}
+  labels:
+  {{- include "incloud-web.selectorLabels" . | nindent 4 }}
+spec:
+  selfSigned: {}
+
+---
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: {{ .Release.Name }}-ca
+  namespace: {{ .Release.Namespace }}
+  labels:
+  {{- include "incloud-web.selectorLabels" . | nindent 4 }}
+spec:
+  issuerRef:
+    group: cert-manager.io
+    kind: Issuer
+    name: selfsigned-issuer
+  privateKey:
+    algorithm: RSA
+    encoding: PKCS1
+    size: 4096
+  isCA: true
+  commonName: root-ca.{{ .Release.Name }}.{{ .Release.Namespace }}.svc
+  secretName: {{ .Release.Name }}-ca.crt
+
+---
+apiVersion: cert-manager.io/v1
+kind: Issuer
+metadata:
+  name: {{ .Release.Name }}
+  namespace: {{ .Release.Namespace }}
+  labels:
+  {{- include "incloud-web.selectorLabels" . | nindent 4 }}
+spec:
+  ca:
+    secretName: {{ .Release.Name }}-ca.crt
+
+---
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: {{ .Release.Name }}-cert
+  namespace: {{ .Release.Namespace }}
+  labels:
+  {{- include "incloud-web.selectorLabels" . | nindent 4 }}
+spec:
+  issuerRef:
+    group: cert-manager.io
+    kind: Issuer
+    name: {{ .Release.Name }}
+    namespace: {{ .Release.Namespace }}
+  dnsNames:
+    - "{{ $.Values.ingress.host }}"
+  commonName: "{{ $.Values.ingress.host }}"
+  secretName: {{ .Release.Name }}-cert-tls
+{{- end }}
+{{- end }}
