@@ -62,7 +62,13 @@ oauth2-proxy:
 
     # Set the Secure flag on cookies — only send over HTTPS
     # Should be true in production environments
-    cookie-secure: true
+    cookie-secure: false
+
+    # Skip SSL/TLS certificate verification when connecting to the upstream provider or OIDC issuer
+    # WARNING: This disables security checks for HTTPS connections and accepts any certificate, including invalid or self-signed ones
+    # Only use in trusted development or testing environments — NEVER in production
+    # Default: false (recommended for secure deployments)
+    ssl-insecure-skip-verify: true
 
     # Scopes requested from the identity provider
     # Uncomment and customize if you need specific claims (e.g., groups)
