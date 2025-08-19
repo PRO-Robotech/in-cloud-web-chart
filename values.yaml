@@ -80,7 +80,7 @@ bff:
   name: bff
   image:
     repository: prorobotech/openapi-ui-k8s-bff
-    tag: main-e188569a
+    tag: main-24cfd47b
     pullPolicy: IfNotPresent
   containerPort: 8082
   extraContainerPorts: []
@@ -144,7 +144,7 @@ web:
   name: web
   image:
     repository: prorobotech/openapi-ui
-    tag: main-8b17d640
+    tag: main-560d1137
     pullPolicy: IfNotPresent
   containerPort: 8080
   extraContainerPorts: []
