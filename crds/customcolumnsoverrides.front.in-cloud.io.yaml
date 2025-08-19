@@ -44,8 +44,7 @@ spec:
                       name:
                         type: string
                       customProps:
-                        type: object
-                        "x-kubernetes-preserve-unknown-fields": true
+                        x-kubernetes-preserve-unknown-fields: true
                     additionalProperties: true
                 additionalPrinterColumnsTrimLengths:
                   type: array
