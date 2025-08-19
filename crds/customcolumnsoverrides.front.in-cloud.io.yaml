@@ -36,7 +36,8 @@ spec:
                   type: array
                   items:
                     type: object
-                    required: [jsonPath, name]
+                    "x-kubernetes-preserve-unknown-fields": true
+                    required: [name]
                     properties:
                       jsonPath:
                         type: string
