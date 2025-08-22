@@ -37,6 +37,7 @@ spec:
         {{- toYaml . | nindent 8 }}
         {{- end }}
       annotations:
+        checksum/configmap: {{ include (print $.Template.BasePath "/configmap.yaml") . | sha256sum }}
         # Pod annotations
         {{- with .Values.podAnnotations }}
         {{- toYaml . | nindent 8 }}
@@ -110,6 +111,22 @@ spec:
           configMap:
             defaultMode: 420
             name: {{ default (printf "%s-nginx-config" (include "incloud-web.fullname" .)) .Values.nginx.configMapName }}
+          {{- if (eq .Values.internalTLS.certSource "certmanager") }}
+        - name: internal-cert
+          secret:
+            defaultMode: 420
+            secretName: {{ .Release.Name }}-cert-internal-tls
+          {{- end }}
+          {{- if (eq .Values.internalTLS.certSource "secret") }}
+        - name: dex-cert
+          secret:
+            defaultMode: 420
+            secretName: {{ .Values.internalTLS.secret.dex.secretName }}
+        - name: oauth2-proxy-cert
+          secret:
+            defaultMode: 420
+            secretName: {{ index (index .Values.internalTLS.secret "oauth2-proxy") "secretName" }}
+          {{- end }}
         {{- end }}
       {{- end }}
 
@@ -244,6 +261,16 @@ spec:
             - mountPath: /etc/nginx/conf.d/default.conf
               name: configuration-nginx-file
               subPath: nginx-config
+            {{- if (eq .Values.internalTLS.certSource "certmanager") }}
+            - mountPath: /etc/nginx/certs/internal
+              name: internal-cert
+            {{- end }}
+            {{- if (eq .Values.internalTLS.certSource "secret") }}
+            - mountPath: /etc/nginx/certs/dex
+              name: dex-cert
+            - mountPath: /etc/nginx/certs/oauth2-proxy
+              name: oauth2-proxy-cert
+            {{- end }}
             {{- with .Values.nginx.extraVolumeMounts }}
             {{- toYaml . | nindent 12 }}
             {{- end }}

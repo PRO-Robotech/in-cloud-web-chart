@@ -43,7 +43,10 @@ dependencies:
     version: 7.18.0
     repository: https://oauth2-proxy.github.io/manifests
     condition: oauth2-proxy.enabled
-
+  - name: dex
+    version: 0.23.1
+    repository: https://charts.dexidp.io
+    condition: dex.enabled
   - name: incloud-web-resources
     version: 0.1.2
     repository: oci://registry-1.docker.io/prorobotech
