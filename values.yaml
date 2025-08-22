@@ -10,16 +10,16 @@ incloud-web-resources:
       enabled: false
 
 oauth2-proxy:
-  enabled: true
+  enabled: false
   priorityClassName: system-cluster-critical
   config:
     # OAuth Client ID and Client Secret issued by the identity provider (e.g., Dex, Keycloak, Google)
-    clientID: "XXXXX"
-    clientSecret: "YYYYY"
+    clientID: "clientid"
+    clientSecret: "clientsecret"
     # Secret used to encrypt cookies. Must be a cryptographically strong value
     # Create a new secret with the following command
     # openssl rand -base64 32 | head -c 32 | base64
-    cookieSecret: "ZZZZZ"
+    cookieSecret: "Vy81NjF6ckxNeE5IVnFuMjFwbEl4dW9YUy8wQ2tUWVQ="
 
   extraArgs:
     # Authentication provider type (e.g., oidc, google, github)
@@ -30,15 +30,15 @@ oauth2-proxy:
 
     # The backend application to proxy to after authentication
     # Replace SVC and PORT with your internal Kubernetes service and port
-    upstream: "http://SVC:PORT"
+    upstream: "http://incloud-web-incloud-web-chart"
 
     # Callback URL where the identity provider redirects after login
     # Must match the redirect URI configured in your IDP
-    redirect-url: "https://DOMAIN/oauth2/callback"
+    redirect-url: "http://incloud-web-incloud-web-chart/oauth2/callback"
 
     # Root URL of the OIDC identity provider (issuer)
     # Should point to your IDP (e.g., Dex, Keycloak, Auth0)
-    oidc-issuer-url: "https://IDP_DOMAIN"
+    oidc-issuer-url: "http://incloud-web-incloud-web-chart/dex"
 
     # Restrict login to specific email domains. Use "*" to allow all domains
     # Example: "example.com" only allows users with @example.com
@@ -71,8 +71,8 @@ oauth2-proxy:
     ssl-insecure-skip-verify: true
 
     # Scopes requested from the identity provider
-    # Uncomment and customize if you need specific claims (e.g., groups)
-    # scope: "openid email profile groups offline_access"
+    # Customize if you need specific claims (e.g., groups)
+    scope: "openid email profile groups offline_access"
 
     # Skip showing the provider login button; redirect directly to IDP
     # Enables seamless single sign-on experience
@@ -85,8 +85,98 @@ oauth2-proxy:
     # URL prefix for oauth2-proxy endpoints (e.g., /oauth2/callback, /oauth2/sign_in)
     proxy-prefix: /oauth2
 
+    # tls-cert-file: /etc/ssl/tls/tls.crt
+    # tls-key-file: /etc/ssl/tls/tls.key
+
+  extraVolumes: []
+    # - name: internal-cert
+    #   secret:
+    #     defaultMode: 420
+    #     secretName: incloud-web-cert-internal-tls
+
+  extraVolumeMounts: []
+    # - mountPath: /etc/ssl/tls
+    #   name: internal-cert
+
+  httpScheme: http
   service:
-    portNumber: 80
+    portNumber: 4080
+
+dex:
+  enabled: false
+
+  config:
+    issuer: http://incloud-web-incloud-web-chart/dex
+
+    frontend:
+      issuerUrl: http://incloud-web-incloud-web-chart/dex
+      theme: "coreos"
+      issuer: "InCloud"
+
+    storage:
+      type: kubernetes
+      config:
+        inCluster: true
+
+    # web:
+    #   tlsCert: /etc/dex/tls/tls.crt
+    #   tlsKey: /etc/dex/tls/tls.key
+
+    expiry:
+      signingKeys: "6h"
+      idTokens: "24h"
+
+    logger:
+      level: debug
+      format: json
+
+    oauth2:
+      passwordConnector: local
+
+    enablePasswordDB: True
+
+    staticClients:
+      - id: "clientid"
+        name: "clientid"
+        secret: "clientsecret"
+        redirectURIs:
+          - "http://incloud-web-incloud-web-chart/oauth2/callback"
+
+    # u: admin@example.com
+    # p: admin
+    staticPasswords:
+      - email: "admin@example.com"
+        # bcrypt hash of the string "admin": $(echo admin | htpasswd -BinC 10 admin | cut -d: -f2)
+        hash: "$2y$10$OFnA7tTUKalTsIiIWzPSp.XE4MhyGSoYh8pzUYSBsuJnN2pcuM7wG"
+        username: "admin"
+        userID: "08a8684b-db88-4b73-90a9-3cd1661f5466"
+  # https:
+  #   enabled: true
+
+  service:
+    ports:
+      http:
+        port: 5556
+      https:
+        port: 5554
+
+  volumes: []
+    # - name: internal-cert
+    #   secret:
+    #     defaultMode: 420
+    #     secretName: incloud-web-cert-internal-tls
+
+  volumeMounts: []
+    # - mountPath: /etc/dex/tls
+    #   name: internal-cert
+
+# --- Cluster ---------------------------------------------------------------
+clusters:
+  - name: default
+    description: default
+    tenant: dev
+    scheme: http
+    api: incloud-web-incloud-web-chart
 
 # --- Global ----------------------------------------------------------------
 nameOverride: ""                  # Overrides chart name; leave empty to use default
@@ -153,8 +243,10 @@ service:
       targetPort: 8082
       protocol: TCP
 
-ingress:
-  enabled: true
+externalDomain: incloud-web-incloud-web-chart
+
+expose:
+  enabled: false
   # resourceType: allowed values [istio, ingress]
   resourceType: ingress
 
@@ -177,23 +269,57 @@ ingress:
 
   path: /
   # servicePort
-  # if oauth2-proxy.enabled == true, set oauth2-proxy port
-  # if oauth2-proxy.enabled == false, set incloud-web port
+  # set incloud-web port
   servicePort: 80
-  host: incloud.example.com
   tls:
-    # The source of the tls certificate. Set as "auto", "secret"
+    # The source of the tls certificate. Set as "certmanager", "secret"
     # or "none" and fill the information in the corresponding section
-    # 1) auto: generate the tls certificate automatically over CertManager
+    # 1) certmanager: generate the tls certificate automatically over CertManager
     # 2) secret: read the tls certificate from the specified secret.
     # The tls certificate can be generated manually or by cert manager
     # 3) none: configure no tls certificate for the ingress. If the default
     # tls certificate is configured in the ingress controller, choose this option
     certSource: none
+    certmanager:
+      # existingIssuer
+      # if you want to use an existing issuer, you must specify:
+      # kind (Issuer or ClusterIssuer) and name
+      existingIssuer:
+        kind: Issuer
+        name: ""
     secret:
       # The name of secret which contains keys named:
       # "tls.crt" - the certificate
       # "tls.key" - the private key
+      secretName: ""
+
+# The internal TLS used for in-cloud components secure communicating. In order to enable https
+# in each component tls cert files need to provided in advance.
+internalTLS:
+  # There are three ways to provide tls
+  # 1) "certmanager" will generate cert automatically
+  # 2) "secret" internal certificates from secret
+  # 3) "none" no certificates
+  certSource: none
+  certmanager:
+    # existingIssuer
+    # if you want to use an existing issuer, you must specify:
+    # kind (Issuer or ClusterIssuer) and name
+    existingIssuer:
+      kind: Issuer
+      name: ""
+  secret:
+    # Each name of secret must contain keys named:
+    # "tls.crt" - the certificate
+    # "tls.key" - the private key
+
+    # oauth2-proxy related cert configuration
+    oauth2-proxy:
+      # secret name for oauth2-proxy's tls certs
+      secretName: ""
+    # dex related cert configuration
+    dex:
+      # secret name for dex's tls certs
       secretName: ""
 
 # --- Container: bff --------------------------------------------------------
@@ -279,8 +405,8 @@ web:
     INSTANCES_API_GROUP: "in-cloud.io"
     INSTANCES_RESOURCE_NAME: "instances"
     INSTANCES_VERSION: "v1alpha1"
-    LOGIN_URL: "/oauth2/sign_in"
-    LOGIN_USERNAME_FIELD: "name"
+    LOGIN_URL: "/oauth2/userinfo"
+    LOGIN_USERNAME_FIELD: "email"
     LOGOUT_URL: "/oauth2/sign_out"
     MARKETPLACE_GROUP: "front.in-cloud.io"
     MARKETPLACE_KIND: "MarketplacePanel"

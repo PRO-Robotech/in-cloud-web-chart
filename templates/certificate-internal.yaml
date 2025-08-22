@@ -1,0 +1,46 @@
+{{- if (eq .Values.internalTLS.certSource "certmanager") }}
+{{- $extIssuer    := .Values.internalTLS.certmanager.existingIssuer -}}
+{{- $issuerKind   := "Issuer" -}}
+{{- $issuerName   := printf "%s-selfsigned-internal" .Release.Name -}}
+{{- if and $extIssuer.kind $extIssuer.name }}
+{{- $issuerKind   = $extIssuer.kind -}}
+{{- $issuerName   = $extIssuer.name -}}
+{{- else }}
+---
+apiVersion: cert-manager.io/v1
+kind: Issuer
+metadata:
+  name: {{ $issuerName }}
+  namespace: {{ .Release.Namespace }}
+  labels:
+  {{- include "incloud-web.selectorLabels" . | nindent 4 }}
+spec:
+  selfSigned: {}
+{{- end }}
+
+---
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: {{ .Release.Name }}-internal-cert
+  namespace: {{ .Release.Namespace }}
+  labels:
+  {{- include "incloud-web.selectorLabels" . | nindent 4 }}
+spec:
+  issuerRef:
+    group: cert-manager.io
+    kind: {{ $issuerKind }}
+    name: {{ $issuerName }}
+  dnsNames:
+    - "{{ .Release.Name }}-dex"
+    - "{{ .Release.Name }}-dex.{{ .Release.Namespace }}"
+    - "{{ .Release.Name }}-dex.{{ .Release.Namespace }}.svc"
+    - "{{ .Release.Name }}-incloud-web-chart"
+    - "{{ .Release.Name }}-incloud-web-chart.{{ .Release.Namespace }}"
+    - "{{ .Release.Name }}-incloud-web-chart.{{ .Release.Namespace }}.svc"
+    - "{{ .Release.Name }}-oauth2-proxy"
+    - "{{ .Release.Name }}-oauth2-proxy.{{ .Release.Namespace }}"
+    - "{{ .Release.Name }}-oauth2-proxy.{{ .Release.Namespace }}.svc"
+  commonName: "{{ .Release.Namespace }}.svc"
+  secretName: {{ .Release.Name }}-cert-internal-tls
+{{- end }}

@@ -1,3 +1,12 @@
+{{- $oauth          := index .Values "oauth2-proxy" -}}
+{{- $oauthPrefix    := index $oauth.extraArgs "proxy-prefix" -}}
+{{- $intCertSource  := .Values.internalTLS.certSource -}}
+{{- $intCertEnabled := (or (eq $intCertSource "certmanager") (eq $intCertSource "secret")) -}}
+{{- $intScheme      := ternary "https" "http" $intCertEnabled -}}
+{{- $extCertSource  := .Values.expose.tls.certSource -}}
+{{- $extScheme      := ternary "https" "http" (or (eq $extCertSource "certmanager") (eq $extCertSource "secret")) -}}
+
+---
 apiVersion: v1
 kind: ConfigMap
 metadata:
@@ -20,12 +29,12 @@ data:
       # Serve static JSON for cluster listing
       location ~ ^(/clusterlist|/api/clusters)$ {
         add_header Content-Type application/json;
-        set $cluster_list '[{"api":"default","description":"default","name":"default","tenant":"dev"}]';
+        set $cluster_list '{{ $.Values.clusters | toJson }}';
         return 200 $cluster_list;
       }
 
-      # Proxy /api/clusters/default to istio-ingressgateway with path rewrite
-      location /api/clusters/default {
+    {{ range $cluster := $.Values.clusters }}
+      location /api/clusters/{{ $cluster.name }} {
           proxy_http_version 1.1;
           proxy_set_header Upgrade $http_upgrade;
           proxy_set_header Connection $connection_upgrade;
@@ -35,9 +44,14 @@ data:
           proxy_send_timeout 86400s;
 
           # Remove prefix before proxying
-          rewrite /api/clusters/default/(.*) /$1 break;
-          proxy_pass http://127.0.0.1:{{ .Values.nginx.containerPort }};
+          rewrite /api/clusters/{{ $cluster.name }}/(.*) /$1 break;
+        {{ if eq $cluster.api $.Values.externalDomain }}
+          proxy_pass http://127.0.0.1:{{ $.Values.nginx.containerPort }};
+        {{ else }}
+          proxy_pass {{ $cluster.scheme }}://{{ $cluster.api }};
+        {{ end }}
       }
+    {{ end }}
 
       # Proxy /k8s requests to Kubernetes API server
       location /k8s {
@@ -48,7 +62,7 @@ data:
 
       # Proxy /openapi-bff to backend (BFF container)
       location /openapi-bff {
-          proxy_pass http://127.0.0.1:{{ .Values.bff.containerPort }};
+          proxy_pass http://127.0.0.1:{{ $.Values.bff.containerPort }};
       }
 
       # WebSocket proxy for BFF (e.g., event streams)
@@ -61,16 +75,21 @@ data:
           proxy_read_timeout 86400s;
           proxy_send_timeout 86400s;
 
-          proxy_pass http://127.0.0.1:{{ .Values.bff.containerPort }};
+          proxy_pass http://127.0.0.1:{{ $.Values.bff.containerPort }};
       }
 
       location = / {
-          return 301 {{ .Values.web.env.BASEPREFIX }};
+          return 301 {{ $extScheme }}://{{ $.Values.externalDomain }}{{ $.Values.web.env.BASEPREFIX }};
       }
 
       # Default route: serve frontend app from Web container
       location {{ .Values.web.env.BASEPREFIX }} {
-          proxy_pass http://127.0.0.1:{{ .Values.web.containerPort }};
+      {{ if $oauth }}
+        auth_request {{ $.Values.web.env.LOGIN_URL }};
+        error_page 401 = {{ $oauthPrefix }}/sign_in;
+      {{ end }}
+
+        proxy_pass http://127.0.0.1:{{ $.Values.web.containerPort }};
       }
 
       # Healthcheck endpoint
@@ -78,4 +97,34 @@ data:
           access_log off;
           return 200 "Healthy\n";
       }
+
+    {{ if and $.Values.dex.enabled $oauth.enabled }}
+      location /dex {
+      {{- if $intCertEnabled }}
+          proxy_ssl_verify on;
+        {{- if (eq .Values.internalTLS.certSource "secret") }}
+          proxy_ssl_trusted_certificate /etc/nginx/certs/dex/tls.crt;
+        {{- else }}
+          proxy_ssl_trusted_certificate /etc/nginx/certs/internal/tls.crt;
+        {{- end }}
+          proxy_pass {{ $intScheme }}://{{ .Release.Name }}-dex.{{ .Release.Namespace }}.svc:{{ $.Values.dex.service.ports.https.port }};
+      {{- else }}
+          proxy_pass {{ $intScheme }}://{{ .Release.Name }}-dex.{{ .Release.Namespace }}.svc:{{ $.Values.dex.service.ports.http.port }};
+      {{- end }}
+      }
+    {{ end }}
+
+    {{ if $oauth.enabled }}
+      location {{ $oauthPrefix }} {
+      {{- if $intCertEnabled }}
+          proxy_ssl_verify on;
+        {{- if (eq .Values.internalTLS.certSource "secret") }}
+          proxy_ssl_trusted_certificate /etc/nginx/certs/oauth2-proxy/tls.crt;
+        {{- else }}
+          proxy_ssl_trusted_certificate /etc/nginx/certs/internal/tls.crt;
+        {{- end }}
+      {{- end }}
+          proxy_pass {{ $intScheme }}://{{ .Release.Name }}-oauth2-proxy:{{ $oauth.service.portNumber }};
+      }
+    {{ end }}
     }
