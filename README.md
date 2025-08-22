@@ -17,13 +17,13 @@ All templates are structured according to Helm best practices and use helper tem
 
 ```bash
 # Install from local chart directory
-helm install incloud-web ./incloud-web -n default
+helm install incloud-web ./incloud-web --namespace default --set oauth2-proxy.enabled=true --set dex.enabled=true
 
 # Render manifests without installing
-helm template incloud-web ./incloud-web --namespace default
+helm template incloud-web ./incloud-web --namespace default --set oauth2-proxy.enabled=true --set dex.enabled=true
 
 # Upgrade an existing release
-helm upgrade incloud-web ./incloud-web -n default
+helm upgrade incloud-web ./incloud-web --namespace default --set oauth2-proxy.enabled=true --set dex.enabled=true
 ```
 
 ### Values

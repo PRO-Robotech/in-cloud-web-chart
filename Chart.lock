@@ -2,8 +2,11 @@ dependencies:
 - name: oauth2-proxy
   repository: https://oauth2-proxy.github.io/manifests
   version: 7.18.0
+- name: dex
+  repository: https://charts.dexidp.io
+  version: 0.23.1
 - name: incloud-web-resources
   repository: oci://registry-1.docker.io/prorobotech
   version: 0.1.2
-digest: sha256:7333e684bcddfeda05ec0354a9811eb3ef8d7eb1565f51f3d1b3192f0a7c5fd4
-generated: "2025-08-18T12:06:02.929096+03:00"
+digest: sha256:9e65ca72583ee7fb29e40d4e691e4f3900d403014ccbc9b8c6c27fe4b63b128b
+generated: "2025-08-26T12:51:28.557549+05:00"
