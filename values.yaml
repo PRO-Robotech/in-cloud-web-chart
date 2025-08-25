@@ -266,7 +266,7 @@ web:
   name: web
   image:
     repository: prorobotech/openapi-ui
-    tag: main-22c856d0
+    tag: main-34727f4a
     pullPolicy: IfNotPresent
   containerPort: 8080
   extraContainerPorts: []
@@ -292,6 +292,7 @@ web:
     PROJECTS_RESOURCE_NAME: "projects"
     PROJECTS_VERSION: "v1alpha1"
     USE_NAMESPACE_NAV: true
+    REMOVE_BACKLINKG: true
   envFrom: []
   resources:
     limits:
