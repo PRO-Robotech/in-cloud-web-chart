@@ -2,6 +2,7 @@
 {{- $tls      := $expose.tls -}}
 {{- $istio    := $expose.istio -}}
 {{- $ingress  := $expose.ingress -}}
+{{- $oauth    := index .Values "oauth2-proxy" -}}
 
 {{- if $expose.enabled -}}
   {{ if eq $expose.resourceType "istio" }}
@@ -78,9 +79,15 @@ spec:
           prefix: {{ $expose.path }}
     route:
     - destination:
+    {{ if $oauth.enabled }}
+        host: {{ .Release.Name }}-oauth2-proxy
+        port:
+          number: {{ $oauth.service.portNumber }}
+    {{ else }}
         host: {{ include "incloud-web.fullname" . }}
         port:
           number: {{ $expose.servicePort }}
+    {{ end }}
 
   {{ else if eq $expose.resourceType "ingress" }}
 ---
@@ -120,9 +127,16 @@ spec:
         - path: {{ $expose.path }}
           pathType: Prefix
           backend:
+    {{ if $oauth.enabled }}
+            service:
+              name: {{ .Release.Name }}-oauth2-proxy
+              port:
+                number: {{ $oauth.service.portNumber }}
+    {{ else }}
             service:
               name: {{ include "incloud-web.fullname" . }}
               port:
                 number: {{ $expose.servicePort }}
+    {{ end }}
   {{- end }}
 {{- end }}
