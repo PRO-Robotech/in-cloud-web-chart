@@ -55,6 +55,10 @@ data:
 
       # Proxy /k8s requests to Kubernetes API server
       location /k8s {
+      {{ if $oauth }}
+          auth_request {{ $.Values.web.env.LOGIN_URL }};
+          error_page 401 = {{ $oauthPrefix }}/sign_in;
+      {{ end }}
           # Remove /k8s prefix
           rewrite /k8s/(.*) /$1 break;
           proxy_pass https://kubernetes.default.svc:443;
@@ -62,11 +66,20 @@ data:
 
       # Proxy /openapi-bff to backend (BFF container)
       location /openapi-bff {
+      {{ if $oauth }}
+          auth_request {{ $.Values.web.env.LOGIN_URL }};
+          error_page 401 = {{ $oauthPrefix }}/sign_in;
+      {{ end }}
           proxy_pass http://127.0.0.1:{{ $.Values.bff.containerPort }};
       }
 
       # WebSocket proxy for BFF (e.g., event streams)
       location /openapi-bff-ws/ {
+      {{ if $oauth }}
+          auth_request {{ $.Values.web.env.LOGIN_URL }};
+          error_page 401 = {{ $oauthPrefix }}/sign_in;
+      {{ end }}
+
           proxy_http_version 1.1;
           proxy_set_header Upgrade $http_upgrade;
           proxy_set_header Connection $connection_upgrade;
