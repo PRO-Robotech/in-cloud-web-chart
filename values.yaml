@@ -1,6 +1,6 @@
 # --- Dependency ----------------------------------------------------------------
 incloud-web-resources:
-  enabled: true
+  enabled: false
   addons:
     argocd:
       enabled: false
