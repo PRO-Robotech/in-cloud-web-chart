@@ -48,7 +48,7 @@ dependencies:
     repository: https://charts.dexidp.io
     condition: dex.enabled
   - name: incloud-web-resources
-    version: 0.1.2
+    version: 0.1.3
     repository: oci://registry-1.docker.io/prorobotech
     condition: incloud-web-resources.enabled
 

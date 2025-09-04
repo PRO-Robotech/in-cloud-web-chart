@@ -7,6 +7,6 @@ dependencies:
   version: 0.23.1
 - name: incloud-web-resources
   repository: oci://registry-1.docker.io/prorobotech
-  version: 0.1.2
-digest: sha256:9e65ca72583ee7fb29e40d4e691e4f3900d403014ccbc9b8c6c27fe4b63b128b
-generated: "2025-08-26T12:51:28.557549+05:00"
+  version: 0.1.3
+digest: sha256:1cd74e0201822213680d77fdae35ece3f32cbe249c6de45d732bfeffbe9adc46
+generated: "2025-09-04T23:59:58.126330839+03:00"
