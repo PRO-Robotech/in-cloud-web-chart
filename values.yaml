@@ -266,7 +266,7 @@ web:
   name: web
   image:
     repository: prorobotech/openapi-ui
-    tag: main-90998ecf
+    tag: main-e91cc964
     pullPolicy: IfNotPresent
   containerPort: 8080
   extraContainerPorts: []
@@ -294,6 +294,7 @@ web:
     USE_NAMESPACE_NAV: true
     REMOVE_BACKLINK: true
     REMOVE_BACKLINK_TEXT: true
+    DOCS_URL: https://in-cloud.io/docs/tech-docs/introduction/
   envFrom: []
   resources:
     limits:
