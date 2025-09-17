@@ -392,7 +392,7 @@ web:
   name: web
   image:
     repository: prorobotech/openapi-ui
-    tag: main-4ee52e16
+    tag: main-24d2d90e
     pullPolicy: IfNotPresent
   containerPort: 8080
   extraContainerPorts: []
