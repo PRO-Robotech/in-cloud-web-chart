@@ -328,7 +328,7 @@ bff:
   name: bff
   image:
     repository: prorobotech/openapi-ui-k8s-bff
-    tag: rrelease-1.0.1-6b311203
+    tag: release-1.0.1-6b311203
     pullPolicy: IfNotPresent
   containerPort: 8082
   extraContainerPorts: []
