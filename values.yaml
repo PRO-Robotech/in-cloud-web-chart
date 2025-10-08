@@ -176,7 +176,7 @@ clusters:
     description: default
     tenant: dev
     scheme: http
-    api: incloud-web-incloud-web-chart
+    api: 127.0.0.1
 
 # --- Global ----------------------------------------------------------------
 nameOverride: ""                  # Overrides chart name; leave empty to use default
@@ -244,6 +244,7 @@ service:
       protocol: TCP
 
 externalDomain: incloud-web-incloud-web-chart
+externalDomainPort: 80
 
 expose:
   enabled: false
