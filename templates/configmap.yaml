@@ -92,7 +92,7 @@ data:
       }
 
       location = / {
-          return 301 {{ $extScheme }}://{{ $.Values.externalDomain }}{{ $.Values.web.env.BASEPREFIX }};
+          return 301 {{ $extScheme }}://{{ $.Values.externalDomain }}:{{ $.Values.externalDomainPort }}{{ $.Values.web.env.BASEPREFIX }};
       }
 
       # Default route: serve frontend app from Web container
