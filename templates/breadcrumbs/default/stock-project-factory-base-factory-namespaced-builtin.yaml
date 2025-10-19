@@ -1,0 +1,13 @@
+---
+apiVersion: front.in-cloud.io/v1alpha1
+kind: Breadcrumb
+metadata:
+  name: stock-project-factory-base-factory-namespaced-builtin
+spec:
+  breadcrumbItems:
+  - key: group-version
+    label: '{6}/{7}'
+    link: /openapi-ui/{clusterName}/{namespace}/builtin-table/{7}
+  - key: specific-name
+    label: '{8}'
+  id: stock-project-factory-base-factory-namespaced-builtin
