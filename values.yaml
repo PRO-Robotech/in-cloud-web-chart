@@ -334,7 +334,7 @@ bff:
   # Container image configuration
   image:
     repository: prorobotech/openapi-ui-k8s-bff
-    tag: release-1.0.2-08aa0208
+    tag: release-1.0.2-4b7124c2
     pullPolicy: IfNotPresent
 
   # Networking configuration for the container
@@ -350,6 +350,14 @@ bff:
     LOGGER_WITH_HEADERS: "TRUE"
     PORT: "8082"
     KUBE_API_URL: "https://kubernetes.default.svc"
+    BASE_CLUSTERNAME: "default"
+    BASE_FRONTEND_PREFIX: "/openapi-ui"
+    BASE_FACTORY_NAMESPACED_API_KEY: "base-factory-namespaced-api"
+    BASE_FACTORY_CLUSTERSCOPED_API_KEY: "base-factory-clusterscoped-api"
+    BASE_FACTORY_NAMESPACED_BUILTIN_KEY: "base-factory-namespaced-builtin"
+    BASE_FACTORY_CLUSTERSCOPED_BUILTIN_KEY: "base-factory-clusterscoped-builtin"
+    BASE_NAMESPACE_FACTORY_KEY: "namespace-details"
+
   envFrom: []
 
   # Resource requests and limits for CPU, memory and ephemeral storage
@@ -425,7 +433,7 @@ web:
   # Container image configuration
   image:
     repository: prorobotech/openapi-ui
-    tag: release-1.0.2-52255f57
+    tag: release-1.0.2-3ec22e8e
     pullPolicy: IfNotPresent
 
   # Networking configuration for the container
