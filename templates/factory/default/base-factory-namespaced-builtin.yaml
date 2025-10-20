@@ -9,7 +9,8 @@ spec:
   urlsToFetch:
   - /api/clusters/{2}/k8s/api/{6}/namespaces/{3}/{7}/{8}
   withScrollableMainContentCard: true
-
+  sidebarTags:
+    - '{6}/{7}'
   data:
   - children:
     - data:

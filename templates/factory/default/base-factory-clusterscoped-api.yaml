@@ -8,7 +8,8 @@ spec:
   urlsToFetch:
   - /api/clusters/{2}/k8s/apis/{5}/{6}/{7}/{8}
   withScrollableMainContentCard: true
-
+  sidebarTags:
+    - '{5}/{6}/{7}'
   data:
   - children:
     - data:
