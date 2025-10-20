@@ -3,12 +3,13 @@ apiVersion: front.in-cloud.io/v1alpha1
 kind: Factory
 metadata:
   name: base-factory-namespaced-builtin
+
+spec:
   key: base-factory-namespaced-builtin
   urlsToFetch:
   - /api/clusters/{2}/k8s/api/{6}/namespaces/{3}/{7}/{8}
   withScrollableMainContentCard: true
 
-spec:
   data:
   - children:
     - data:
@@ -166,26 +167,33 @@ spec:
                     id: created-time-block
                     vertical: true
                   type: antdFlex
-                - data:
-                    id: time-label
-                    strong: true
-                    text: Created
-                  type: antdText
-                - children:
-                  - data:
-                      id: time-icon
-                      text: "\U0001F310"
-                    type: antdText
-                  - data:
-                      formatter: timestamp
-                      id: time-value
-                      text: '{reqsJsonPath[0][".metadata.creationTimestamp"]["-"]}'
-                    type: parsedText
+                - type: antdFlex
                   data:
-                    align: center
-                    gap: 6
-                    id: time-block
-                  type: antdFlex
+                    id: created-time-block
+                    vertical: true
+                    gap: 4
+                  children:
+                    - data:
+                        id: time-label
+                        strong: true
+                        text: Created
+                      type: antdText
+                    - type: antdFlex
+                      data:
+                        id: time-block
+                        align: center
+                        gap: 6
+                      children:
+                        - data:
+                            id: time-icon
+                            text: "\U0001F310"
+                          type: antdText
+                        - data:
+                            formatter: timestamp
+                            id: time-value
+                            text: '{reqsJsonPath[0][".metadata.creationTimestamp"]["-"]}'
+                          type: parsedText
+
                 data:
                   gap: 24
                   id: left-stack
