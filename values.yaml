@@ -334,7 +334,7 @@ bff:
   # Container image configuration
   image:
     repository: prorobotech/openapi-ui-k8s-bff
-    tag: release-1.0.3-421f38a2
+    tag: release-1.0.3-8c82f7e0
     pullPolicy: IfNotPresent
 
   # Networking configuration for the container
@@ -433,7 +433,7 @@ web:
   # Container image configuration
   image:
     repository: prorobotech/openapi-ui
-    tag: release-1.0.3-322462f4
+    tag: release-1.0.3-a67e911b
     pullPolicy: IfNotPresent
 
   # Networking configuration for the container
@@ -443,6 +443,9 @@ web:
   # Environment variables that configure integration with APIs and UI behavior
   env:
     BASEPREFIX: "/openapi-ui"
+    TITLE_TEXT: "OpenAPI UI"
+    LOGO_TEXT: "In-Cloud"
+    FOOTER_TEXT: "PRO Robotech"
     CUSTOMIZATION_API_GROUP: "front.in-cloud.io"
     CUSTOMIZATION_API_VERSION: "v1alpha1"
     CUSTOMIZATION_NAVIGATION_RESOURCE: "navigation"
