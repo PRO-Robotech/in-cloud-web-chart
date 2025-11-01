@@ -245,10 +245,9 @@ spec:
               substractHeight: 315
               limit: 40
               fieldSelector:
-                involvedObject.kind: "{reqsJsonPath[0]['.involvedObject.kind']['-']}"
-                involvedObject.namespace: "{reqsJsonPath[0]['.involvedObject.namespace']['-']}"
-                involvedObject.name: "{reqsJsonPath[0]['.involvedObject.name']['-']}"
-                involvedObject.apiVersion: "{reqsJsonPath[0]['.involvedObject.apiVersion']['-']}"
+                regarding.kind: "{reqsJsonPath[0]['.kind']['-']}"
+                regarding.name: "{reqsJsonPath[0]['.metadata.name']['-']}"
+                regarding.apiVersion: "{reqsJsonPath[0]['.apiVersion']['-']}"
               baseFactoryNamespacedAPIKey: base-factory-namespaced-api
               baseFactoryClusterSceopedAPIKey: base-factory-clusterscoped-api
               baseFactoryNamespacedBuiltinKey: base-factory-namespaced-builtin
