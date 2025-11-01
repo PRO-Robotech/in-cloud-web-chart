@@ -260,4 +260,28 @@ spec:
           type: YamlEditorSingleton
         key: yaml
         label: YAML
+
+      - key: events
+        label: Events
+        children:
+          - type: Events
+            data:
+              id: events
+              baseprefix: "/openapi-ui"
+              clusterNamePartOfUrl: "{2}"
+              wsUrl: "/api/clusters/{2}/openapi-bff-ws/events/eventsWs"
+              pageSize: 50
+              substractHeight: 315
+              limit: 40
+              fieldSelector:
+                involvedObject.kind: "{reqsJsonPath[0]['.involvedObject.kind']['-']}"
+                involvedObject.namespace: "{reqsJsonPath[0]['.involvedObject.namespace']['-']}"
+                involvedObject.name: "{reqsJsonPath[0]['.involvedObject.name']['-']}"
+                involvedObject.apiVersion: "{reqsJsonPath[0]['.involvedObject.apiVersion']['-']}"
+              baseFactoryNamespacedAPIKey: base-factory-namespaced-api
+              baseFactoryClusterSceopedAPIKey: base-factory-clusterscoped-api
+              baseFactoryNamespacedBuiltinKey: base-factory-namespaced-builtin
+              baseFactoryClusterSceopedBuiltinKey: base-factory-clusterscoped-builtin
+              baseNamespaceFactoryKey: namespace-details
+
     type: antdTabs

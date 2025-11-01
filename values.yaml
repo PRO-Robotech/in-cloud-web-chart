@@ -356,7 +356,7 @@ bff:
     BASE_FACTORY_CLUSTERSCOPED_API_KEY: "base-factory-clusterscoped-api"
     BASE_FACTORY_NAMESPACED_BUILTIN_KEY: "base-factory-namespaced-builtin"
     BASE_FACTORY_CLUSTERSCOPED_BUILTIN_KEY: "base-factory-clusterscoped-builtin"
-    BASE_NAMESPACE_FACTORY_KEY: "base-factory-clusterscoped-builtin"
+    BASE_NAMESPACE_FACTORY_KEY: "details-namespace"
 
   envFrom: []
 
@@ -474,7 +474,7 @@ web:
     BASE_FACTORY_CLUSTERSCOPED_API_KEY: "base-factory-clusterscoped-api"
     BASE_FACTORY_NAMESPACED_BUILTIN_KEY: "base-factory-namespaced-builtin"
     BASE_FACTORY_CLUSTERSCOPED_BUILTIN_KEY: "base-factory-clusterscoped-builtin"
-    BASE_NAMESPACE_FACTORY_KEY: "base-factory-clusterscoped-builtin"
+    BASE_NAMESPACE_FACTORY_KEY: "details-namespace"
   envFrom: []
 
   # Resource requests and limits for CPU, memory and ephemeral storage
