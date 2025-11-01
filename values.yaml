@@ -334,7 +334,7 @@ bff:
   # Container image configuration
   image:
     repository: prorobotech/openapi-ui-k8s-bff
-    tag: release-1.0.3-3540632e
+    tag: release-1.0.3-421f38a2
     pullPolicy: IfNotPresent
 
   # Networking configuration for the container
@@ -356,7 +356,7 @@ bff:
     BASE_FACTORY_CLUSTERSCOPED_API_KEY: "base-factory-clusterscoped-api"
     BASE_FACTORY_NAMESPACED_BUILTIN_KEY: "base-factory-namespaced-builtin"
     BASE_FACTORY_CLUSTERSCOPED_BUILTIN_KEY: "base-factory-clusterscoped-builtin"
-    BASE_NAMESPACE_FACTORY_KEY: "namespace-details"
+    BASE_NAMESPACE_FACTORY_KEY: "base-factory-clusterscoped-builtin"
 
   envFrom: []
 
@@ -433,7 +433,7 @@ web:
   # Container image configuration
   image:
     repository: prorobotech/openapi-ui
-    tag: release-1.0.3-d1a1bd65
+    tag: release-1.0.3-7167864f
     pullPolicy: IfNotPresent
 
   # Networking configuration for the container
@@ -467,6 +467,11 @@ web:
     REMOVE_BACKLINK_TEXT: true
     DOCS_URL: https://in-cloud.io/docs/tech-docs/introduction/
     SEARCH_TABLE_CUSTOMIZATION_PREFIX: "stock-"
+    BASE_FACTORY_NAMESPACED_API_KEY: "base-factory-namespaced-api"
+    BASE_FACTORY_CLUSTERSCOPED_API_KEY: "base-factory-clusterscoped-api"
+    BASE_FACTORY_NAMESPACED_BUILTIN_KEY: "base-factory-namespaced-builtin"
+    BASE_FACTORY_CLUSTERSCOPED_BUILTIN_KEY: "base-factory-clusterscoped-builtin"
+    BASE_NAMESPACE_FACTORY_KEY: "base-factory-clusterscoped-builtin"
   envFrom: []
 
   # Resource requests and limits for CPU, memory and ephemeral storage
