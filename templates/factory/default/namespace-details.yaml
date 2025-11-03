@@ -243,6 +243,7 @@ spec:
                 substractHeight: 400
                 type: builtin
                 typeName: namespaces
+                readOnly: false
               
 
         - key: events
