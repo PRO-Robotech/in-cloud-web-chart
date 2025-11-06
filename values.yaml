@@ -334,7 +334,7 @@ bff:
   # Container image configuration
   image:
     repository: prorobotech/openapi-ui-k8s-bff
-    tag: release-1.1.0-3ffe719e
+    tag: release-1.1.0-f21547c3
     pullPolicy: IfNotPresent
 
   # Networking configuration for the container
@@ -357,6 +357,7 @@ bff:
     BASE_FACTORY_NAMESPACED_BUILTIN_KEY: "base-factory-namespaced-builtin"
     BASE_FACTORY_CLUSTERSCOPED_BUILTIN_KEY: "base-factory-clusterscoped-builtin"
     BASE_NAMESPACE_FACTORY_KEY: "details-namespace"
+    BASE_ALLOWED_AUTH_HEADERS: user-agent,accept,content-type,application/json,origin,referer,accept-encoding,cookie
 
   envFrom: []
 
