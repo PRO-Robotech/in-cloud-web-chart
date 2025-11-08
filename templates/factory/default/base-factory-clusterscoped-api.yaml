@@ -1,0 +1,257 @@
+---
+apiVersion: front.in-cloud.io/v1alpha1
+kind: Factory
+metadata:
+  name: base-factory-clusterscoped-api
+spec:
+  key: base-factory-clusterscoped-api
+  urlsToFetch:
+  - /api/clusters/{2}/k8s/apis/{5}/{6}/{7}/{8}
+  withScrollableMainContentCard: true
+  sidebarTags:
+    - '{5}/{6}/{7}'
+  data:
+  - children:
+    - data:
+        id: factory-resource-badge
+        style:
+          fontSize: 20px
+        value: '{reqsJsonPath[0][".kind"]["-"]}'
+      type: ResourceBadge
+    - data:
+        id: header-name
+        style:
+          fontFamily: RedHatDisplay, Overpass, overpass, helvetica, arial, sans-serif
+          fontSize: 20px
+          lineHeight: 24px
+        text: '{reqsJsonPath[0][".metadata.name"]["-"]}'
+      type: parsedText
+    data:
+      align: center
+      gap: 6
+      id: header-row
+      style:
+        marginBottom: 24px
+    type: antdFlex
+  - data:
+      defaultActiveKey: details
+      id: tabs-root
+      items:
+      - children:
+        - children:
+          - data:
+              id: details-title
+              strong: true
+              style:
+                fontSize: 20px
+                marginBottom: 12px
+                fontWeight: bold
+              text: '{reqsJsonPath[0][".kind"]["-"]} details'
+            type: parsedText
+          - data:
+              $space: 16
+              id: details-spacer
+            type: Spacer
+          - children:
+            - children:
+              - children:
+                - children:
+                  - data:
+                      id: field-name-label
+                      strong: true
+                      text: Name
+                    type: antdText
+                  - data:
+                      id: field-name-value
+                      text: '{reqsJsonPath[0][".metadata.name"]["-"]}'
+                    type: parsedText
+                  data:
+                    gap: 4
+                    id: field-name-block
+                    vertical: true
+                  type: antdFlex
+                - children:
+                  - data:
+                      id: labels-title
+                      strong: true
+                      style:
+                        fontSize: 14
+                      text: Labels
+                    type: antdText
+                  - data:
+                      containerStyle:
+                        marginTop: -30px
+                      editModalWidth: 650
+                      endpoint: /api/clusters/{2}/k8s/apis/{5}/{6}/{7}/{8}
+                      id: labels-editor
+                      inputLabel: ""
+                      jsonPathToLabels: .metadata.labels
+                      linkPrefix: /openapi-ui/{2}/search?kinds={5}~{6}~{7}&labels=
+                      maxEditTagTextLength: 35
+                      modalDescriptionText: ""
+                      modalTitle: Edit labels
+                      notificationSuccessMessage: Updated successfully
+                      notificationSuccessMessageDescription: Labels have been updated
+                      paddingContainerEnd: 24px
+                      pathToValue: /metadata/labels
+                      reqIndex: 0
+                      selectProps:
+                        maxTagTextLength: 35
+                    type: Labels
+                  data:
+                    gap: 8
+                    id: labels-block
+                    vertical: true
+                  type: antdFlex
+                - children:
+                  - data:
+                      id: annotations
+                      strong: true
+                      text: Annotations
+                    type: antdText
+                  - data:
+                      cols:
+                      - 11
+                      - 11
+                      - 2
+                      editModalWidth: 800px
+                      endpoint: /api/clusters/{2}/k8s/apis/{5}/{6}/{7}/{8}
+                      errorText: 0 Annotations
+                      id: annotations
+                      inputLabel: ""
+                      jsonPathToObj: .metadata.annotations
+                      modalDescriptionText: ""
+                      modalTitle: Edit annotations
+                      notificationSuccessMessage: Updated successfully
+                      notificationSuccessMessageDescription: Annotations have been
+                        updated
+                      pathToValue: /metadata/annotations
+                      reqIndex: 0
+                      text: ~counter~ Annotations
+                    type: Annotations
+                  data:
+                    gap: 4
+                    id: ds-annotations
+                    vertical: true
+                  type: antdFlex
+                - children: null
+                  data:
+                    gap: 4
+                    id: created-time-block
+                    vertical: true
+                  type: antdFlex
+                - type: antdFlex
+                  data:
+                    id: created-time-block
+                    vertical: true
+                    gap: 4
+                  children:
+                    - data:
+                        id: time-label
+                        strong: true
+                        text: Created
+                      type: antdText
+                    - type: antdFlex
+                      data:
+                        id: time-block
+                        align: center
+                        gap: 6
+                      children:
+                        - data:
+                            id: time-icon
+                            text: "\U0001F310"
+                          type: antdText
+                        - data:
+                            formatter: timestamp
+                            id: time-value
+                            text: '{reqsJsonPath[0][".metadata.creationTimestamp"]["-"]}'
+                          type: parsedText
+
+                data:
+                  gap: 24
+                  id: left-stack
+                  vertical: true
+                type: antdFlex
+              data:
+                id: details-col-left
+                span: 12
+              type: antdCol
+            data:
+              gutter:
+              - 48
+              - 12
+              id: details-grid
+            type: antdRow
+          - children:
+            - children:
+              - data:
+                  id: conditions-title
+                  strong: true
+                  style:
+                    fontSize: 22
+                  text: Conditions
+                type: antdText
+              - data:
+                  baseprefix: /openapi-ui
+                  clusterNamePartOfUrl: '{2}'
+                  customizationId: factory-status-conditions
+                  fetchUrl: /api/clusters/{2}/k8s/apis/{5}/{6}/{7}/{8}
+                  id: conditions-table
+                  pathToItems: .status.conditions
+                  withoutControls: true
+                type: EnrichedTable
+              data:
+                id: conditions-col
+                style:
+                  marginTop: 32px
+                  padding: 16px
+              type: antdCol
+            type: VisibilityContainer
+            data:
+              id: conditions-visibility-guard
+              value: '{reqsJsonPath[0][".status.conditions"]}'
+          data:
+            id: details-card
+            style:
+              marginBottom: 24px
+          type: ContentCard
+        key: details
+        label: Details
+      - children:
+        - data:
+            cluster: '{2}'
+            id: yaml-editor
+            isNameSpaced: false
+            prefillValuesRequestIndex: 0
+            substractHeight: 400
+            type: api
+            apiGroup: '{5}'
+            apiVersion: '{6}'
+            typeName: '{7}'
+          type: YamlEditorSingleton
+        key: yaml
+        label: YAML
+
+      - key: events
+        label: Events
+        children:
+          - type: Events
+            data:
+              id: events
+              baseprefix: "/openapi-ui"
+              clusterNamePartOfUrl: "{2}"
+              wsUrl: "/api/clusters/{2}/openapi-bff-ws/events/eventsWs"
+              pageSize: 50
+              substractHeight: 315
+              limit: 40
+              fieldSelector:
+                regarding.kind: "{reqsJsonPath[0]['.kind']['-']}"
+                regarding.name: "{reqsJsonPath[0]['.metadata.name']['-']}"
+                regarding.apiVersion: "{reqsJsonPath[0]['.apiVersion']['-']}"
+              baseFactoryNamespacedAPIKey: base-factory-namespaced-api
+              baseFactoryClusterSceopedAPIKey: base-factory-clusterscoped-api
+              baseFactoryNamespacedBuiltinKey: base-factory-namespaced-builtin
+              baseFactoryClusterSceopedBuiltinKey: base-factory-clusterscoped-builtin
+              baseNamespaceFactoryKey: namespace-details
+
+    type: antdTabs

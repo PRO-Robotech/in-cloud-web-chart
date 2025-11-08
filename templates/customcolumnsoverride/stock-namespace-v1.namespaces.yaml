@@ -1,0 +1,56 @@
+apiVersion: front.in-cloud.io/v1alpha1
+kind: CustomColumnsOverride
+metadata:
+  name: stock-namespace-v1.namespaces
+spec:
+  additionalPrinterColumns:
+  - customProps:
+      disableEventBubbling: true
+      items:
+      - children:
+        - data:
+            id: example-resource-badge
+            value: Namespace
+          type: ResourceBadge
+        - data:
+            href: /openapi-ui/{2}/factory/namespace-details/{reqsJsonPath[0]['.metadata.name']['-']}
+            id: name-link
+            text: '{reqsJsonPath[0][".metadata.name"]["-"]}'
+          type: antdLink
+        data:
+          align: center
+          direction: row
+          gap: 6
+          id: resource-badge-link-row
+        type: antdFlex
+    jsonPath: .metadata.name
+    name: Name
+    type: factory
+  - jsonPath: .status.phase
+    name: Status
+    type: string
+  - customProps:
+      disableEventBubbling: true
+      items:
+      - children:
+        - data:
+            id: time-icon
+            text: "\U0001F310"
+          type: antdText
+        - data:
+            formatter: timestamp
+            id: time-value
+            text: '{reqsJsonPath[0][".metadata.creationTimestamp"]["-"]}'
+          type: parsedText
+        data:
+          align: center
+          gap: 6
+          id: time-block
+        type: antdFlex
+    jsonPath: .metadata.creationTimestamp
+    name: Created
+    type: factory
+  additionalPrinterColumnsTrimLengths:
+  - key: Name
+    value: 64
+  id: stock-namespace-/v1/namespaces

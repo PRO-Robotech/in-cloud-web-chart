@@ -1,0 +1,13 @@
+---
+apiVersion: front.in-cloud.io/v1alpha1
+kind: Breadcrumb
+metadata:
+  name: stock-cluster-factory-base-factory-clusterscoped-api
+spec:
+  breadcrumbItems:
+  - key: group-version
+    label: '{5}/{6}/{7}'
+    link: /openapi-ui/{clusterName}/api-table/{5}/{6}/{7}
+  - key: specific-name
+    label: '{8}'
+  id: stock-cluster-factory-base-factory-clusterscoped-api
