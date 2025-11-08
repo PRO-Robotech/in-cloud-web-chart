@@ -5,11 +5,11 @@ description: Chart for configuring Kubernetes Web UI InCloud
 type: application
 
 # Chart (packaging) version — semver. Bump on ANY template/values change.
-version: 0.1.7-dev
+version: 1.0.3
 
 # Application version — free-form string. Tie it to app images/tags you ship.
 # Tip: keep it in sync with image tags from values.yaml.
-appVersion: "main-8b17d640"
+appVersion: "main-19509fe"
 
 # Minimal supported Kubernetes version (features used: apps/v1, probes, fsGroupChangePolicy, etc.)
 kubeVersion: ">=1.22.0-0"
