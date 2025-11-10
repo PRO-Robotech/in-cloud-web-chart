@@ -334,7 +334,7 @@ bff:
   # Container image configuration
   image:
     repository: prorobotech/openapi-ui-k8s-bff
-    tag: release-1.1.0-9090829d
+    tag: release-1.1.0-0e199f50
     pullPolicy: IfNotPresent
 
   # Networking configuration for the container
@@ -434,7 +434,7 @@ web:
   # Container image configuration
   image:
     repository: prorobotech/openapi-ui
-    tag: release-1.1.0-ce543fda
+    tag: release-1.1.0-c09e6fdb
     pullPolicy: IfNotPresent
 
   # Networking configuration for the container
