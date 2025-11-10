@@ -59,9 +59,21 @@ data:
           auth_request {{ $.Values.web.env.LOGIN_URL }};
           error_page 401 = {{ $oauthPrefix }}/sign_in;
       {{ end }}
-          # Remove /k8s prefix
-          rewrite /k8s/(.*) /$1 break;
-          proxy_pass https://kubernetes.default.svc:443;
+
+        # --- WebSocket / streaming essentials ---
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection $connection_upgrade;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_set_header Host $host;
+        proxy_read_timeout 86400s;
+        proxy_send_timeout 86400s;
+        proxy_buffering off;           # avoid buffering for watch/WS
+        proxy_request_buffering off;   # avoid request buffering
+
+        # Remove /k8s prefix and proxy to apiserver service
+        rewrite /k8s/(.*) /$1 break;
+        proxy_pass https://kubernetes.default.svc:443;
       }
 
       # Proxy /openapi-bff to backend (BFF container)
