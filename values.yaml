@@ -243,8 +243,8 @@ service:
       targetPort: 8082
       protocol: TCP
 
-externalDomain: incloud-web-incloud-web-chart
-externalDomainPort: 80
+externalDomain: 127.0.0.1
+externalDomainPort: 8081
 
 expose:
   enabled: false
