@@ -334,7 +334,7 @@ bff:
   # Container image configuration
   image:
     repository: prorobotech/openapi-ui-k8s-bff
-    tag: release-1.1.0-466ff6e2
+    tag: release-1.1.0-a604aa32
     pullPolicy: IfNotPresent
 
   # Networking configuration for the container
@@ -357,6 +357,8 @@ bff:
     BASE_FACTORY_CLUSTERSCOPED_BUILTIN_KEY: "base-factory-clusterscoped-builtin"
     BASE_NAMESPACE_FACTORY_KEY: "details-namespace"
     BASE_ALLOWED_AUTH_HEADERS: user-agent,accept,content-type,origin,referer,accept-encoding,cookie
+    BASE_NAVIGATION_RESOURCE_PLURAL_NAME: "navigations"
+    BASE_NAVIGATION_RESOURCE_SPEICIFC_NAME: "navigation"
 
   envFrom: []
 
@@ -433,7 +435,7 @@ web:
   # Container image configuration
   image:
     repository: prorobotech/openapi-ui
-    tag: release-1.1.0-82d6ba67
+    tag: release-1.1.0-80f7c9ac
     pullPolicy: IfNotPresent
 
   # Networking configuration for the container
