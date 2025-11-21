@@ -33,7 +33,7 @@ spec:
                 - type
                 # - apiGroup
                 # - apiVersion
-                - typeName
+                - plural
               properties:
                 name:
                   type: string
@@ -46,7 +46,7 @@ spec:
                   type: string
                 apiVersion:
                   type: string
-                typeName:
+                plural:
                   type: string
                 disabled:
                   type: boolean
