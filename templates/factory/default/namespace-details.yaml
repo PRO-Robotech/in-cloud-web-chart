@@ -242,7 +242,7 @@ spec:
                 prefillValuesRequestIndex: 0
                 substractHeight: 400
                 type: builtin
-                typeName: namespaces
+                plural: namespaces
                 readOnly: false
               
 
@@ -253,7 +253,7 @@ spec:
               data:
                 id: events
                 baseprefix: "/openapi-ui"
-                clusterNamePartOfUrl: "{2}"
+                cluster: "{2}"
                 wsUrl: "/api/clusters/{2}/openapi-bff-ws/events/eventsWs"
                 pageSize: 50
                 substractHeight: 315
