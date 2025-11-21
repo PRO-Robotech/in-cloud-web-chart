@@ -334,7 +334,7 @@ bff:
   # Container image configuration
   image:
     repository: prorobotech/openapi-ui-k8s-bff
-    tag: release-1.1.0-a604aa32
+    tag: release-1.1.0-b732baf5
     pullPolicy: IfNotPresent
 
   # Networking configuration for the container
@@ -357,8 +357,8 @@ bff:
     BASE_FACTORY_CLUSTERSCOPED_BUILTIN_KEY: "base-factory-clusterscoped-builtin"
     BASE_NAMESPACE_FACTORY_KEY: "details-namespace"
     BASE_ALLOWED_AUTH_HEADERS: user-agent,accept,content-type,origin,referer,accept-encoding,cookie
-    BASE_NAVIGATION_RESOURCE_PLURAL_NAME: "navigations"
-    BASE_NAVIGATION_RESOURCE_SPEICIFC_NAME: "navigation"
+    BASE_NAVIGATION_RESOURCE_PLURAL: "navigations"
+    BASE_NAVIGATION_RESOURCE_NAME: "navigation"
 
   envFrom: []
 
@@ -435,7 +435,7 @@ web:
   # Container image configuration
   image:
     repository: prorobotech/openapi-ui
-    tag: release-1.1.0-81f60523
+    tag: release-1.1.0-e8e56421
     pullPolicy: IfNotPresent
 
   # Networking configuration for the container
@@ -456,23 +456,21 @@ web:
     HIDE_INSIDE: true
     CUSTOMIZATION_API_GROUP: "front.in-cloud.io"
     CUSTOMIZATION_API_VERSION: "v1alpha1"
-    CUSTOMIZATION_NAVIGATION_RESOURCE: "navigation"
+    CUSTOMIZATION_NAVIGATION_RESOURCE_PLURAL: "navigation"
     CUSTOMIZATION_NAVIGATION_RESOURCE_NAME: "navigations"
     INSTANCES_API_GROUP: "in-cloud.io"
-    INSTANCES_RESOURCE_NAME: "instances"
-    INSTANCES_VERSION: "v1alpha1"
+    INSTANCES_PLURAL: "instances"
+    INSTANCES_API_VERSION: "v1alpha1"
     LOGIN_URL: "/oauth2/userinfo"
     LOGIN_USERNAME_FIELD: "email"
     LOGOUT_URL: "/oauth2/sign_out"
-    MARKETPLACE_GROUP: "front.in-cloud.io"
     MARKETPLACE_KIND: "MarketplacePanel"
-    MARKETPLACE_RESOURCE_NAME: "marketplacepanels"
-    MARKETPLACE_VERSION: "v1alpha1"
+    MARKETPLACE_PLURAL: "marketplacepanels"
     NAVIGATE_FROM_CLUSTERLIST: "/openapi-ui/~recordValue~/builtin-table/pods"
     NODE_TERMINAL_DEFAULT_PROFILE: "general"
     PROJECTS_API_GROUP: "in-cloud.io"
-    PROJECTS_RESOURCE_NAME: "projects"
-    PROJECTS_VERSION: "v1alpha1"
+    PROJECTS_PLURAL: "projects"
+    PROJECTS_API_VERSION: "v1alpha1"
     USE_NAMESPACE_NAV: true
     REMOVE_BACKLINK: true
     REMOVE_BACKLINK_TEXT: true

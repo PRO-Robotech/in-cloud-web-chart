@@ -222,7 +222,7 @@ spec:
                 type: antdText
               - data:
                   baseprefix: /openapi-ui
-                  clusterNamePartOfUrl: '{2}'
+                  cluster: '{2}'
                   customizationId: factory-status-conditions
                   fetchUrl: /api/clusters/{2}/k8s/apis/{6}/{7}/namespaces/{3}/{8}/{9}
                   id: conditions-table
@@ -256,7 +256,7 @@ spec:
             type: api
             apiGroup: '{6}'
             apiVersion: '{7}'
-            typeName: '{8}'
+            plural: '{8}'
           type: YamlEditorSingleton
         key: yaml
         label: YAML
@@ -268,7 +268,7 @@ spec:
             data:
               id: events
               baseprefix: "/openapi-ui"
-              clusterNamePartOfUrl: "{2}"
+              cluster: "{2}"
               wsUrl: "/api/clusters/{2}/openapi-bff-ws/events/eventsWs"
               pageSize: 50
               substractHeight: 315
