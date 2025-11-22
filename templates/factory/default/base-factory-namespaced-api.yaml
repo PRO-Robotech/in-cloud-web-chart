@@ -9,8 +9,8 @@ spec:
 
   urlsToFetch:
     - cluster: "{2}"
-      group: "{6}"
-      version: "{7}"
+      apiGroup: "{6}"
+      apiVersion: "{7}"
       namespace: "{3}"
       plural: "{8}"
       fieldSelector: "metadata.name={9}"
@@ -280,14 +280,14 @@ spec:
                           - type: EnrichedTable
                             data:
                               baseprefix: /openapi-ui
-                              clusterNamePartOfUrl: '{2}'
+                              cluster: '{2}'
                               customizationId: factory-status-conditions
                               id: conditions-table
                               pathToItems: .items.0.status.conditions
                               withoutControls: true
                               k8sResourceToFetch:
-                                group: "{6}"
-                                version: "{7}"
+                                apiGroup: "{6}"
+                                apiVersion: "{7}"
                                 namespace: "{3}"
                                 plural: "{8}"
                               fieldSelector:
@@ -306,7 +306,7 @@ spec:
                   substractHeight: 400
                   type: api
                   pathToData: .items.0
-                  forcedKind: '{reqsJsonPath[0][".items.0.kind"]}'
+                  # forcedKind: '{reqsJsonPath[0][".items.0.kind"]}'
                   apiGroup: '{6}'
                   apiVersion: '{7}'
                   typeName: '{8}'
@@ -319,7 +319,7 @@ spec:
                 data:
                   id: events
                   baseprefix: "/openapi-ui"
-                  clusterNamePartOfUrl: "{2}"
+                  cluster: "{2}"
                   wsUrl: "/api/clusters/{2}/openapi-bff-ws/events/eventsWs"
                   pageSize: 50
                   substractHeight: 315
