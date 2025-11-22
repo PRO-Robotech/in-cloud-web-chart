@@ -9,7 +9,7 @@ spec:
 
   urlsToFetch:
     - cluster: "{2}"
-      version: "{5}"
+      apiVersion: "{5}"
       plural: "{6}"
       fieldSelector: "metadata.name={7}"
 
@@ -243,14 +243,13 @@ spec:
                           - type: EnrichedTable
                             data:
                               baseprefix: /openapi-ui
-                              clusterNamePartOfUrl: '{2}'
+                              cluster: '{2}'
                               customizationId: factory-status-conditions
                               id: conditions-table
                               pathToItems: .items.0.status.conditions
                               withoutControls: true
                               k8sResourceToFetch:
-                                group: "{5}"
-                                version: "{6}"
+                                apiVersion: "{6}"
                                 plural: "{7}"
                               fieldSelector:
                                 metadata.name: "{8}"
@@ -270,7 +269,7 @@ spec:
                   substractHeight: 400
                   type: builtin
                   pathToData: .items.0
-                  forcedKind: '{reqsJsonPath[0][".items.0.kind"]}'
+                  # forcedKind: '{reqsJsonPath[0][".items.0.kind"]}'
                   apiVersion: '{5}'
                   typeName: '{6}'
 
@@ -283,15 +282,15 @@ spec:
                 data:
                   id: events
                   baseprefix: "/openapi-ui"
-                  clusterNamePartOfUrl: "{2}"
+                  cluster: "{2}"
                   wsUrl: "/api/clusters/{2}/openapi-bff-ws/events/eventsWs"
                   pageSize: 50
                   substractHeight: 315
                   limit: 40
                   fieldSelector:
-                    regarding.kind: "{reqsJsonPath[0]['.kind']['-']}"
-                    regarding.name: "{reqsJsonPath[0]['.metadata.name']['-']}"
-                    regarding.apiVersion: "{reqsJsonPath[0]['.apiVersion']['-']}"
+                    regarding.kind: "{reqsJsonPath[0]['.items.0.kind']['-']}"
+                    regarding.name: "{reqsJsonPath[0]['.items.0.metadata.name']['-']}"
+                    regarding.apiVersion: "{reqsJsonPath[0]['.items.0.apiVersion']['-']}"
                   baseFactoryNamespacedAPIKey: base-factory-namespaced-api
                   baseFactoryClusterSceopedAPIKey: base-factory-clusterscoped-api
                   baseFactoryNamespacedBuiltinKey: base-factory-namespaced-builtin
