@@ -259,7 +259,7 @@ spec:
                 substractHeight: 315
                 limit: 40
                 fieldSelector:
-                  regarding.namespace: "{5}"
+                  regarding.namespace: "{7}"
                 baseFactoryNamespacedAPIKey: base-factory-namespaced-api
                 baseFactoryClusterSceopedAPIKey: base-factory-clusterscoped-api
                 baseFactoryNamespacedBuiltinKey: base-factory-namespaced-builtin
