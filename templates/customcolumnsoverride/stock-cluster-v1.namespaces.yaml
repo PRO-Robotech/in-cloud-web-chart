@@ -13,7 +13,7 @@ spec:
             value: Namespace
           type: ResourceBadge
         - data:
-            href: /openapi-ui/{2}/factory/namespace-details/{reqsJsonPath[0]['.metadata.name']['-']}
+            href: /openapi-ui/{2}/factory/namespace-details/v1/namespaces/{reqsJsonPath[0]['.metadata.name']['-']}
             id: name-link
             text: '{reqsJsonPath[0][".metadata.name"]["-"]}'
           type: antdLink

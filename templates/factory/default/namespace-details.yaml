@@ -8,9 +8,9 @@ spec:
   - namespace-details
   urlsToFetch:
     - cluster: "{2}"
-      apiVersion: "v1"
-      plural: "namespaces"
-      fieldSelector: "metadata.name={5}"
+      apiVersion: "{5}"
+      plural: "{6}"
+      fieldSelector: "metadata.name={7}"
 
   withScrollableMainContentCard: true
 
