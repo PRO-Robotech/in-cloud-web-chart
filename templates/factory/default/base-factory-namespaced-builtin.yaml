@@ -308,7 +308,7 @@ spec:
                   pathToData: .items.0
                   # forcedKind: '{reqsJsonPath[0][".items.0.kind"]}'
                   apiVersion: '{6}'
-                  typeName: '{7}'
+                  plural: '{7}'
 
 
           - key: events
