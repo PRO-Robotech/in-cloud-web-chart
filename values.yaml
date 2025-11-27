@@ -466,7 +466,7 @@ web:
     LOGOUT_URL: "/oauth2/sign_out"
     MARKETPLACE_KIND: "MarketplacePanel"
     MARKETPLACE_PLURAL: "marketplacepanels"
-    NAVIGATE_FROM_CLUSTERLIST: "/openapi-ui/~recordValue~/builtin-table/pods"
+    NAVIGATE_FROM_CLUSTERLIST: "/openapi-ui/~recordValue~/builtin-table/pods?resources=metrics.k8s.io/v1beta1/pods"
     NODE_TERMINAL_DEFAULT_PROFILE: "general"
     PROJECTS_API_GROUP: "in-cloud.io"
     PROJECTS_PLURAL: "projects"
