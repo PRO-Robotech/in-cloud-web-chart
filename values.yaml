@@ -355,7 +355,7 @@ bff:
     BASE_FACTORY_CLUSTERSCOPED_API_KEY: "base-factory-clusterscoped-api"
     BASE_FACTORY_NAMESPACED_BUILTIN_KEY: "base-factory-namespaced-builtin"
     BASE_FACTORY_CLUSTERSCOPED_BUILTIN_KEY: "base-factory-clusterscoped-builtin"
-    BASE_NAMESPACE_FACTORY_KEY: "details-namespace"
+    BASE_NAMESPACE_FACTORY_KEY: "namespace-details/v1/namespaces"
     BASE_ALLOWED_AUTH_HEADERS: user-agent,accept,content-type,origin,referer,accept-encoding,cookie
     BASE_NAVIGATION_RESOURCE_PLURAL: "navigations"
     BASE_NAVIGATION_RESOURCE_NAME: "navigation"
@@ -480,7 +480,7 @@ web:
     BASE_FACTORY_CLUSTERSCOPED_API_KEY: "base-factory-clusterscoped-api"
     BASE_FACTORY_NAMESPACED_BUILTIN_KEY: "base-factory-namespaced-builtin"
     BASE_FACTORY_CLUSTERSCOPED_BUILTIN_KEY: "base-factory-clusterscoped-builtin"
-    BASE_NAMESPACE_FACTORY_KEY: "details-namespace"
+    BASE_NAMESPACE_FACTORY_KEY: "namespace-details/v1/namespaces"
     CUSTOMIZATION_SIDEBAR_FALLBACK_ID: "fallback"
   envFrom: []
 
