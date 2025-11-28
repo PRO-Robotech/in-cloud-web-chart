@@ -149,7 +149,7 @@ spec:
                                       - type: antdLink
                                         data:
                                           id: namespace-link
-                                          href: /openapi-ui/{2}/factory/namespace-details/{reqsJsonPath[0]['.items.0.metadata.namespace']['-']}
+                                          href: /openapi-ui/{2}/factory/namespace-details/v1/namespaces/{reqsJsonPath[0]['.items.0.metadata.namespace']['-']}
                                           text: '{reqsJsonPath[0][".items.0.metadata.namespace"]["-"]}'
 
 
