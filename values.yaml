@@ -355,7 +355,7 @@ bff:
     BASE_FACTORY_CLUSTERSCOPED_API_KEY: "base-factory-clusterscoped-api"
     BASE_FACTORY_NAMESPACED_BUILTIN_KEY: "base-factory-namespaced-builtin"
     BASE_FACTORY_CLUSTERSCOPED_BUILTIN_KEY: "base-factory-clusterscoped-builtin"
-    BASE_NAMESPACE_FACTORY_KEY: "details-namespace"
+    BASE_NAMESPACE_FACTORY_KEY: "namespace-details/v1/namespaces"
     BASE_ALLOWED_AUTH_HEADERS: user-agent,accept,content-type,origin,referer,accept-encoding,cookie
     BASE_NAVIGATION_RESOURCE_PLURAL: "navigations"
     BASE_NAVIGATION_RESOURCE_NAME: "navigation"
@@ -435,7 +435,7 @@ web:
   # Container image configuration
   image:
     repository: prorobotech/openapi-ui
-    tag: release-1.2.0-b2a1be25
+    tag: release-1.2.0-70b1c766
     pullPolicy: IfNotPresent
 
   # Networking configuration for the container
@@ -466,7 +466,7 @@ web:
     LOGOUT_URL: "/oauth2/sign_out"
     MARKETPLACE_KIND: "MarketplacePanel"
     MARKETPLACE_PLURAL: "marketplacepanels"
-    NAVIGATE_FROM_CLUSTERLIST: "/openapi-ui/~recordValue~/builtin-table/pods"
+    NAVIGATE_FROM_CLUSTERLIST: "/openapi-ui/~recordValue~/builtin-table/pods?resources=metrics.k8s.io/v1beta1/pods"
     NODE_TERMINAL_DEFAULT_PROFILE: "general"
     PROJECTS_API_GROUP: "in-cloud.io"
     PROJECTS_PLURAL: "projects"
@@ -480,7 +480,7 @@ web:
     BASE_FACTORY_CLUSTERSCOPED_API_KEY: "base-factory-clusterscoped-api"
     BASE_FACTORY_NAMESPACED_BUILTIN_KEY: "base-factory-namespaced-builtin"
     BASE_FACTORY_CLUSTERSCOPED_BUILTIN_KEY: "base-factory-clusterscoped-builtin"
-    BASE_NAMESPACE_FACTORY_KEY: "details-namespace"
+    BASE_NAMESPACE_FACTORY_KEY: "namespace-details/v1/namespaces"
     CUSTOMIZATION_SIDEBAR_FALLBACK_ID: "fallback"
   envFrom: []
 
