@@ -309,7 +309,7 @@ spec:
                   # forcedKind: '{reqsJsonPath[0][".items.0.kind"]}'
                   apiGroup: '{6}'
                   apiVersion: '{7}'
-                  typeName: '{8}'
+                  plural: '{8}'
 
           - key: events
             label: Events
