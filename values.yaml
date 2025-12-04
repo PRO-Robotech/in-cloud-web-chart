@@ -1,14 +1,4 @@
 # --- Dependency ----------------------------------------------------------------
-incloud-web-resources:
-  enabled: false
-  addons:
-    argocd:
-      enabled: false
-    hbf:
-      enabled: false
-    trivy:
-      enabled: false
-
 oauth2-proxy:
   enabled: false
   priorityClassName: system-cluster-critical
@@ -178,6 +168,29 @@ clusters:
     scheme: http
     api: 127.0.0.1
 
+# --- Default Web Resources ---------------------------------------------------------------
+# This parameter group allows you to disable the default resources. 
+# This is necessary if you plan to define your own resources 
+# (e.g., via the incloud-web-resources chart) or manage them by another means.
+defaultWebResources:
+  breadcrumbs:
+    default:
+      stock-cluster-factory-namespace-details: true
+      stock-cluster-factory-base-factory-clusterscoped-api: true
+      stock-cluster-factory-base-factory-clusterscoped-builtin: true
+      stock-project-factory-base-factory-namespaced-api: true
+      stock-project-factory-base-factory-namespaced-builtin: true
+  customcolumnsoverride:
+    stock-cluster-v1_namespaces: true
+    stock-namespace-v1_namespaces: true
+  factory:
+    default:
+      base-factory-clusterscoped-api: true
+      base-factory-clusterscoped-builtin: true
+      base-factory-namespaced-api: true
+      base-factory-namespaced-builtin: true
+      namespace-details: true
+
 # --- Global ----------------------------------------------------------------
 nameOverride: ""                  # Overrides chart name; leave empty to use default
 fullnameOverride: "" # Overrides full release name; leave empty to use default
@@ -268,6 +281,7 @@ expose:
       annotations: {}
       labels: {}
 
+  # The path should end with a "/"
   path: /
   # servicePort
   # set incloud-web port
