@@ -1,3 +1,4 @@
+{{ if (index .Values.defaultWebResources.breadcrumbs.default "stock-project-factory-base-factory-namespaced-api") }}
 ---
 apiVersion: front.in-cloud.io/v1alpha1
 kind: Breadcrumb
@@ -11,3 +12,4 @@ spec:
   - key: specific-name
     label: '{9}'
   id: stock-project-factory-base-factory-namespaced-api
+{{ end }}
