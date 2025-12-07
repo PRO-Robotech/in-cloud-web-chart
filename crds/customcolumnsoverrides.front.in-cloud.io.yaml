@@ -67,9 +67,17 @@ spec:
                       value:
                         type: string
                     additionalProperties: true
-                additionalPrinterColumnsDisableSortersAndFilters:
+                additionalPrinterColumnsCustomSortersAndFilters:
                   items:
-                    type: string
+                    type: object
+                    properties:
+                      key:
+                        type: string
+                      type:
+                        type: string
+                    required:
+                      - key
+                      - type
                   type: array
 
       subresources:
