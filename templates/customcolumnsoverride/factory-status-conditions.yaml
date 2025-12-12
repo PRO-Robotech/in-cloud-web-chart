@@ -1,0 +1,49 @@
+---
+apiVersion: front.in-cloud.io/v1alpha1
+kind: CustomColumnsOverride
+metadata:
+  name: base-factory-status-conditions
+spec:
+  additionalPrinterColumns:
+  - jsonPath: .type
+    name: Type
+    type: string
+  - jsonPath: .status
+    name: Status
+    type: bool
+  - customProps:
+      disableEventBubbling: true
+      items:
+      - children:
+        - data:
+            id: time-icon
+            text: "\U0001F310"
+          type: antdText
+        - data:
+            formatter: timestamp
+            id: time-value
+            text: '{reqsJsonPath[0][".lastTransitionTime"]["-"]}'
+          type: parsedText
+        data:
+          align: center
+          gap: 6
+          id: time-block
+        type: antdFlex
+    jsonPath: .lastTransitionTime
+    name: Updated
+    type: factory
+  - jsonPath: .reason
+    name: Reason
+    type: string
+  - jsonPath: .message
+    name: Message
+    type: string
+  additionalPrinterColumnsTrimLengths:
+  - key: Message
+    value: 64
+  additionalPrinterColumnsUndefinedValues:
+  - key: Reason
+    value: '-'
+  - key: Message
+    value: '-'
+  id: factory-status-conditions
