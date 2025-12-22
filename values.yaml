@@ -372,7 +372,7 @@ bff:
     BASE_NAMESPACE_FACTORY_KEY: "namespace-details/v1/namespaces"
     BASE_ALLOWED_AUTH_HEADERS: user-agent,accept,content-type,origin,referer,accept-encoding,cookie
     BASE_NAVIGATION_RESOURCE_PLURAL: "navigations"
-    BASE_NAVIGATION_RESOURCE_NAME: "navigation"
+    BASE_NAVIGATION_RESOURCE_NAME: "fallback"
 
   envFrom: []
 
@@ -449,7 +449,7 @@ web:
   # Container image configuration
   image:
     repository: prorobotech/openapi-ui
-    tag: release-1.2.0-abe1588f
+    tag: release-1.2.0-43649e8a
     pullPolicy: IfNotPresent
 
   # Networking configuration for the container
@@ -471,7 +471,7 @@ web:
     CUSTOMIZATION_API_GROUP: "front.in-cloud.io"
     CUSTOMIZATION_API_VERSION: "v1alpha1"
     CUSTOMIZATION_NAVIGATION_RESOURCE_PLURAL: "navigations"
-    CUSTOMIZATION_NAVIGATION_RESOURCE_NAME: "navigation"
+    CUSTOMIZATION_NAVIGATION_RESOURCE_NAME: "fallback"
     INSTANCES_API_GROUP: "in-cloud.io"
     INSTANCES_PLURAL: "instances"
     INSTANCES_API_VERSION: "v1alpha1"
