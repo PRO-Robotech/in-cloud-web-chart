@@ -256,43 +256,43 @@ spec:
                                           text: '{reqsJsonPath[0][".items.0.metadata.creationTimestamp"]["-"]}'
 
 
-                      - type: VisibilityContainer
+                  - type: VisibilityContainer
+                    data:
+                      id: conditions-visibility-guard
+                      value: '{reqsJsonPath[0][".items.0.status.conditions"]}'
+                    children:
+
+                      - type: antdCol
                         data:
-                          id: conditions-visibility-guard
-                          value: '{reqsJsonPath[0][".items.0.status.conditions"]}'
+                          id: conditions-col
+                          style:
+                            marginTop: 32px
+                            padding: 16px
                         children:
 
-                          - type: antdCol
+                          - type: antdText
                             data:
-                              id: conditions-col
+                              id: conditions-title
+                              strong: true
                               style:
-                                marginTop: 32px
-                                padding: 16px
-                            children:
+                                fontSize: 22
+                              text: Conditions
 
-                              - type: antdText
-                                data:
-                                  id: conditions-title
-                                  strong: true
-                                  style:
-                                    fontSize: 22
-                                  text: Conditions
-
-                              - type: EnrichedTable
-                                data:
-                                  baseprefix: /openapi-ui
-                                  cluster: '{2}'
-                                  customizationId: factory-status-conditions
-                                  id: conditions-table
-                                  pathToItems: .items.0.status.conditions
-                                  withoutControls: true
-                                  k8sResourceToFetch:
-                                    group: "{5}"
-                                    apiVersion: "{6}"
-                                    namespace: "{3}"
-                                    plural: "{7}"
-                                  fieldSelector:
-                                    metadata.name: "{8}"
+                          - type: EnrichedTable
+                            data:
+                              baseprefix: /openapi-ui
+                              cluster: '{2}'
+                              customizationId: factory-status-conditions
+                              id: conditions-table
+                              pathToItems: .items.0.status.conditions
+                              withoutControls: true
+                              k8sResourceToFetch:
+                                group: "{5}"
+                                apiVersion: "{6}"
+                                namespace: "{3}"
+                                plural: "{7}"
+                              fieldSelector:
+                                metadata.name: "{8}"
 
           - key: yaml
             label: YAML
