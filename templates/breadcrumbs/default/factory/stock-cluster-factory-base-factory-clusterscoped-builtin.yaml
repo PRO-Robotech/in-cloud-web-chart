@@ -1,3 +1,4 @@
+{{ if (index .Values.defaultWebResources.breadcrumbs.default "stock-cluster-factory-base-factory-clusterscoped-builtin") }}
 ---
 apiVersion: front.in-cloud.io/v1alpha1
 kind: Breadcrumb
@@ -11,3 +12,4 @@ spec:
   - key: specific-name
     label: '{7}'
   id: stock-cluster-factory-base-factory-clusterscoped-builtin
+{{ end }}

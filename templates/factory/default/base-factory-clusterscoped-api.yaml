@@ -1,3 +1,4 @@
+{{ if (index .Values.defaultWebResources.factory.default "base-factory-clusterscoped-api") }}
 ---
 apiVersion: front.in-cloud.io/v1alpha1
 kind: Factory
@@ -267,7 +268,7 @@ spec:
                 data:
                   id: yaml-editor
                   cluster: "{2}"
-                  isNameSpaced: true
+                  isNameSpaced: false
                   prefillValuesRequestIndex: 0
                   substractHeight: 400
                   type: api
@@ -275,7 +276,7 @@ spec:
                   # forcedKind: '{reqsJsonPath[0][".items.0.kind"]}'
                   apiGroup: '{5}'
                   apiVersion: '{6}'
-                  typeName: '{7}'
+                  plural: '{7}'
 
           - key: events
             label: Events
@@ -299,3 +300,4 @@ spec:
                   baseFactoryNamespacedBuiltinKey: base-factory-namespaced-builtin
                   baseFactoryClusterSceopedBuiltinKey: base-factory-clusterscoped-builtin
                   baseNamespaceFactoryKey: namespace-details
+{{ end }}

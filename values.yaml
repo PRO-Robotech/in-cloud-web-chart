@@ -1,14 +1,4 @@
 # --- Dependency ----------------------------------------------------------------
-incloud-web-resources:
-  enabled: false
-  addons:
-    argocd:
-      enabled: false
-    hbf:
-      enabled: false
-    trivy:
-      enabled: false
-
 oauth2-proxy:
   enabled: false
   priorityClassName: system-cluster-critical
@@ -178,6 +168,29 @@ clusters:
     scheme: http
     api: 127.0.0.1
 
+# --- Default Web Resources ---------------------------------------------------------------
+# This parameter group allows you to disable the default resources. 
+# This is necessary if you plan to define your own resources 
+# (e.g., via the incloud-web-resources chart) or manage them by another means.
+defaultWebResources:
+  breadcrumbs:
+    default:
+      stock-cluster-factory-namespace-details: true
+      stock-cluster-factory-base-factory-clusterscoped-api: true
+      stock-cluster-factory-base-factory-clusterscoped-builtin: true
+      stock-project-factory-base-factory-namespaced-api: true
+      stock-project-factory-base-factory-namespaced-builtin: true
+  customcolumnsoverride:
+    stock-cluster-v1_namespaces: true
+    stock-namespace-v1_namespaces: true
+  factory:
+    default:
+      base-factory-clusterscoped-api: true
+      base-factory-clusterscoped-builtin: true
+      base-factory-namespaced-api: true
+      base-factory-namespaced-builtin: true
+      namespace-details: true
+
 # --- Global ----------------------------------------------------------------
 nameOverride: ""                  # Overrides chart name; leave empty to use default
 fullnameOverride: "" # Overrides full release name; leave empty to use default
@@ -268,6 +281,7 @@ expose:
       annotations: {}
       labels: {}
 
+  # The path should end with a "/"
   path: /
   # servicePort
   # set incloud-web port
@@ -334,7 +348,7 @@ bff:
   # Container image configuration
   image:
     repository: prorobotech/openapi-ui-k8s-bff
-    tag: v1.1.0-f5efa005
+    tag: v1.2.0-9dea64b4
     pullPolicy: IfNotPresent
 
   # Networking configuration for the container
@@ -355,10 +369,10 @@ bff:
     BASE_FACTORY_CLUSTERSCOPED_API_KEY: "base-factory-clusterscoped-api"
     BASE_FACTORY_NAMESPACED_BUILTIN_KEY: "base-factory-namespaced-builtin"
     BASE_FACTORY_CLUSTERSCOPED_BUILTIN_KEY: "base-factory-clusterscoped-builtin"
-    BASE_NAMESPACE_FACTORY_KEY: "details-namespace"
+    BASE_NAMESPACE_FACTORY_KEY: "namespace-details/v1/namespaces"
     BASE_ALLOWED_AUTH_HEADERS: user-agent,accept,content-type,origin,referer,accept-encoding,cookie
     BASE_NAVIGATION_RESOURCE_PLURAL: "navigations"
-    BASE_NAVIGATION_RESOURCE_NAME: "navigation"
+    BASE_NAVIGATION_RESOURCE_NAME: "fallback"
 
   envFrom: []
 
@@ -435,7 +449,7 @@ web:
   # Container image configuration
   image:
     repository: prorobotech/openapi-ui
-    tag: v1.1.0-55440d5e
+    tag: v1.2.0-f77b3241
     pullPolicy: IfNotPresent
 
   # Networking configuration for the container
@@ -457,7 +471,7 @@ web:
     CUSTOMIZATION_API_GROUP: "front.in-cloud.io"
     CUSTOMIZATION_API_VERSION: "v1alpha1"
     CUSTOMIZATION_NAVIGATION_RESOURCE_PLURAL: "navigations"
-    CUSTOMIZATION_NAVIGATION_RESOURCE_NAME: "navigation"
+    CUSTOMIZATION_NAVIGATION_RESOURCE_NAME: "fallback"
     INSTANCES_API_GROUP: "in-cloud.io"
     INSTANCES_PLURAL: "instances"
     INSTANCES_API_VERSION: "v1alpha1"
@@ -466,7 +480,7 @@ web:
     LOGOUT_URL: "/oauth2/sign_out"
     MARKETPLACE_KIND: "MarketplacePanel"
     MARKETPLACE_PLURAL: "marketplacepanels"
-    NAVIGATE_FROM_CLUSTERLIST: "/openapi-ui/~recordValue~/builtin-table/pods"
+    NAVIGATE_FROM_CLUSTERLIST: "/openapi-ui/~recordValue~/builtin-table/pods?resources=metrics.k8s.io/v1beta1/pods"
     NODE_TERMINAL_DEFAULT_PROFILE: "general"
     PROJECTS_API_GROUP: "in-cloud.io"
     PROJECTS_PLURAL: "projects"
@@ -480,7 +494,7 @@ web:
     BASE_FACTORY_CLUSTERSCOPED_API_KEY: "base-factory-clusterscoped-api"
     BASE_FACTORY_NAMESPACED_BUILTIN_KEY: "base-factory-namespaced-builtin"
     BASE_FACTORY_CLUSTERSCOPED_BUILTIN_KEY: "base-factory-clusterscoped-builtin"
-    BASE_NAMESPACE_FACTORY_KEY: "details-namespace"
+    BASE_NAMESPACE_FACTORY_KEY: "namespace-details/v1/namespaces"
     CUSTOMIZATION_SIDEBAR_FALLBACK_ID: "fallback"
   envFrom: []
 

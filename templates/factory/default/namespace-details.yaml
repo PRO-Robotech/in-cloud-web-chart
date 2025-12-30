@@ -1,3 +1,5 @@
+{{ if (index .Values.defaultWebResources.factory.default "namespace-details") }}
+---
 apiVersion: front.in-cloud.io/v1alpha1
 kind: Factory
 metadata:
@@ -265,3 +267,4 @@ spec:
                 baseFactoryNamespacedBuiltinKey: base-factory-namespaced-builtin
                 baseFactoryClusterSceopedBuiltinKey: base-factory-clusterscoped-builtin
                 baseNamespaceFactoryKey: namespace-details
+{{ end }}
