@@ -1,3 +1,4 @@
+{{ if (index .Values.defaultWebResources.factory.default "base-factory-clusterscoped-builtin") }}
 ---
 apiVersion: front.in-cloud.io/v1alpha1
 kind: Factory
@@ -249,12 +250,10 @@ spec:
                               pathToItems: .items.0.status.conditions
                               withoutControls: true
                               k8sResourceToFetch:
-                                apiVersion: "{6}"
-                                plural: "{7}"
+                                apiVersion: "{5}"
+                                plural: "{6}"
                               fieldSelector:
-                                metadata.name: "{8}"
-
-
+                                metadata.name: "{7}"
 
           - key: yaml
             label: YAML
@@ -264,15 +263,14 @@ spec:
                 data:
                   id: yaml-editor
                   cluster: "{2}"
-                  isNameSpaced: true
+                  isNameSpaced: false
                   prefillValuesRequestIndex: 0
                   substractHeight: 400
                   type: builtin
                   pathToData: .items.0
                   # forcedKind: '{reqsJsonPath[0][".items.0.kind"]}'
                   apiVersion: '{5}'
-                  typeName: '{6}'
-
+                  plural: '{6}'
 
           - key: events
             label: Events
@@ -296,3 +294,4 @@ spec:
                   baseFactoryNamespacedBuiltinKey: base-factory-namespaced-builtin
                   baseFactoryClusterSceopedBuiltinKey: base-factory-clusterscoped-builtin
                   baseNamespaceFactoryKey: namespace-details
+{{ end }}

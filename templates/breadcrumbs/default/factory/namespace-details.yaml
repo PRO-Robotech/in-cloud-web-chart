@@ -1,3 +1,4 @@
+{{ if (index .Values.defaultWebResources.breadcrumbs.default "stock-cluster-factory-namespace-details") }}
 ---
 apiVersion: front.in-cloud.io/v1alpha1
 kind: Breadcrumb
@@ -11,3 +12,4 @@ spec:
       link: "/openapi-ui/{cluster}/builtin-table/namespaces"
     - key: namespace
       label: "{7}"
+{{ end }}

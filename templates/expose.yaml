@@ -73,22 +73,29 @@ spec:
   gateways:
     - {{ $istio.gateway.name }}
   http:
-  - name: {{ include "incloud-web.fullname" . }}
-    match:
-      - uri:
-          prefix: {{ $expose.path }}
-    route:
-    - destination:
-    {{ if $oauth.enabled }}
-        host: {{ .Release.Name }}-oauth2-proxy
-        port:
-          number: {{ $oauth.service.portNumber }}
-    {{ else }}
-        host: {{ include "incloud-web.fullname" . }}
-        port:
-          number: {{ $expose.servicePort }}
-    {{ end }}
-
+    - match:
+        - uri:
+            exact: {{ $expose.path }}
+      redirect:
+        {{ if or (eq $tls.certSource "certmanager") (eq $tls.certSource "secret") }}
+        scheme: https
+        {{ end }}
+        uri: {{ $expose.path }}openapi-ui
+    - match:
+        - uri:
+            prefix: {{ $expose.path }}
+      name: incloud-web
+      route:
+        - destination:
+        {{ if $oauth.enabled }}
+            host: {{ .Release.Name }}-oauth2-proxy
+            port:
+              number: {{ $oauth.service.portNumber }}
+        {{ else }}
+            host: {{ include "incloud-web.fullname" . }}
+            port:
+              number: {{ $expose.servicePort }}
+        {{ end }}
   {{ else if eq $expose.resourceType "ingress" }}
 ---
 apiVersion: networking.k8s.io/v1

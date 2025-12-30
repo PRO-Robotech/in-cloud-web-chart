@@ -44,6 +44,10 @@ spec:
                       type: string
                     clear:
                       type: string
+                    mapOptionsPattern:
+                      type: string
+                    aliasPath:
+                      type: string
                 namespaces:
                   type: object
                   required:
@@ -54,6 +58,8 @@ spec:
                       type: string
                     clear:
                       type: string
+                    aliasPath:
+                      type: string
                 projects:
                   type: object
                   required:
@@ -63,6 +69,8 @@ spec:
                     change:
                       type: string
                     clear:
+                      type: string
+                    aliasPath:
                       type: string
                 baseFactoriesMapping:
                   type: object

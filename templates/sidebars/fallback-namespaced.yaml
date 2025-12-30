@@ -1,0 +1,198 @@
+apiVersion: front.in-cloud.io/v1alpha1
+kind: Sidebar
+metadata:
+  name: fallback-namespaced
+spec:
+  id: fallback-namespaced
+  keysAndTags:
+    pods:
+      - v1/pods
+      - pod-details
+    configmaps:
+      - v1/configmaps
+      - configmap-details
+    limitranges:
+      - v1/limitranges
+      - limitrange-details
+    namespaces:
+      - v1/namespaces
+      - namespace-details
+    nodes:
+      - v1/nodes
+      - node-details
+    persistentvolumeclaims:
+      - v1/persistentvolumeclaims
+      - persistentvolumeclaim-details
+    persistentvolumes:
+      - v1/persistentvolumes
+      - persistentvolume-details
+    resourcequotas:
+      - v1/resourcequotas
+      - resourcequota-details
+    secrets:
+      - v1/secrets
+      - secret-details
+    serviceaccounts:
+      - v1/serviceaccounts
+      - serviceaccount-details
+    services:
+      - v1/services
+      - service-details
+    replicationcontrollers:
+      - v1/replicationcontrollers
+      - replicationcontroller-details
+    clusterrolebindings:
+      - rbac.authorization.k8s.io/v1/clusterrolebindings
+      - clusterrolebinding-details
+    clusterroles:
+      - rbac.authorization.k8s.io/v1/clusterroles
+      - clusterrole-details
+    cronjobs:
+      - batch/v1/cronjobs
+    customresourcedefinitions:
+      - apiextensions.k8s.io/v1/customresourcedefinitions
+      - customresourcedefinition-details
+    daemonsets:
+      - apps/v1/daemonsets
+    deployments:
+      - apps/v1/deployments
+      - deployment-details
+    horizontalpodautoscalers:
+      - autoscaling/v2/horizontalpodautoscalers
+      - horizontalpodautoscaler-details
+    ingresses:
+      - networking.k8s.io/v1/ingresses
+      - ingresse-details
+    jobs:
+      - batch/v1/jobs
+      - job-details
+    networkpolicies:
+      - networking.k8s.io/v1/networkpolicies
+      - networkpolicy-details
+    poddisruptionbudgets:
+      - policy/v1/poddisruptionbudgets
+      - poddisruptionbudget-details
+    replicasets:
+      - apps/v1/replicasets
+      - replicaset-details
+    rolebindings:
+      - rbac.authorization.k8s.io/v1/rolebindings
+      - rolebinding-details
+    roles:
+      - rbac.authorization.k8s.io/v1/roles
+      - role-details
+    statefulsets:
+      - apps/v1/statefulsets
+      - statefulset-details
+    storageclasses:
+      - storage.k8s.io/v1/storageclasses
+      - storageclass-details
+  menuItems:
+  - children:
+    - key: search
+      label: Search
+      link: /openapi-ui/{cluster}/search
+    key: home
+    label: Home
+  - children:
+    - key: pods
+      label: Pods
+      link: /openapi-ui/{cluster}/builtin-table/pods?resources=metrics.k8s.io/v1beta1/pods
+    - key: deployments
+      label: Deployments
+      link: /openapi-ui/{cluster}/api-table/apps/v1/deployments
+    - key: statefulsets
+      label: Statefulsets
+      link: /openapi-ui/{cluster}/api-table/apps/v1/statefulsets
+    - key: secrets
+      label: Secrets
+      link: /openapi-ui/{cluster}/builtin-table/secrets
+    - key: configmaps
+      label: ConfigMaps
+      link: /openapi-ui/{cluster}/builtin-table/configmaps
+    - key: cronjobs
+      label: CronJobs
+      link: /openapi-ui/{cluster}/api-table/batch/v1/cronjobs
+    - key: jobs
+      label: Jobs
+      link: /openapi-ui/{cluster}/api-table/batch/v1/jobs
+    - key: daemonsets
+      label: Daemonsets
+      link: /openapi-ui/{cluster}/api-table/apps/v1/daemonsets
+    - key: replicasets
+      label: ReplicaSets
+      link: /openapi-ui/{cluster}/api-table/apps/v1/replicasets
+    - key: replicationcontrollers
+      label: ReplicationControllers
+      link: /openapi-ui/{cluster}/builtin-table/replicationcontrollers
+    - key: horizontalpodautoscalers
+      label: HorizontalPodAutoscalers
+      link: /openapi-ui/{cluster}/api-table/autoscaling/v2/horizontalpodautoscalers
+    - key: poddisruptionbudgets
+      label: PodDisruptionBudgets
+      link: /openapi-ui/{cluster}/api-table/policy/v1/poddisruptionbudgets
+    key: workloads
+    label: Workloads
+  - children:
+    - key: services
+      label: Services
+      link: /openapi-ui/{cluster}/builtin-table/services
+    - key: networkpolicies
+      label: NetworkPolicies
+      link: /openapi-ui/{cluster}/api-table/networking.k8s.io/v1/networkpolicies
+    - key: ingresses
+      label: Ingresses
+      link: /openapi-ui/{cluster}/api-table/networking.k8s.io/v1/ingresses
+    key: networking
+    label: Networking
+  - children:
+    - key: persistentvolumes
+      label: PersistentVolumes
+      link: /openapi-ui/{cluster}/builtin-table/persistentvolumes
+    - key: persistentvolumeclaims
+      label: PersistentVolumeClaims
+      link: /openapi-ui/{cluster}/builtin-table/persistentvolumeclaims
+    - key: storageclasses
+      label: StorageClasses
+      link: /openapi-ui/{cluster}/api-table/storage.k8s.io/v1/storageclasses
+    key: storage
+    label: Storage
+  - children:
+    - key: nodes
+      label: Nodes
+      link: /openapi-ui/{cluster}/builtin-table/nodes?resources=metrics.k8s.io/v1beta1/nodes
+    key: compute
+    label: Compute
+  - children:
+    - key: serviceaccounts
+      label: ServiceAccounts
+      link: /openapi-ui/{cluster}/builtin-table/serviceaccounts
+    - key: roles
+      label: Roles
+      link: /openapi-ui/{cluster}/api-table/rbac.authorization.k8s.io/v1/roles
+    - key: rolebindings
+      label: RoleBindings
+      link: /openapi-ui/{cluster}/api-table/rbac.authorization.k8s.io/v1/rolebindings
+    - key: clusterroles
+      label: ClusterRoles
+      link: /openapi-ui/{cluster}/api-table/rbac.authorization.k8s.io/v1/clusterroles
+    - key: clusterrolebindings
+      label: ClusterRoleBindings
+      link: /openapi-ui/{cluster}/api-table/rbac.authorization.k8s.io/v1/clusterrolebindings
+    key: usermanagement
+    label: User Management
+  - children:
+    - key: namespaces
+      label: Namespaces
+      link: /openapi-ui/{cluster}/builtin-table/namespaces
+    - key: limitranges
+      label: LimitRanges
+      link: /openapi-ui/{cluster}/builtin-table/limitranges
+    - key: resourcequotas
+      label: ResourceQuotas
+      link: /openapi-ui/{cluster}/builtin-table/resourcequotas
+    - key: customresourcedefinitions
+      label: CustomResourceDefinitions
+      link: /openapi-ui/{cluster}/api-table/apiextensions.k8s.io/v1/customresourcedefinitions
+    key: administration
+    label: Administration
