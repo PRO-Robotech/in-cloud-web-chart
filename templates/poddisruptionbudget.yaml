@@ -1,0 +1,20 @@
+{{- if .Values.podDisruptionBudget }}
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: {{ include "incloud-web.fullname" . }}
+  namespace: {{ .Release.Namespace }}
+spec:
+  {{- with .Values.podDisruptionBudget }}
+    {{- toYaml . | nindent 2 }}
+  {{- end }}
+  selector:
+    matchLabels:
+      {{- include "incloud-web.selectorLabels" . | nindent 6 }}
+      {{- with .Values.podLabels }}
+      {{- toYaml . | nindent 6 }}
+      {{- end }}
+      {{- with .Values.extraTemplateMetadata.labels }}
+      {{- toYaml . | nindent 6 }}
+      {{- end }}
+{{- end }}
