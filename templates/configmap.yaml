@@ -85,6 +85,13 @@ data:
           proxy_pass http://127.0.0.1:{{ $.Values.bff.containerPort }};
       }
 
+      {{ if $.Values.moduleExample.enabled }}
+      # Proxy /openapi-ui-plugin to backend (Module container)
+      location /openapi-ui-plugin {
+          proxy_pass http://127.0.0.1:{{ $.Values.moduleExample.containerPort }};
+      }
+      {{ end }}
+
       # WebSocket proxy for BFF (e.g., event streams)
       location /openapi-bff-ws/ {
       {{ if $oauth.enabled }}
