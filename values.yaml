@@ -449,7 +449,7 @@ web:
   # Container image configuration
   image:
     repository: prorobotech/openapi-ui
-    tag: release-1.2.1-0e4cd54b
+    tag: release-1.2.1-03555b41
     pullPolicy: IfNotPresent
 
   # Networking configuration for the container
@@ -486,6 +486,8 @@ web:
     PROJECTS_PLURAL: "projects"
     PROJECTS_API_VERSION: "v1alpha1"
     USE_NAMESPACE_NAV: true
+    USE_NEW_NAVIGATION: true
+    BREADCRUMBS_NO_MARGIN_TOP: true
     REMOVE_BACKLINK: true
     REMOVE_BACKLINK_TEXT: true
     DOCS_URL: https://in-cloud.io/docs/tech-docs/introduction/
