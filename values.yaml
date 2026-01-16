@@ -348,7 +348,7 @@ bff:
   # Container image configuration
   image:
     repository: prorobotech/openapi-ui-k8s-bff
-    tag: v1.2.0-9dea64b4
+    tag: release-1.2.1-1c9a35a5
     pullPolicy: IfNotPresent
 
   # Networking configuration for the container
@@ -359,7 +359,6 @@ bff:
   env:
     BASE_API_GROUP: "front.in-cloud.io"
     BASE_API_VERSION: "v1alpha1"
-    DEBUG_CONTAINER_IMAGE: "nicolaka/netshoot:v0.13"
     LOGGER: "TRUE"
     LOGGER_WITH_HEADERS: "TRUE"
     PORT: "8082"
@@ -449,7 +448,7 @@ web:
   # Container image configuration
   image:
     repository: prorobotech/openapi-ui
-    tag: v1.2.0-f77b3241
+    tag: release-1.2.1-9c64107a
     pullPolicy: IfNotPresent
 
   # Networking configuration for the container
