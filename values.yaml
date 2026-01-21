@@ -746,3 +746,8 @@ extraObjects: []
 # affinity: {}
 podDisruptionBudget:
   minAvailable: 1
+
+strategy:
+  rollingUpdate:
+    maxUnavailable: 1
+    maxSurge: 1
