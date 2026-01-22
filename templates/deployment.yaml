@@ -20,9 +20,9 @@ spec:
     # Rolling update strategy configuration
     type: RollingUpdate
     rollingUpdate:
-      maxUnavailable: {{ .Values.strategy.rollingUpdate.maxUnavailable | quote }}
-      maxSurge: {{ .Values.strategy.rollingUpdate.maxSurge | quote }}
-      
+      maxUnavailable: {{ .Values.strategy.rollingUpdate.maxUnavailable }}
+      maxSurge: {{ .Values.strategy.rollingUpdate.maxSurge }}
+
   template:
     metadata:
       labels:
