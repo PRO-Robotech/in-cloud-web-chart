@@ -11,5 +11,5 @@ spec:
       label: "v1/namespaces"
       link: "/openapi-ui/{cluster}/builtin-table/namespaces"
     - key: namespace
-      label: "{7}"
+      label: "details"
 {{ end }}

@@ -14,7 +14,7 @@ spec:
       plural: "{6}"
       fieldSelector: "metadata.name={7}"
 
-  withScrollableMainContentCard: true
+  withScrollableMainContentCard: false
 
   data:
   - type: antdFlex
@@ -26,22 +26,33 @@ spec:
         marginBottom: 24px
 
     children:
-    - type: ResourceBadge
-      data:
-        id: factory-resource-badge
-        style:
-          fontSize: 20px
-        value: '{reqsJsonPath[0][".items.0.kind"]["-"]}'
-      
-    - type: parsedText
-      data:
-        id: header-name
-        style:
-          fontFamily: RedHatDisplay, Overpass, overpass, helvetica, arial, sans-serif
-          fontSize: 20px
-          lineHeight: 24px
-        text: '{reqsJsonPath[0][".items.0.metadata.name"]["-"]}'
-      
+      - type: ResourceBadge
+        data:
+          id: factory-resource-badge
+          style:
+            fontSize: 20px
+          value: '{reqsJsonPath[0][".items.0.kind"]["-"]}'
+
+      - type: DropdownRedirect
+        data:
+          id: resource-name-dropdown
+
+          cluster: '{2}'
+          apiVersion: '{5}'
+          plural: '{6}'
+
+          jsonPath: ".metadata.name"
+          redirectUrl: "/openapi-ui/{2}/factory/{4}/{5}/{6}/{chosenEntryValue}"
+          currentValue: "{reqsJsonPath[0]['.items.0.metadata.name']['Select {6}...']}"
+          placeholder: "Select {6}..."
+
+      - type: CopyButton
+        data:
+          id: copy-resource-name
+          copyText: "{reqsJsonPath[0]['.items.0.metadata.name']['-']}"
+          successMessage: "Name copied to clipboard."
+          tooltip: "Copy {reqsJsonPath[0]['.items.0.kind']['-']} name"
+
   - type: antdTabs
     data:
       defaultActiveKey: details
@@ -235,36 +246,47 @@ spec:
         - key: yaml
           label: YAML
           children:
-
-            - type: YamlEditorSingleton
-              data:
-                id: yaml-editor
-                cluster: "{2}"
-                isNameSpaced: true
-                prefillValuesRequestIndex: 0
-                substractHeight: 400
-                type: builtin
-                pathToData: ".items.0"
-                apiVersion: "v1"
-                plural: "namespaces"
+              - type: ContentCard
+                data:
+                  id: yaml-editor-card
+                  style:
+                    marginBottom: 24px
+                children:
+                  - type: YamlEditorSingleton
+                    data:
+                      id: yaml-editor
+                      cluster: "{2}"
+                      isNameSpaced: true
+                      prefillValuesRequestIndex: 0
+                      substractHeight: 350
+                      type: builtin
+                      pathToData: ".items.0"
+                      apiVersion: "v1"
+                      plural: "namespaces"
 
         - key: events
           label: Events
           children:
-            - type: Events
-              data:
-                id: events
-                baseprefix: "/openapi-ui"
-                cluster: "{2}"
-                wsUrl: "/api/clusters/{2}/openapi-bff-ws/events/eventsWs"
-                pageSize: 50
-                substractHeight: 315
-                limit: 40
-                fieldSelector:
-                  regarding.namespace: "{7}"
-                baseFactoryNamespacedAPIKey: base-factory-namespaced-api
-                baseFactoryClusterSceopedAPIKey: base-factory-clusterscoped-api
-                baseFactoryNamespacedBuiltinKey: base-factory-namespaced-builtin
-                baseFactoryClusterSceopedBuiltinKey: base-factory-clusterscoped-builtin
-                baseNamespaceFactoryKey: namespace-details
+              - type: ContentCard
+                data:
+                  id: details-card
+                  style:
+                    marginBottom: 24px
+                children:
+                  - type: Events
+                    data:
+                      id: events
+                      baseprefix: "/openapi-ui"
+                      cluster: "{2}"
+                      wsUrl: "/api/clusters/{2}/openapi-bff-ws/events/eventsWs"
+                      pageSize: 50
+                      substractHeight: 315
+                      limit: 40
+                      fieldSelector:
+                        regarding.namespace: "{7}"
+                      baseFactoryNamespacedAPIKey: base-factory-namespaced-api
+                      baseFactoryClusterSceopedAPIKey: base-factory-clusterscoped-api
+                      baseFactoryNamespacedBuiltinKey: base-factory-namespaced-builtin
+                      baseFactoryClusterSceopedBuiltinKey: base-factory-clusterscoped-builtin
+                      baseNamespaceFactoryKey: namespace-details
 {{ end }}
