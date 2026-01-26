@@ -10,6 +10,6 @@ spec:
     label: '{6}/{7}'
     link: /openapi-ui/{cluster}/{namespace}/builtin-table/{7}
   - key: specific-name
-    label: '{8}'
+    label: 'details'
   id: stock-project-factory-base-factory-namespaced-builtin
 {{ end }}

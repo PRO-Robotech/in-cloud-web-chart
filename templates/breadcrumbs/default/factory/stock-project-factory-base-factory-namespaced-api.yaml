@@ -10,6 +10,6 @@ spec:
     label: '{6}/{7}/{8}'
     link: /openapi-ui/{cluster}/{namespace}/api-table/{6}/{7}/{8}
   - key: specific-name
-    label: '{9}'
+    label: 'details'
   id: stock-project-factory-base-factory-namespaced-api
 {{ end }}
