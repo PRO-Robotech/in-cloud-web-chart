@@ -171,7 +171,7 @@ clusters:
 # --- Default Web Resources ---------------------------------------------------------------
 # This parameter group allows you to disable the default resources. 
 # This is necessary if you plan to define your own resources 
-# (e.g., via the incloud-web-resources chart) or manage them by another means.
+# (e.g., via the incloud-web-chart chart) or manage them by another means.
 defaultWebResources:
   breadcrumbs:
     default:
@@ -751,3 +751,369 @@ strategy:
   rollingUpdate:
     maxUnavailable: 1
     maxSurge: 1
+
+basePrefix: openapi-ui
+
+sidebars:
+  # Cluster-level sidebar (when no namespace/project context is selected)
+  # Displays global cluster resources and overview
+  cluster:
+    # Configuration for custom sidebar navigation items
+    # customItems allows you to define additional sidebar sections with custom structure
+    #
+    # Each item should be structured as:
+    # - key: unique-identifier     # Unique key for the sidebar section
+    #   label: "Display Name"      # Display text (supports URL templating)
+    #   children:                  # Optional nested items array
+    #     - key: child-unique-id
+    #       label: "Child Name"
+    #       link: /openapi-ui/{cluster}/api-table/apiGroup/apiVersion/resourceName
+    #     - key: child-unique-id
+    #       label: "Child Name"
+    #       link: /openapi-ui/{2}/api-table/apiGroup/apiVersion/resourceName
+    # URL Templating in labels:
+    # Use {n} pattern to insert URL path segments, where n is the segment index (1-based)
+    # Example paths:
+    # /openapi-ui/cluster-name/builtin-table/namespaces
+    #   {1} = "openapi-ui", {2} = "cluster-name", {3} = "builtin-table", {4} = "namespaces"
+    #   {cluster} = "cluster-name"
+    customItems: []
+
+    home:
+      enabled: true
+      items:
+        search: true
+        projects: false
+        instances: false
+
+    # ArgoCD sidebar section and sub-items
+    argocd:
+      enabled: true
+      items:
+        argocdlink: false  # Link to ArgoCD UI
+        applications: true  # ArgoCD Applications
+        applicationset: true  # ArgoCD ApplicationSets
+        appprojects: true  # ArgoCD Projects
+      extraItems: []  # Additional custom ArgoCD items
+
+    # Monitoring tools section
+    monitoring:
+      enabled: true
+      items:
+        grafana: true  # Grafana dashboard links
+      extraItems: []
+
+    # HostBase Firewall management section
+    hbf:
+      enabled: true
+      items:
+        hosts: true
+        networks: true
+        addressgroups: true
+        services: true
+        svcsvcrules: true
+        svcfqdnrules: true
+      extraItems: []
+
+    # HBF system configuration section
+    hbfSystem:
+      enabled: true
+      items:
+        hostbindings: true
+        networkbindings: true
+        addressgroupbindings: true
+        addressgroupportmappings: true
+      extraItems: []
+
+    # Workloads management section
+    workloads:
+      enabled: true
+      items:
+        pods: true
+        deployments: true
+        statefulsets: true
+        secrets: true
+        configmaps: true
+        cronjobs: true
+        jobs: true
+        daemonsets: true
+        replicasets: true
+        replicationcontrollers: true
+        horizontalpodautoscalers: true  # HPA configurations
+        poddisruptionbudgets: true  # PDB configurations
+      extraItems: []
+
+    # Networking resources section
+    networking:
+      enabled: true
+      items:
+        services: true
+        networkpolicies: true
+        ingresses: true
+      extraItems: []
+
+    # Storage resources section
+    storage:
+      enabled: true
+      items:
+        persistentvolumes: true  # Cluster-wide PVs
+        persistentvolumeclaims: true  # Namespace-scoped PVCs
+        storageclasses: true  # Storage classes
+      extraItems: []
+
+    # Compute resources section
+    compute:
+      enabled: true
+      items:
+        nodes: true  # Cluster nodes
+      extraItems: []
+
+    # User and access management section
+    usermanagement:
+      enabled: true
+      items:
+        serviceaccounts: true  # Namespace-scoped service accounts
+        roles: true  # Namespace-scoped roles
+        rolebindings: true  # Namespace-scoped role bindings
+        clusterroles: true  # Cluster-wide roles
+        clusterrolebindings: true  # Cluster-wide role bindings
+      extraItems: []
+
+    # Cluster administration section
+    administration:
+      enabled: true
+      items:
+        namespaces: true  # Namespace management
+        limitranges: true  # Resource limits
+        resourcequotas: true  # Resource quotas
+        customresourcedefinitions: true  # CRD management
+      extraItems: []
+
+  # Namespaced-level sidebar (when namespace or project context is selected)
+  # Displays resources scoped to the selected namespace/project
+  namespaced:
+    # Configuration for custom sidebar navigation items
+    # customItems allows you to define additional sidebar sections with custom structure
+    #
+    # Each item should be structured as:
+    # - key: unique-identifier     # Unique key for the sidebar section
+    #   label: "Display Name"      # Display text (supports URL templating)
+    #   children:                  # Optional nested items array
+    #     - key: child-unique-id
+    #       label: "Child Name"
+    #       link: /openapi-ui/{cluster}/{namespace}/api-table/apiGroup/apiVersion/resourceName
+    #     - key: child-unique-id
+    #       label: "Child Name"
+    #       link: /openapi-ui/{2}/{3}/api-table/apiGroup/apiVersion/resourceName
+    # URL Templating in labels:
+    # Use {n} pattern to insert URL path segments, where n is the segment index (1-based)
+    # Example paths:
+    # /openapi-ui/cluster-name/namespace/builtin-table/pods
+    #   {1} = "openapi-ui", {2} = "cluster-name", {3} = "namespace", etc.
+    #   {cluster} = "cluster-name"
+    #   {namespace} = "namespace"
+    customItems: []
+
+    home:
+      enabled: true
+      items:
+        search: true
+        projects: false
+        instances: false
+
+    # ArgoCD resources within the namespace/project
+    argocd:
+      enabled: true
+      items:
+        applications: true
+        applicationset: true
+        appprojects: true
+      extraItems: []
+
+    # HBF resources within the namespace
+    hbf:
+      enabled: true
+      items:
+        hosts: true
+        networks: true
+        addressgroups: true
+        services: true
+        svcsvcrules: true
+        svcfqdnrules: true
+      extraItems: []
+
+    # HBF system resources within the namespace
+    hbfSystem:
+      enabled: true
+      items:
+        hostbindings: true
+        networkbindings: true
+        ieagagrules: true
+        servicealiases: true
+        addressgroupbindings: true
+        addressgroupportmappings: true
+      extraItems: []
+
+    # Workloads within the namespace
+    workloads:
+      enabled: true
+      items:
+        pods: true
+        deployments: true
+        statefulsets: true
+        secrets: true
+        configmaps: true
+        cronjobs: true
+        jobs: true
+        daemonsets: true
+        replicasets: true
+        replicationcontrollers: true
+        horizontalpodautoscalers: true
+        poddisruptionbudgets: true
+      extraItems: []
+
+    # Networking within the namespace
+    networking:
+      enabled: true
+      items:
+        services: true
+        networkpolicies: true
+        ingresses: true
+      extraItems: []
+
+    # Storage resources within the namespace
+    storage:
+      enabled: true
+      items:
+        persistentvolumes: true
+        persistentvolumeclaims: true  # Namespace-scoped PVCs
+        storageclasses: true
+      extraItems: []
+
+    # Compute resources (typically cluster-scoped, but visible in context)
+    compute:
+      enabled: true
+      items:
+        nodes: true
+      extraItems: []
+
+    # User management within the namespace
+    usermanagement:
+      enabled: true
+      items:
+        serviceaccounts: true  # Namespace-scoped service accounts
+        roles: true  # Namespace-scoped roles
+        rolebindings: true  # Namespace-scoped role bindings
+        clusterroles: true  # Cluster-wide roles (visible in context)
+        clusterrolebindings: true  # Cluster-wide bindings (visible in context)
+      extraItems: []
+
+    # Administration within the namespace
+    administration:
+      enabled: true
+      items:
+        namespaces: true  # Current namespace management
+        limitranges: true  # Namespace resource limits
+        resourcequotas: true  # Namespace resource quotas
+        customresourcedefinitions: true  # CRDs (cluster-wide but visible)
+      extraItems: []
+
+  # Mapping of resource keys to API endpoints and detail views
+  extrakeysAndTags: {}
+  
+  # Mapping of resource keys to API endpoints and detail views
+  keysAndTags:
+    clusterrolebindings:
+      - rbac.authorization.k8s.io/v1/clusterrolebindings
+      - clusterrolebinding-details
+    clusterroles:
+      - rbac.authorization.k8s.io/v1/clusterroles
+      - clusterrole-details
+    configmaps:
+      - configmaps
+      - v1/configmaps
+      - configmap-details
+    cronjobs:
+      - batch/v1/cronjobs
+    customresourcedefinitions:
+      - apiextensions.k8s.io/v1/customresourcedefinitions
+      - customresourcedefinition-details
+    daemonsets:
+      - apps/v1/daemonsets
+    deployments:
+      - apps/v1/deployments
+      - deployment-details
+    horizontalpodautoscalers:
+      - autoscaling/v2/horizontalpodautoscalers
+      - horizontalpodautoscaler-details
+    ingresses:
+      - networking.k8s.io/v1/ingresses
+      - ingresse-details
+    jobs:
+      - batch/v1/jobs
+      - job-details
+    limitranges:
+      - limitranges
+      - v1/limitranges
+      - limitrange-details
+    namespaces:
+      - namespaces
+      - v1/namespaces
+      - namespace-details
+    networkpolicies:
+      - networking.k8s.io/v1/networkpolicies
+      - networkpolicy-details
+    nodes:
+      - nodes
+      - v1/nodes
+      - node-details
+    persistentvolumeclaims:
+      - persistentvolumeclaims
+      - v1/persistentvolumeclaims
+      - persistentvolumeclaim-details
+    persistentvolumes:
+      - persistentvolumes
+      - persistentvolume-details
+      - v1/persistentvolumes
+    poddisruptionbudgets:
+      - policy/v1/poddisruptionbudgets
+      - poddisruptionbudget-details
+    pods:
+      - pods
+      - v1/pods
+      - pod-details
+    replicasets:
+      - apps/v1/replicasets
+      - replicaset-details
+    replicationcontrollers:
+      - replicationcontrollers
+      - v1/replicationcontrollers
+      - replicationcontroller-details
+    resourcequotas:
+      - resourcequotas
+      - v1/resourcequotas
+      - resourcequota-details
+    rolebindings:
+      - rbac.authorization.k8s.io/v1/rolebindings
+      - rolebinding-details
+    roles:
+      - rbac.authorization.k8s.io/v1/roles
+      - role-details
+    secrets:
+      - secrets
+      - v1/secrets
+      - secret-details
+    serviceaccounts:
+      - serviceaccounts
+      - v1/serviceaccounts
+      - serviceaccount-details
+    services:
+      - services
+      - v1/services
+      - service-details
+    statefulsets:
+      - apps/v1/statefulsets
+      - statefulset-details
+    storageclasses:
+      - storage.k8s.io/v1/storageclasses
+      - storageclass-details
