@@ -31,8 +31,10 @@ metadata:
 spec:
   id: "stock-project-api-form-edit"
   breadcrumbItems:
-    - key: create-api-res-namespaced-table
+    - key: update-api-res-namespaced-table
       label: "{apiGroup}/{apiVersion}/{plural}"
       link: "/{{ .Values.basePrefix }}/{cluster}/{namespace}/api-table/{apiGroup}/{apiVersion}/{plural}"
-    - key: create-api-res-namespaced-plural
+    - key: update-api-res-namespaced-name
+      label: "{9}"
+    - key: update-api-res-namespaced-plural
       label: Update
