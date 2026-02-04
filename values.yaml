@@ -449,7 +449,7 @@ web:
   # Container image configuration
   image:
     repository: prorobotech/openapi-ui
-    tag: release-1.3.0-cf360f53
+    tag: release-1.3.0-5d5a0027
     pullPolicy: IfNotPresent
 
   # Networking configuration for the container
@@ -499,6 +499,7 @@ web:
     BASE_FACTORY_CLUSTERSCOPED_BUILTIN_KEY: "base-factory-clusterscoped-builtin"
     BASE_NAMESPACE_FACTORY_KEY: "namespace-details/v1/namespaces"
     CUSTOMIZATION_SIDEBAR_FALLBACK_ID: "fallback"
+    CUSTOMIZATION_BREADCRUMBS_FALLBACK_ID: "fallback"
     # MF_PLUGINS_NO_CLUSTER: '{"plugin-header":{"name":"plugin-header","entry":"http://127.0.0.1:8081/openapi-ui-plugin/assets/remoteEntry.js","exposedModule":"./App"},"plugin-navigation":{"name":"plugin-navigation","entry":"http://127.0.0.1:8081/openapi-ui-plugin/assets/remoteEntry.js","exposedModule":"./App"},"plugin-sidebar":{"name":"plugin-sidebar","entry":"http://127.0.0.1:8081/openapi-ui-plugin/assets/remoteEntry.js","exposedModule":"./App"}}'
   envFrom: []
 
