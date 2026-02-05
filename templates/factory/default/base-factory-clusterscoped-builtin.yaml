@@ -145,6 +145,9 @@ spec:
                                       reqIndex: 0
                                       selectProps:
                                         maxTagTextLength: 35
+                                      permissionContext:
+                                        cluster: "{2}"
+                                        plural: "{6}"
 
                               - type: antdFlex
                                 data:
@@ -178,6 +181,9 @@ spec:
                                       pathToValue: /metadata/annotations
                                       reqIndex: 0
                                       text: ~counter~ Annotations
+                                      permissionContext:
+                                        cluster: "{2}"
+                                        plural: "{6}"
 
 
                               - type: antdFlex
@@ -269,6 +275,9 @@ spec:
                       # forcedKind: '{reqsJsonPath[0][".items.0.kind"]}'
                       apiVersion: '{5}'
                       plural: '{6}'
+                      permissionContext:
+                        cluster: "{2}"
+                        plural: "{6}"
 
           - key: events
             label: Events
