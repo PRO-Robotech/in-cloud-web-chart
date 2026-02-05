@@ -842,7 +842,6 @@ sidebars:
         jobs: true
         daemonsets: true
         replicasets: true
-        replicationcontrollers: true
         horizontalpodautoscalers: true  # HPA configurations
         poddisruptionbudgets: true  # PDB configurations
       extraItems: []
@@ -971,7 +970,6 @@ sidebars:
         jobs: true
         daemonsets: true
         replicasets: true
-        replicationcontrollers: true
         horizontalpodautoscalers: true
         poddisruptionbudgets: true
       extraItems: []
@@ -1089,10 +1087,6 @@ sidebars:
     replicasets:
       - apps/v1/replicasets
       - replicaset-details
-    replicationcontrollers:
-      - replicationcontrollers
-      - v1/replicationcontrollers
-      - replicationcontroller-details
     resourcequotas:
       - resourcequotas
       - v1/resourcequotas
