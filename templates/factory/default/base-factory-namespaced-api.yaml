@@ -183,6 +183,11 @@ spec:
                                       reqIndex: 0
                                       selectProps:
                                         maxTagTextLength: 35
+                                      permissionContext:
+                                        cluster: "{2}"
+                                        apiGroup: "{6}"
+                                        namespace: "{3}"
+                                        plural: "{8}"
 
 
                               - type: antdFlex
@@ -217,6 +222,11 @@ spec:
                                       pathToValue: /metadata/annotations
                                       reqIndex: 0
                                       text: ~counter~ Annotations
+                                      permissionContext:
+                                        cluster: "{2}"
+                                        apiGroup: "{6}"
+                                        namespace: "{3}"
+                                        plural: "{8}"
 
 
                               - type: antdFlex
@@ -310,6 +320,11 @@ spec:
                       apiGroup: '{6}'
                       apiVersion: '{7}'
                       plural: '{8}'
+                      permissionContext:
+                        cluster: "{2}"
+                        apiGroup: "{6}"
+                        namespace: "{3}"
+                        plural: "{8}"
 
           - key: events
             label: Events

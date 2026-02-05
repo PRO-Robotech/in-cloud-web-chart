@@ -137,6 +137,10 @@ spec:
                                       id: labels-editor
                                       inputLabel: ""
                                       jsonPathToLabels: .items.0.metadata.labels
+                                      permissionContext:
+                                        cluster: "{2}"
+                                        apiGroup: "{5}"
+                                        plural: "{7}"
                                       linkPrefix: /openapi-ui/{2}/search?kinds={5}~{6}~{7}&labels=
                                       maxEditTagTextLength: 35
                                       modalDescriptionText: ""
@@ -175,6 +179,10 @@ spec:
                                       id: annotations
                                       inputLabel: ""
                                       jsonPathToObj: .items.0.metadata.annotations
+                                      permissionContext:
+                                        cluster: "{2}"
+                                        apiGroup: "{5}"
+                                        plural: "{7}"
                                       modalDescriptionText: ""
                                       modalTitle: Edit annotations
                                       notificationSuccessMessage: Updated successfully
@@ -275,6 +283,10 @@ spec:
                       apiGroup: '{5}'
                       apiVersion: '{6}'
                       plural: '{7}'
+                      permissionContext:
+                        cluster: "{2}"
+                        apiGroup: "{5}"
+                        plural: "{7}"
 
           - key: events
             label: Events
