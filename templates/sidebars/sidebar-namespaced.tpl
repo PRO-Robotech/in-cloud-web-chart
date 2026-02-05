@@ -82,11 +82,6 @@
       label: ReplicaSets
       link: /{{ $.Values.basePrefix }}/{cluster}/{namespace}/api-table/apps/v1/replicasets
     {{- end }}
-    {{- if .items.replicationcontrollers }}
-    - key: replicationcontrollers
-      label: ReplicationControllers
-      link: /{{ $.Values.basePrefix }}/{cluster}/{namespace}/builtin-table/replicationcontrollers
-    {{- end }}
     {{- if .items.horizontalpodautoscalers }}
     - key: horizontalpodautoscalers
       label: HorizontalPodAutoscalers
