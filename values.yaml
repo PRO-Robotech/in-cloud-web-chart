@@ -790,45 +790,6 @@ sidebars:
         projects: false
         instances: false
 
-    # ArgoCD sidebar section and sub-items
-    argocd:
-      enabled: true
-      items:
-        argocdlink: false  # Link to ArgoCD UI
-        applications: true  # ArgoCD Applications
-        applicationset: true  # ArgoCD ApplicationSets
-        appprojects: true  # ArgoCD Projects
-      extraItems: []  # Additional custom ArgoCD items
-
-    # Monitoring tools section
-    monitoring:
-      enabled: true
-      items:
-        grafana: true  # Grafana dashboard links
-      extraItems: []
-
-    # HostBase Firewall management section
-    hbf:
-      enabled: true
-      items:
-        hosts: true
-        networks: true
-        addressgroups: true
-        services: true
-        svcsvcrules: true
-        svcfqdnrules: true
-      extraItems: []
-
-    # HBF system configuration section
-    hbfSystem:
-      enabled: true
-      items:
-        hostbindings: true
-        networkbindings: true
-        addressgroupbindings: true
-        addressgroupportmappings: true
-      extraItems: []
-
     # Workloads management section
     workloads:
       enabled: true
@@ -924,39 +885,6 @@ sidebars:
         projects: false
         instances: false
 
-    # ArgoCD resources within the namespace/project
-    argocd:
-      enabled: true
-      items:
-        applications: true
-        applicationset: true
-        appprojects: true
-      extraItems: []
-
-    # HBF resources within the namespace
-    hbf:
-      enabled: true
-      items:
-        hosts: true
-        networks: true
-        addressgroups: true
-        services: true
-        svcsvcrules: true
-        svcfqdnrules: true
-      extraItems: []
-
-    # HBF system resources within the namespace
-    hbfSystem:
-      enabled: true
-      items:
-        hostbindings: true
-        networkbindings: true
-        ieagagrules: true
-        servicealiases: true
-        addressgroupbindings: true
-        addressgroupportmappings: true
-      extraItems: []
-
     # Workloads within the namespace
     workloads:
       enabled: true
@@ -1026,93 +954,56 @@ sidebars:
   # Mapping of resource keys to API endpoints and detail views
   keysAndTags:
     clusterrolebindings:
-      - rbac.authorization.k8s.io/v1/clusterrolebindings
       - clusterrolebinding-details
     clusterroles:
-      - rbac.authorization.k8s.io/v1/clusterroles
       - clusterrole-details
     configmaps:
-      - configmaps
-      - v1/configmaps
       - configmap-details
     cronjobs:
-      - batch/v1/cronjobs
+      - cronjob-details
     customresourcedefinitions:
-      - apiextensions.k8s.io/v1/customresourcedefinitions
       - customresourcedefinition-details
     daemonsets:
-      - apps/v1/daemonsets
+      - daemonset-details
     deployments:
-      - apps/v1/deployments
       - deployment-details
     horizontalpodautoscalers:
-      - autoscaling/v2/horizontalpodautoscalers
       - horizontalpodautoscaler-details
     ingresses:
-      - networking.k8s.io/v1/ingresses
       - ingresse-details
     jobs:
-      - batch/v1/jobs
       - job-details
     limitranges:
-      - limitranges
-      - v1/limitranges
       - limitrange-details
     namespaces:
-      - namespaces
-      - v1/namespaces
       - namespace-details
     networkpolicies:
-      - networking.k8s.io/v1/networkpolicies
       - networkpolicy-details
     nodes:
-      - nodes
-      - v1/nodes
       - node-details
     persistentvolumeclaims:
-      - persistentvolumeclaims
-      - v1/persistentvolumeclaims
       - persistentvolumeclaim-details
     persistentvolumes:
-      - persistentvolumes
       - persistentvolume-details
-      - v1/persistentvolumes
     poddisruptionbudgets:
-      - policy/v1/poddisruptionbudgets
       - poddisruptionbudget-details
     pods:
-      - pods
-      - v1/pods
       - pod-details
     replicasets:
-      - apps/v1/replicasets
       - replicaset-details
     resourcequotas:
-      - resourcequotas
-      - v1/resourcequotas
       - resourcequota-details
     rolebindings:
-      - rbac.authorization.k8s.io/v1/rolebindings
       - rolebinding-details
     roles:
-      - rbac.authorization.k8s.io/v1/roles
       - role-details
     secrets:
-      - secrets
-      - v1/secrets
       - secret-details
     serviceaccounts:
-      - serviceaccounts
-      - v1/serviceaccounts
       - serviceaccount-details
     services:
-      - services
-      - v1/services
       - service-details
     statefulsets:
-      - apps/v1/statefulsets
       - statefulset-details
     storageclasses:
-      - storage.k8s.io/v1/storageclasses
       - storageclass-details
-
