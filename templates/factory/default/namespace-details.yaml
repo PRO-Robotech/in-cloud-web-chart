@@ -4,6 +4,10 @@ apiVersion: front.in-cloud.io/v1alpha1
 kind: Factory
 metadata:
   name: namespace-details
+  # Best practice: keep Helm ownership labels for traceability of cluster-scoped CRs.
+  # These resources are cluster-scoped by CRD design, so namespace is intentionally omitted.
+  labels:
+    {{- include "incloud-web.labels" . | nindent 4 }}
 spec:
   key: namespace-details
   sidebarTags:
@@ -43,7 +47,7 @@ spec:
           plural: '{6}'
 
           jsonPath: ".metadata.name"
-          redirectUrl: "/openapi-ui/{2}/factory/{4}/{5}/{6}/{chosenEntryValue}"
+          redirectUrl: '{{ include "incloud-web.basePrefixWithSlash" $ }}/{2}/factory/{4}/{5}/{6}/{chosenEntryValue}'
           currentValue: "{reqsJsonPath[0]['.items.0.metadata.name']['Select {6}...']}"
           placeholder: "Select {6}..."
 
@@ -121,7 +125,7 @@ spec:
                                   permissionContext:
                                     cluster: "{2}"
                                     plural: "{6}"
-                                  linkPrefix: /openapi-ui/{2}/search?kinds=~v1~namespaces&labels=
+                                  linkPrefix: {{ include "incloud-web.basePrefixWithSlash" $ }}/{2}/search?kinds=~v1~namespaces&labels=
                                   maxEditTagTextLength: 35
                                   modalDescriptionText: ""
                                   modalTitle: Edit labels
@@ -270,7 +274,7 @@ spec:
                   - type: Events
                     data:
                       id: events
-                      baseprefix: "/openapi-ui"
+                      baseprefix: '{{ include "incloud-web.basePrefixWithSlash" $ }}'
                       cluster: "{2}"
                       wsUrl: "/api/clusters/{2}/openapi-bff-ws/events/eventsWs"
                       pageSize: 50

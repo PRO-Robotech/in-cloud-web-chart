@@ -4,6 +4,10 @@ apiVersion: front.in-cloud.io/v1alpha1
 kind: Factory
 metadata:
   name: base-factory-namespaced-api
+  # Best practice: keep Helm ownership labels for traceability of cluster-scoped CRs.
+  # These resources are cluster-scoped by CRD design, so namespace is intentionally omitted.
+  labels:
+    {{- include "incloud-web.labels" . | nindent 4 }}
 
 spec:
   key: base-factory-namespaced-api
@@ -51,7 +55,7 @@ spec:
             plural: '{8}'
 
             jsonPath: ".metadata.name"
-            redirectUrl: "/openapi-ui/{2}/{3}/factory/{5}/{6}/{7}/{8}/{chosenEntryValue}"
+            redirectUrl: '{{ include "incloud-web.basePrefixWithSlash" $ }}/{2}/{3}/factory/{5}/{6}/{7}/{8}/{chosenEntryValue}'
             currentValue: "{reqsJsonPath[0]['.items.0.metadata.name']['Select {8}...']}"
             placeholder: "Select {8}..."
 
@@ -144,7 +148,7 @@ spec:
                                       - type: antdLink
                                         data:
                                           id: namespace-link
-                                          href: /openapi-ui/{2}/factory/namespace-details/v1/namespaces/{reqsJsonPath[0]['.items.0.metadata.namespace']['-']}
+                                          href: {{ include "incloud-web.basePrefixWithSlash" $ }}/{2}/factory/namespace-details/v1/namespaces/{reqsJsonPath[0]['.items.0.metadata.namespace']['-']}
                                           text: '{reqsJsonPath[0][".items.0.metadata.namespace"]["-"]}'
 
 
@@ -172,7 +176,7 @@ spec:
                                       id: labels-editor
                                       inputLabel: ""
                                       jsonPathToLabels: .items.0.metadata.labels
-                                      linkPrefix: /openapi-ui/{2}/search?kinds={6}~{7}~{8}&labels=
+                                      linkPrefix: {{ include "incloud-web.basePrefixWithSlash" $ }}/{2}/search?kinds={6}~{7}~{8}&labels=
                                       maxEditTagTextLength: 35
                                       modalDescriptionText: ""
                                       modalTitle: Edit labels
@@ -284,7 +288,7 @@ spec:
 
                           - type: EnrichedTable
                             data:
-                              baseprefix: /openapi-ui
+                              baseprefix: {{ include "incloud-web.basePrefixWithSlash" $ }}
                               cluster: '{2}'
                               customizationId: factory-status-conditions
                               id: conditions-table
@@ -338,7 +342,7 @@ spec:
                   - type: Events
                     data:
                       id: events
-                      baseprefix: "/openapi-ui"
+                      baseprefix: '{{ include "incloud-web.basePrefixWithSlash" $ }}'
                       cluster: "{2}"
                       wsUrl: "/api/clusters/{2}/openapi-bff-ws/events/eventsWs"
                       pageSize: 50

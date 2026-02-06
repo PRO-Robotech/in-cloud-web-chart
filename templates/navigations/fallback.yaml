@@ -2,13 +2,17 @@ apiVersion: front.in-cloud.io/v1alpha1
 kind: Navigation
 metadata:
   name: fallback
+  # Best practice: keep Helm ownership labels for traceability of cluster-scoped CRs.
+  # These resources are cluster-scoped by CRD design, so namespace is intentionally omitted.
+  labels:
+    {{- include "incloud-web.labels" . | nindent 4 }}
 spec:
   projects:
-    clear: "/openapi-ui/{selectedCluster}/builtin-table/pods"
-    change: "/openapi-ui/{selectedCluster}/{value}/builtin-table/pods"
+    clear: '{{ include "incloud-web.basePrefixWithSlash" $ }}/{selectedCluster}/builtin-table/pods'
+    change: '{{ include "incloud-web.basePrefixWithSlash" $ }}/{selectedCluster}/{value}/builtin-table/pods'
   instances:
-    clear: "/openapi-ui/{selectedCluster}/builtin-table/pods"
-    change: "/openapi-ui/{selectedCluster}/{value}/builtin-table/pods"
+    clear: '{{ include "incloud-web.basePrefixWithSlash" $ }}/{selectedCluster}/builtin-table/pods'
+    change: '{{ include "incloud-web.basePrefixWithSlash" $ }}/{selectedCluster}/{value}/builtin-table/pods'
   namespaces:
-    clear: "/openapi-ui/{selectedCluster}/builtin-table/pods"
-    change: "/openapi-ui/{selectedCluster}/{value}/builtin-table/pods"
+    clear: '{{ include "incloud-web.basePrefixWithSlash" $ }}/{selectedCluster}/builtin-table/pods'
+    change: '{{ include "incloud-web.basePrefixWithSlash" $ }}/{selectedCluster}/{value}/builtin-table/pods'

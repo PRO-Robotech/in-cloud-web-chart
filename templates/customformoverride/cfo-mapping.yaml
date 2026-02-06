@@ -2,6 +2,10 @@ apiVersion: front.in-cloud.io/v1alpha1
 kind: CFOMapping
 metadata:
   name: default
+  # Best practice: keep Helm ownership labels for traceability of cluster-scoped CRs.
+  # These resources are cluster-scoped by CRD design, so namespace is intentionally omitted.
+  labels:
+    {{- include "incloud-web.labels" . | nindent 4 }}
 spec:
   mappings:
     default-/v1/secrets: "default-/v1/secrets"
@@ -10,4 +14,4 @@ spec:
     default-/apps/v1/daemonsets: "default-/apps/v1/daemonsets"
     default-/apps/v1/deployments: "default-/apps/v1/deployments"
     default-/apps/v1/replicasets: "default-/apps/v1/replicasets"
-    default-/apps/v1/replicasets: "default-/apps/v1/statefulsets"
+    default-/apps/v1/statefulsets: "default-/apps/v1/statefulsets"

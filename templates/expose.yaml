@@ -80,7 +80,7 @@ spec:
         {{ if or (eq $tls.certSource "certmanager") (eq $tls.certSource "secret") }}
         scheme: https
         {{ end }}
-        uri: {{ $expose.path }}openapi-ui
+        uri: {{ $expose.path }}{{ include "incloud-web.basePrefix" . }}
     - match:
         - uri:
             prefix: {{ $expose.path }}

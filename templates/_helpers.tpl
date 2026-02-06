@@ -54,3 +54,20 @@ app.kubernetes.io/instance: {{ .Release.Name }}
   value: {{ $v | quote }}
 {{- end }}
 {{- end }}
+
+{{/* ----------------------------------------------------------------------
+ Base prefix helpers
+---------------------------------------------------------------------- */}}
+{{- define "incloud-web.basePrefix" -}}
+{{- $envPrefix := .Values.web.env.BASEPREFIX | default "" -}}
+{{- if $envPrefix -}}
+{{- trimSuffix "/" (trimPrefix "/" $envPrefix) -}}
+{{- else -}}
+{{- $valuePrefix := .Values.basePrefix | default "openapi-ui" -}}
+{{- trimSuffix "/" (trimPrefix "/" $valuePrefix) -}}
+{{- end -}}
+{{- end }}
+
+{{- define "incloud-web.basePrefixWithSlash" -}}
+{{- printf "/%s" (include "incloud-web.basePrefix" .) -}}
+{{- end }}

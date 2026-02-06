@@ -1,14 +1,26 @@
+{{- $defaultWebResources := index .Values "defaultWebResources" | default dict -}}
+{{- $breadcrumbs := index $defaultWebResources "breadcrumbs" | default dict -}}
+{{- $breadcrumbsDefault := index $breadcrumbs "default" | default dict -}}
+{{- $enabled := true -}}
+{{- if hasKey $breadcrumbsDefault "fallback-factory-clusterscoped" -}}
+{{- $enabled = index $breadcrumbsDefault "fallback-factory-clusterscoped" -}}
+{{- end -}}
+{{- if eq (toString $enabled) "true" }}
 ---
 apiVersion: front.in-cloud.io/v1alpha1
 kind: Breadcrumb
 metadata:
   name: fallback-factory-clusterscoped-api
+  # Best practice: keep Helm ownership labels for traceability of cluster-scoped CRs.
+  # These resources are cluster-scoped by CRD design, so namespace is intentionally omitted.
+  labels:
+    {{- include "incloud-web.labels" . | nindent 4 }}
 spec:
   id: "fallback-factory-clusterscoped-api"
   breadcrumbItems:
     - key: group-version
       label: "{5}/{6}/{7}"
-      link: "/openapi-ui/{cluster}/api-table/{5}/{6}/{7}"
+      link: '{{ include "incloud-web.basePrefixWithSlash" $ }}/{cluster}/api-table/{5}/{6}/{7}'
     - key: resource-name
       label: "{8}"
     - key: details
@@ -19,14 +31,19 @@ apiVersion: front.in-cloud.io/v1alpha1
 kind: Breadcrumb
 metadata:
   name: fallback-factory-clusterscoped-builtin
+  # Best practice: keep Helm ownership labels for traceability of cluster-scoped CRs.
+  # These resources are cluster-scoped by CRD design, so namespace is intentionally omitted.
+  labels:
+    {{- include "incloud-web.labels" . | nindent 4 }}
 spec:
   id: "fallback-factory-clusterscoped-builtin"
   breadcrumbItems:
     - key: group-version
       label: "{5}/{6}"
-      link: "/openapi-ui/{cluster}/builtin-table/{6}"
+      link: '{{ include "incloud-web.basePrefixWithSlash" $ }}/{cluster}/builtin-table/{6}'
     - key: resource-name
       label: "{7}"
     - key: details
       label: "Details"
+{{- end }}
 

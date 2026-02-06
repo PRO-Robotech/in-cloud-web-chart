@@ -1,14 +1,26 @@
+{{- $defaultWebResources := index .Values "defaultWebResources" | default dict -}}
+{{- $breadcrumbs := index $defaultWebResources "breadcrumbs" | default dict -}}
+{{- $breadcrumbsDefault := index $breadcrumbs "default" | default dict -}}
+{{- $enabled := true -}}
+{{- if hasKey $breadcrumbsDefault "fallback-form-namespaced" -}}
+{{- $enabled = index $breadcrumbsDefault "fallback-form-namespaced" -}}
+{{- end -}}
+{{- if eq (toString $enabled) "true" }}
 ---
 apiVersion: front.in-cloud.io/v1alpha1
 kind: Breadcrumb
 metadata:
   name: fallback-form-namespaced-api
+  # Best practice: keep Helm ownership labels for traceability of cluster-scoped CRs.
+  # These resources are cluster-scoped by CRD design, so namespace is intentionally omitted.
+  labels:
+    {{- include "incloud-web.labels" . | nindent 4 }}
 spec:
   id: "fallback-form-namespaced-api"
   breadcrumbItems:
     - key: create-api-res-namespaced-table
       label: "{6}/{7}/{8}"
-      link: "/openapi-ui/{cluster}/{namespace}/api-table/{6}/{7}/{8}"
+      link: '{{ include "incloud-web.basePrefixWithSlash" $ }}/{cluster}/{namespace}/api-table/{6}/{7}/{8}'
     - key: create-api-res-namespaced-plural
       label: Create
 ---
@@ -16,12 +28,16 @@ apiVersion: front.in-cloud.io/v1alpha1
 kind: Breadcrumb
 metadata:
   name: fallback-form-namespaced-api-edit
+  # Best practice: keep Helm ownership labels for traceability of cluster-scoped CRs.
+  # These resources are cluster-scoped by CRD design, so namespace is intentionally omitted.
+  labels:
+    {{- include "incloud-web.labels" . | nindent 4 }}
 spec:
   id: "fallback-form-namespaced-api-edit"
   breadcrumbItems:
     - key: update-api-res-namespaced-table
       label: "{6}/{7}/{8}"
-      link: "/openapi-ui/{cluster}/{namespace}/api-table/{6}/{7}/{8}"
+      link: '{{ include "incloud-web.basePrefixWithSlash" $ }}/{cluster}/{namespace}/api-table/{6}/{7}/{8}'
     - key: update-api-res-namespaced-name
       label: "{9}"
     - key: update-api-res-namespaced-plural
@@ -31,12 +47,16 @@ apiVersion: front.in-cloud.io/v1alpha1
 kind: Breadcrumb
 metadata:
   name: fallback-form-namespaced-builtin
+  # Best practice: keep Helm ownership labels for traceability of cluster-scoped CRs.
+  # These resources are cluster-scoped by CRD design, so namespace is intentionally omitted.
+  labels:
+    {{- include "incloud-web.labels" . | nindent 4 }}
 spec:
   id: "fallback-form-namespaced-builtin"
   breadcrumbItems:
     - key: create-builtin-res-namespaced-table
       label: "v1/{7}"
-      link: "/openapi-ui/{cluster}/{namespace}/builtin-table/{7}"
+      link: '{{ include "incloud-web.basePrefixWithSlash" $ }}/{cluster}/{namespace}/builtin-table/{7}'
     - key: create-builtin-res-namespaced-plural
       label: Create
 ---
@@ -44,14 +64,18 @@ apiVersion: front.in-cloud.io/v1alpha1
 kind: Breadcrumb
 metadata:
   name: fallback-form-namespaced-builtin-edit
+  # Best practice: keep Helm ownership labels for traceability of cluster-scoped CRs.
+  # These resources are cluster-scoped by CRD design, so namespace is intentionally omitted.
+  labels:
+    {{- include "incloud-web.labels" . | nindent 4 }}
 spec:
   id: "fallback-form-namespaced-builtin-edit"
   breadcrumbItems:
     - key: update-builtin-res-namespaced-table
       label: "v1/{7}"
-      link: "/openapi-ui/{cluster}/{namespace}/builtin-table/{7}"
+      link: '{{ include "incloud-web.basePrefixWithSlash" $ }}/{cluster}/{namespace}/builtin-table/{7}'
     - key: update-builtin-res-namespaced-name
       label: "{8}"
     - key: update-builtin-res-namespaced-plural
       label: Update
-
+{{- end }}

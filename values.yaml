@@ -175,11 +175,14 @@ clusters:
 defaultWebResources:
   breadcrumbs:
     default:
-      stock-cluster-factory-namespace-details: true
-      stock-cluster-factory-base-factory-clusterscoped-api: true
-      stock-cluster-factory-base-factory-clusterscoped-builtin: true
-      stock-project-factory-base-factory-namespaced-api: true
-      stock-project-factory-base-factory-namespaced-builtin: true
+      # Toggle rendering of fallback breadcrumbs shipped by this chart.
+      fallback-factory-clusterscoped: true
+      fallback-factory-namespaced: true
+      fallback-form-clusterscoped: true
+      fallback-form-namespaced: true
+      fallback-search: true
+      fallback-table-clusterscoped: true
+      fallback-table-namespaced: true
   customcolumnsoverride:
     stock-cluster-v1_namespaces: true
     stock-namespace-v1_namespaces: true
@@ -256,6 +259,7 @@ service:
       targetPort: 8082
       protocol: TCP
 
+# External host and port used by NGINX redirects and expose resources.
 externalDomain: 127.0.0.1
 externalDomainPort: 8081
 
@@ -588,7 +592,6 @@ nginx:
 
   # ConfigMap reference for custom NGINX configuration
   configMapName: ""        # Defaults to "<fullname>-nginx-config"
-  configKey: "nginx-config"
 
   # Environment variables and external sources
   env: {}
@@ -756,6 +759,7 @@ strategy:
     maxUnavailable: 1
     maxSurge: 1
 
+# Base UI path without leading slash; used as fallback when web.env.BASEPREFIX is empty.
 basePrefix: openapi-ui
 
 sidebars:
@@ -786,9 +790,8 @@ sidebars:
     home:
       enabled: true
       items:
+        # Search is currently rendered by templates; projects/instances toggles were removed as unused.
         search: true
-        projects: false
-        instances: false
 
     # Workloads management section
     workloads:
@@ -881,9 +884,8 @@ sidebars:
     home:
       enabled: true
       items:
+        # Search is currently rendered by templates; projects/instances toggles were removed as unused.
         search: true
-        projects: false
-        instances: false
 
     # Workloads within the namespace
     workloads:

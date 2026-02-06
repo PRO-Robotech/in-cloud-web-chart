@@ -3,6 +3,10 @@ apiVersion: front.in-cloud.io/v1alpha1
 kind: CustomFormsOverride
 metadata:
   name: default-apps.v1.deployments
+  # Best practice: keep Helm ownership labels for traceability of cluster-scoped CRs.
+  # These resources are cluster-scoped by CRD design, so namespace is intentionally omitted.
+  labels:
+    {{- include "incloud-web.labels" . | nindent 4 }}
 spec:
   customizationId: "default-/apps/v1/deployments"
   hidden:

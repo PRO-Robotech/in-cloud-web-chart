@@ -1,4 +1,4 @@
-# return [] if sidebebar items are empty
+# Return an empty array when no sidebar section is enabled.
 {{ define "incloud-web-chart.sidebar.menu.items.cluster" }}
 {{- if (include "incloud-web-chart.sidebar.menu.items.cluster-items" . | trim) }}
 {{ include "incloud-web-chart.sidebar.menu.items.cluster-items" . }}
@@ -9,8 +9,6 @@
 
 {{ define "incloud-web-chart.sidebar.menu.items.cluster-items" }}
 {{ $sidebars := .Values.sidebars.cluster }}
-{{ $projRes := .Values.projectResource }}
-{{ $instRes := .Values.instanceResource }}
 
 {{- with $sidebars.home }}
   {{- if .enabled }}
@@ -18,7 +16,7 @@
     {{- if .items.search }}
     - key: search
       label: Search
-      link: /openapi-ui/{cluster}/search
+      link: {{ include "incloud-web.basePrefixWithSlash" $ }}/{cluster}/search
     {{- end }}
     {{- with .extraItems }}
       {{ . | toYaml | nindent 4 }}
@@ -28,11 +26,10 @@
   {{- end }}
 {{- end }}
 
-{{- if $sidebars.customItems -}}
-  {{- range $sidebars.customItems }}
-{{ $sidebars.customItems | toYaml }}
-  {{- end }}
-{{- end -}}
+{{/* Keep user-defined custom items as-is to avoid mutating their structure. */}}
+{{- with $sidebars.customItems }}
+{{- toYaml . | nindent 0 }}
+{{- end }}
 
 {{- with $sidebars.workloads }}
   {{- if .enabled }}
@@ -40,57 +37,57 @@
     {{- if .items.pods }}
     - key: pods
       label: Pods
-      link: /{{ $.Values.basePrefix }}/{cluster}/builtin-table/pods?resources=metrics.k8s.io/v1beta1/pods
+      link: {{ include "incloud-web.basePrefixWithSlash" $ }}/{cluster}/builtin-table/pods?resources=metrics.k8s.io/v1beta1/pods
     {{- end }}
     {{- if .items.deployments }}
     - key: deployments
       label: Deployments
-      link: /{{ $.Values.basePrefix }}/{cluster}/api-table/apps/v1/deployments
+      link: {{ include "incloud-web.basePrefixWithSlash" $ }}/{cluster}/api-table/apps/v1/deployments
     {{- end }}
     {{- if .items.statefulsets }}
     - key: statefulsets
       label: Statefulsets
-      link: /{{ $.Values.basePrefix }}/{cluster}/api-table/apps/v1/statefulsets
+      link: {{ include "incloud-web.basePrefixWithSlash" $ }}/{cluster}/api-table/apps/v1/statefulsets
     {{- end }}
     {{- if .items.secrets }}
     - key: secrets
       label: Secrets
-      link: /{{ $.Values.basePrefix }}/{cluster}/builtin-table/secrets
+      link: {{ include "incloud-web.basePrefixWithSlash" $ }}/{cluster}/builtin-table/secrets
     {{- end }}
     {{- if .items.configmaps }}
     - key: configmaps
       label: ConfigMaps
-      link: /{{ $.Values.basePrefix }}/{cluster}/builtin-table/configmaps
+      link: {{ include "incloud-web.basePrefixWithSlash" $ }}/{cluster}/builtin-table/configmaps
     {{- end }}
     {{- if .items.cronjobs }}
     - key: cronjobs
       label: CronJobs
-      link: /{{ $.Values.basePrefix }}/{cluster}/api-table/batch/v1/cronjobs
+      link: {{ include "incloud-web.basePrefixWithSlash" $ }}/{cluster}/api-table/batch/v1/cronjobs
     {{- end }}
     {{- if .items.jobs }}
     - key: jobs
       label: Jobs
-      link: /{{ $.Values.basePrefix }}/{cluster}/api-table/batch/v1/jobs
+      link: {{ include "incloud-web.basePrefixWithSlash" $ }}/{cluster}/api-table/batch/v1/jobs
     {{- end }}
     {{- if .items.daemonsets }}
     - key: daemonsets
       label: Daemonsets
-      link: /{{ $.Values.basePrefix }}/{cluster}/api-table/apps/v1/daemonsets
+      link: {{ include "incloud-web.basePrefixWithSlash" $ }}/{cluster}/api-table/apps/v1/daemonsets
     {{- end }}
     {{- if .items.replicasets }}
     - key: replicasets
       label: ReplicaSets
-      link: /{{ $.Values.basePrefix }}/{cluster}/api-table/apps/v1/replicasets
+      link: {{ include "incloud-web.basePrefixWithSlash" $ }}/{cluster}/api-table/apps/v1/replicasets
     {{- end }}
     {{- if .items.horizontalpodautoscalers }}
     - key: horizontalpodautoscalers
       label: HorizontalPodAutoscalers
-      link: /{{ $.Values.basePrefix }}/{cluster}/api-table/autoscaling/v2/horizontalpodautoscalers
+      link: {{ include "incloud-web.basePrefixWithSlash" $ }}/{cluster}/api-table/autoscaling/v2/horizontalpodautoscalers
     {{- end }}
     {{- if .items.poddisruptionbudgets }}
     - key: poddisruptionbudgets
       label: PodDisruptionBudgets
-      link: /{{ $.Values.basePrefix }}/{cluster}/api-table/policy/v1/poddisruptionbudgets
+      link: {{ include "incloud-web.basePrefixWithSlash" $ }}/{cluster}/api-table/policy/v1/poddisruptionbudgets
     {{- end }}
     {{- with .extraItems }}
       {{ . | toYaml | nindent 4 }}
@@ -106,17 +103,17 @@
     {{- if .items.services }}
     - key: services
       label: Services
-      link: /{{ $.Values.basePrefix }}/{cluster}/builtin-table/services
+      link: {{ include "incloud-web.basePrefixWithSlash" $ }}/{cluster}/builtin-table/services
     {{- end }}
     {{- if .items.networkpolicies }}
     - key: networkpolicies
       label: NetworkPolicies
-      link: /{{ $.Values.basePrefix }}/{cluster}/api-table/networking.k8s.io/v1/networkpolicies
+      link: {{ include "incloud-web.basePrefixWithSlash" $ }}/{cluster}/api-table/networking.k8s.io/v1/networkpolicies
     {{- end }}
     {{- if .items.ingresses }}
     - key: ingresses
       label: Ingresses
-      link: /{{ $.Values.basePrefix }}/{cluster}/api-table/networking.k8s.io/v1/ingresses
+      link: {{ include "incloud-web.basePrefixWithSlash" $ }}/{cluster}/api-table/networking.k8s.io/v1/ingresses
     {{- end }}
     {{- with .extraItems }}
       {{ . | toYaml | nindent 4 }}
@@ -132,17 +129,17 @@
     {{- if .items.persistentvolumes }}
     - key: persistentvolumes
       label: PersistentVolumes
-      link: /{{ $.Values.basePrefix }}/{cluster}/builtin-table/persistentvolumes
+      link: {{ include "incloud-web.basePrefixWithSlash" $ }}/{cluster}/builtin-table/persistentvolumes
     {{- end }}
     {{- if .items.persistentvolumeclaims }}
     - key: persistentvolumeclaims
       label: PersistentVolumeClaims
-      link: /{{ $.Values.basePrefix }}/{cluster}/builtin-table/persistentvolumeclaims
+      link: {{ include "incloud-web.basePrefixWithSlash" $ }}/{cluster}/builtin-table/persistentvolumeclaims
     {{- end }}
     {{- if .items.storageclasses }}
     - key: storageclasses
       label: StorageClasses
-      link: /{{ $.Values.basePrefix }}/{cluster}/api-table/storage.k8s.io/v1/storageclasses
+      link: {{ include "incloud-web.basePrefixWithSlash" $ }}/{cluster}/api-table/storage.k8s.io/v1/storageclasses
     {{- end }}
     {{- with .extraItems }}
       {{ . | toYaml | nindent 4 }}
@@ -158,7 +155,7 @@
     {{- if .items.nodes }}
     - key: nodes
       label: Nodes
-      link: /{{ $.Values.basePrefix }}/{cluster}/builtin-table/nodes?resources=metrics.k8s.io/v1beta1/nodes
+      link: {{ include "incloud-web.basePrefixWithSlash" $ }}/{cluster}/builtin-table/nodes?resources=metrics.k8s.io/v1beta1/nodes
     {{- end }}
     {{- with .extraItems }}
       {{ . | toYaml | nindent 4 }}
@@ -174,27 +171,27 @@
     {{- if .items.serviceaccounts }}
     - key: serviceaccounts
       label: ServiceAccounts
-      link: /{{ $.Values.basePrefix }}/{cluster}/builtin-table/serviceaccounts
+      link: {{ include "incloud-web.basePrefixWithSlash" $ }}/{cluster}/builtin-table/serviceaccounts
     {{- end }}
     {{- if .items.roles }}
     - key: roles
       label: Roles
-      link: /{{ $.Values.basePrefix }}/{cluster}/api-table/rbac.authorization.k8s.io/v1/roles
+      link: {{ include "incloud-web.basePrefixWithSlash" $ }}/{cluster}/api-table/rbac.authorization.k8s.io/v1/roles
     {{- end }}
     {{- if .items.rolebindings }}
     - key: rolebindings
       label: RoleBindings
-      link: /{{ $.Values.basePrefix }}/{cluster}/api-table/rbac.authorization.k8s.io/v1/rolebindings
+      link: {{ include "incloud-web.basePrefixWithSlash" $ }}/{cluster}/api-table/rbac.authorization.k8s.io/v1/rolebindings
     {{- end }}
     {{- if .items.clusterroles }}
     - key: clusterroles
       label: ClusterRoles
-      link: /{{ $.Values.basePrefix }}/{cluster}/api-table/rbac.authorization.k8s.io/v1/clusterroles
+      link: {{ include "incloud-web.basePrefixWithSlash" $ }}/{cluster}/api-table/rbac.authorization.k8s.io/v1/clusterroles
     {{- end }}
     {{- if .items.clusterrolebindings }}
     - key: clusterrolebindings
       label: ClusterRoleBindings
-      link: /{{ $.Values.basePrefix }}/{cluster}/api-table/rbac.authorization.k8s.io/v1/clusterrolebindings
+      link: {{ include "incloud-web.basePrefixWithSlash" $ }}/{cluster}/api-table/rbac.authorization.k8s.io/v1/clusterrolebindings
     {{- end }}
     {{- with .extraItems }}
       {{ . | toYaml | nindent 4 }}
@@ -210,22 +207,22 @@
     {{- if .items.namespaces }}
     - key: namespaces
       label: Namespaces
-      link: /{{ $.Values.basePrefix }}/{cluster}/builtin-table/namespaces
+      link: {{ include "incloud-web.basePrefixWithSlash" $ }}/{cluster}/builtin-table/namespaces
     {{- end }}
     {{- if .items.limitranges }}
     - key: limitranges
       label: LimitRanges
-      link: /{{ $.Values.basePrefix }}/{cluster}/builtin-table/limitranges
+      link: {{ include "incloud-web.basePrefixWithSlash" $ }}/{cluster}/builtin-table/limitranges
     {{- end }}
     {{- if .items.resourcequotas }}
     - key: resourcequotas
       label: ResourceQuotas
-      link: /{{ $.Values.basePrefix }}/{cluster}/builtin-table/resourcequotas
+      link: {{ include "incloud-web.basePrefixWithSlash" $ }}/{cluster}/builtin-table/resourcequotas
     {{- end }}
     {{- if .items.customresourcedefinitions }}
     - key: customresourcedefinitions
       label: CustomResourceDefinitions
-      link: /{{ $.Values.basePrefix }}/{cluster}/api-table/apiextensions.k8s.io/v1/customresourcedefinitions
+      link: {{ include "incloud-web.basePrefixWithSlash" $ }}/{cluster}/api-table/apiextensions.k8s.io/v1/customresourcedefinitions
     {{- end }}
     {{- with .extraItems }}
       {{ . | toYaml | nindent 4 }}

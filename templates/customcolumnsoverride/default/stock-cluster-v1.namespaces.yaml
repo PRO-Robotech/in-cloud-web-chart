@@ -4,6 +4,10 @@ apiVersion: front.in-cloud.io/v1alpha1
 kind: CustomColumnsOverride
 metadata:
   name: stock-cluster-v1.namespaces
+  # Best practice: keep Helm ownership labels for traceability of cluster-scoped CRs.
+  # These resources are cluster-scoped by CRD design, so namespace is intentionally omitted.
+  labels:
+    {{- include "incloud-web.labels" . | nindent 4 }}
 spec:
   additionalPrinterColumns:
   - customProps:
@@ -15,7 +19,7 @@ spec:
             value: Namespace
           type: ResourceBadge
         - data:
-            href: /openapi-ui/{2}/factory/namespace-details/v1/namespaces/{reqsJsonPath[0]['.metadata.name']['-']}
+            href: {{ include "incloud-web.basePrefixWithSlash" $ }}/{2}/factory/namespace-details/v1/namespaces/{reqsJsonPath[0]['.metadata.name']['-']}
             id: name-link
             text: '{reqsJsonPath[0][".metadata.name"]["-"]}'
           type: antdLink

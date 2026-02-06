@@ -1,8 +1,20 @@
+{{- $defaultWebResources := index .Values "defaultWebResources" | default dict -}}
+{{- $breadcrumbs := index $defaultWebResources "breadcrumbs" | default dict -}}
+{{- $breadcrumbsDefault := index $breadcrumbs "default" | default dict -}}
+{{- $enabled := true -}}
+{{- if hasKey $breadcrumbsDefault "fallback-table-namespaced" -}}
+{{- $enabled = index $breadcrumbsDefault "fallback-table-namespaced" -}}
+{{- end -}}
+{{- if eq (toString $enabled) "true" }}
 ---
 apiVersion: front.in-cloud.io/v1alpha1
 kind: Breadcrumb
 metadata:
   name: fallback-table-namespaced-api
+  # Best practice: keep Helm ownership labels for traceability of cluster-scoped CRs.
+  # These resources are cluster-scoped by CRD design, so namespace is intentionally omitted.
+  labels:
+    {{- include "incloud-web.labels" . | nindent 4 }}
 spec:
   id: "fallback-table-namespaced-api"
   breadcrumbItems:
@@ -13,11 +25,13 @@ apiVersion: front.in-cloud.io/v1alpha1
 kind: Breadcrumb
 metadata:
   name: fallback-table-namespaced-builtin
+  # Best practice: keep Helm ownership labels for traceability of cluster-scoped CRs.
+  # These resources are cluster-scoped by CRD design, so namespace is intentionally omitted.
+  labels:
+    {{- include "incloud-web.labels" . | nindent 4 }}
 spec:
   id: "fallback-table-namespaced-builtin"
   breadcrumbItems:
     - key: api
       label: "v1/{5}"
-
-
-
+{{- end }}
