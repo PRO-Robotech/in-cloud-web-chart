@@ -449,7 +449,7 @@ web:
   # Container image configuration
   image:
     repository: prorobotech/openapi-ui
-    tag: release-1.4.0-6cce5173
+    tag: release-1.4.0-7714d5fd
     pullPolicy: IfNotPresent
 
   # Networking configuration for the container
