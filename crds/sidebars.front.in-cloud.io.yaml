@@ -15,10 +15,18 @@ spec:
     - name: v1alpha1
       served: true
       storage: true
+      additionalPrinterColumns:
+        - name: ID
+          type: string
+          jsonPath: .spec.id
+        - name: Age
+          type: date
+          jsonPath: .metadata.creationTimestamp
       schema:
         openAPIV3Schema:
           type: object
-          required: [spec]
+          required:
+            - spec
           properties:
             apiVersion:
               type: string
@@ -28,7 +36,10 @@ spec:
               type: object
             spec:
               type: object
-              required: [id, menuItems]
+              additionalProperties: true
+              required:
+                - id
+                - menuItems
               properties:
                 id:
                   type: string
@@ -39,21 +50,57 @@ spec:
                     type: array
                     items:
                       type: string
+                externalKeys:
+                  type: array
+                  items:
+                    type: string
                 menuItems:
                   type: array
                   items:
                     type: object
-                    required: [key, label]
+                    additionalProperties: true
+                    required:
+                      - key
+                      - label
                     properties:
                       key:
                         type: string
                       label:
                         type: string
+                      link:
+                        type: string
+                      resourcesList:
+                        type: object
+                        additionalProperties: true
+                        required:
+                          - cluster
+                          - apiVersion
+                          - plural
+                          - linkToResource
+                          - jsonPathToName
+                        properties:
+                          cluster:
+                            type: string
+                          apiGroup:
+                            type: string
+                          apiVersion:
+                            type: string
+                          plural:
+                            type: string
+                          namespace:
+                            type: string
+                          linkToResource:
+                            type: string
+                          jsonPathToName:
+                            type: string
                       children:
                         type: array
                         items:
                           type: object
-                          required: [key, label, link]
+                          additionalProperties: true
+                          required:
+                            - key
+                            - label
                           properties:
                             key:
                               type: string
@@ -61,15 +108,29 @@ spec:
                               type: string
                             link:
                               type: string
-                          additionalProperties: true
-                    additionalProperties: true
-              additionalProperties: true
+                            resourcesList:
+                              type: object
+                              additionalProperties: true
+                              required:
+                                - cluster
+                                - apiVersion
+                                - plural
+                                - linkToResource
+                                - jsonPathToName
+                              properties:
+                                cluster:
+                                  type: string
+                                apiGroup:
+                                  type: string
+                                apiVersion:
+                                  type: string
+                                plural:
+                                  type: string
+                                namespace:
+                                  type: string
+                                linkToResource:
+                                  type: string
+                                jsonPathToName:
+                                  type: string
       subresources:
         status: {}
-      additionalPrinterColumns:
-        - name: ID
-          type: string
-          jsonPath: .spec.id
-        - name: Age
-          type: date
-          jsonPath: .metadata.creationTimestamp
