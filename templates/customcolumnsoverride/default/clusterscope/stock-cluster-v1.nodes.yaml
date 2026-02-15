@@ -1,0 +1,144 @@
+{{- $customWebResources := default (dict) .Values.customWebResources -}}
+{{- $customCcoResources := default (dict) $customWebResources.customcolumnsoverride -}}
+{{- $nodeDetailsCco := index $customCcoResources "node-details" -}}
+{{- if eq (include "in-cloud.web.cco.isEnabled" (dict "config" $nodeDetailsCco)) "true" }}
+# =================================================
+# Cluster-scoped Node list columns override
+# =================================================
+apiVersion: front.in-cloud.io/v1alpha1
+kind: CustomColumnsOverride
+metadata:
+  # Name of this CustomColumnsOverride resource
+  name: stock-cluster-v1.nodes
+spec:
+  # Unique identifier of this CustomColumnsOverride
+  id: stock-cluster-/v1/nodes
+
+  # =================================================
+  # Table columns rendered in the Nodes list
+  # =================================================
+  additionalPrinterColumns:
+
+    # =================================================
+    # Resource name with link to Node details Factory
+    # =================================================
+    - name: Name
+      type: factory
+      {{ include "in-cloud.web.cco.props.badgeLink" (list $
+          "/openapi-ui/{2}/factory/node-details/v1/nodes/{reqsJsonPath[0]['.metadata.name']['-']}"
+        ) | nindent 6
+      }}
+
+    # =================================================
+    # MachineConfigPool name (taken from node annotation)
+    # =================================================
+    - name: Machine Pool
+      type: factory
+      {{ include "in-cloud.web.cco.props.badgeLink" (list $
+          "/openapi-ui/{2}/factory/base-factory-clusterscoped-api/mco.in-cloud.io/v1alpha1/machineconfigpools/{reqsJsonPath[0]['.metadata.annotations[\"mco.in-cloud.io/pool\"]']['-']}"
+          (dict
+          "name" "Machine Pool"
+          "jsonPath" ".metadata.annotations[\"mco.in-cloud.io/pool\"]"
+          "badge" "MachineConfigPool"
+          "text" "{reqsJsonPath[0]['.metadata.annotations[\"mco.in-cloud.io/pool\"]']['-']}"
+          )
+        ) | nindent 6
+      }}
+
+    # =================================================
+    # RenderedMachineConfig revision currently applied
+    # =================================================
+    - name: Render Config
+      type: factory
+      {{ include "in-cloud.web.cco.props.badgeLink" (list $
+          "/openapi-ui/{2}/factory/base-factory-clusterscoped-api/mco.in-cloud.io/v1alpha1/renderedmachineconfigs/{reqsJsonPath[0]['.metadata.annotations[\"mco.in-cloud.io/current-revision\"]']['-']}"
+          (dict
+          "name" "Render Config"
+          "jsonPath" ".metadata.annotations[\"mco.in-cloud.io/current-revision\"]"
+          "badge" "RenderedMachineConfig"
+          "text" "{reqsJsonPath[0]['.metadata.annotations[\"mco.in-cloud.io/current-revision\"]']['-']}"
+          )
+        ) | nindent 6
+      }}
+
+    # =================================================
+    # Node memory usage / capacity visualization
+    # =================================================
+    - name: Memory
+      type: factory
+      {{ include "in-cloud.web.cco.props.memory" (dict
+          "value" "{reqsJsonPath[0]['.additionalReqsData.0.items[?(@.metadata.name==\"{reqsJsonPath[0][\".metadata.name\"]}\")].usage.memory']['-']}"
+        ) | nindent 6
+      }}
+
+    # =================================================
+    # Node CPU usage / capacity visualization
+    # =================================================
+    - name: CPU
+      type: factory
+      {{ include "in-cloud.web.cco.props.cpu" (dict
+          "value" "{reqsJsonPath[0]['.additionalReqsData.0.items[?(@.metadata.name==\"{reqsJsonPath[0][\".metadata.name\"]}\")].usage.cpu']['-']}"
+        ) | nindent 6
+      }}
+
+    # =================================================
+    # Internal IP address of the node
+    # =================================================
+    - name: Internal IP
+      type: factory
+      {{ include "in-cloud.web.columns.factory.text" (dict
+          "value" "{reqsJsonPath[0]['.status.addresses[?(@.type==\"InternalIP\")].address']['-']}"
+        ) | nindent 6
+      }}
+
+    # =================================================
+    # External IP address of the node (if present)
+    # =================================================
+    - name: External IP
+      type: factory
+      {{ include "in-cloud.web.columns.factory.text" (dict
+          "value" "{reqsJsonPath[0]['.status.addresses[?(@.type==\"ExternalIP\")].address']['-']}"
+        ) | nindent 6
+      }}
+
+    # =================================================
+    # Operating system image of the node
+    # =================================================
+    - name: OS Image
+      type: string
+      jsonPath: .status.nodeInfo.osImage
+
+    # =================================================
+    # Kernel version running on the node
+    # =================================================
+    - name: Kernel Version
+      type: string
+      jsonPath: .status.nodeInfo.kernelVersion
+
+    # =================================================
+    # Kubelet version on the node
+    # =================================================
+    - name: Kubelet Version
+      type: string
+      jsonPath: .status.nodeInfo.kubeletVersion
+
+    # =================================================
+    # Node readiness / scheduling status
+    # =================================================
+    - name: Status
+      type: factory
+      {{ include "in-cloud.web.columns.factory.nodeStatus" . | nindent 6 }}
+
+    # =================================================
+    # Resource creation timestamp (formatted)
+    # =================================================
+    - name: Created
+      type: factory
+      jsonPath: .metadata.creationTimestamp
+      {{ include "in-cloud.web.columns.factory.created" . | nindent 6 }}
+
+  # Trim long values for selected columns in tables
+  additionalPrinterColumnsTrimLengths:
+    - key: Name
+      value: 64
+{{- end -}}

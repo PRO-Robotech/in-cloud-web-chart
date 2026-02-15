@@ -1,0 +1,169 @@
+{{ if (index .Values.defaultWebResources.factory.default "base-factory-clusterscoped-api") }}
+{{/* Shared factory context (resource, permission context, endpoint) */}}
+{{- $clusterScopedApiCtx := fromYaml (include "in-cloud.web.factoryContext.clusterScopedApi" .) -}}
+{{- $clusterScopedApiResource := $clusterScopedApiCtx.resource -}}
+{{- $clusterScopedApiPermissionContext := $clusterScopedApiCtx.permissionContext -}}
+{{- $clusterScopedApiEndpoint := $clusterScopedApiCtx.endpoint -}}
+---
+apiVersion: front.in-cloud.io/v1alpha1
+kind: Factory
+metadata:
+  name: base-factory-clusterscoped-api
+
+spec:
+  key: base-factory-clusterscoped-api
+
+  # =========================
+  # Data sources
+  # =========================
+  urlsToFetch:
+    # Fetch selected API resource by name
+    # Primary resource request (from shared factory context)
+    {{- include "in-cloud.web.factoryContext.primaryUrlToFetchList" (dict
+        "resource" $clusterScopedApiResource
+        "fieldSelector" "metadata.name={8}"
+      ) | trim | nindent 4 }}
+
+  # Disable scroll wrapper for main content card
+  withScrollableMainContentCard: false
+
+  # =========================
+  # Sidebar tags for navigation
+  # =========================
+  sidebarTags:
+    - '{5}/{6}/{7}'
+
+  # =========================
+  # Page layout
+  # =========================
+  data:
+
+    # =========================
+    # Header row (resource title + actions)
+    # =========================
+    - type: antdFlex
+      data:
+        id: header-row
+        align: center
+        justify: space-between
+        style:
+          marginBottom: 24px
+      children:
+
+        # =========================
+        # LEFT SIDE: Resource identity
+        # =========================
+        - type: antdFlex
+          data:
+            align: center
+            gap: 6
+          children:
+            {{ include "in-cloud.web.header.left" (dict
+                "k8sResourceToFetch" $clusterScopedApiResource
+                "redirectUrl" "/openapi-ui/{2}/factory/{4}/{5}/{6}/{7}/{chosenEntryValue}"
+              ) | nindent 12
+            }}
+
+        # =========================
+        # RIGHT SIDE: Resource actions
+        # =========================
+        - type: ActionsDropdown
+          data:
+            id: resource-actions
+            buttonText: Actions
+            actions:
+
+              # ---- Edit resource ----
+              {{ include "in-cloud.web.action.edit" (dict
+                  "k8sResourceToFetch" (merge (dict
+                    "name" "{reqsJsonPath[0]['.items.0.metadata.name']['-']}"
+                  ) $clusterScopedApiResource)
+                  "permissionContext" $clusterScopedApiPermissionContext
+                ) | nindent 14 
+              }}
+
+              # ---- Edit labels ----
+              {{ include "in-cloud.web.action.editLabels" (dict
+                  "endpoint" $clusterScopedApiEndpoint
+                  "permissionContext" $clusterScopedApiPermissionContext
+                ) | nindent 14 
+              }}
+
+              # ---- Edit annotations ----
+              {{ include "in-cloud.web.action.editAnnotations" (dict
+                  "endpoint" $clusterScopedApiEndpoint
+                  "permissionContext" $clusterScopedApiPermissionContext
+                ) | nindent 14 
+              }}
+
+              # ---- Delete resource ----
+              {{ include "in-cloud.web.action.delete" (dict
+                  "endpoint" $clusterScopedApiEndpoint
+                  "redirectTo" "/openapi-ui/{2}/api-table/{5}/{6}/{7}"
+                  "permissionContext" $clusterScopedApiPermissionContext
+                ) | nindent 14 
+              }}
+
+    # =========================
+    # Main content tabs
+    # =========================
+    - type: antdTabs
+      data:
+        defaultActiveKey: details
+        id: tabs-root
+        items:
+
+          # =========================
+          # DETAILS TAB
+          # =========================
+          - key: details
+            label: Details
+            children:
+              - type: antdFlex
+                data:
+                  id: details-stack
+                  vertical: true
+                  gap: 24
+                children:
+                  # ---- Row 1: Resource info + metadata counters ----
+                  {{ include "in-cloud.web.contentCard.resourceInfoAndMetadataRow" (dict
+                      "namespaced" false
+                      "endpoint" $clusterScopedApiEndpoint
+                      "permissionContext" $clusterScopedApiPermissionContext
+                    ) | nindent 18 }}
+
+                  # =========================
+                  # Conditions (only when present)
+                  # =========================
+                  {{ include "in-cloud.web.contentCard.conditionsVisibility" (dict
+                      "k8sResourceToFetch" $clusterScopedApiResource
+                      "fieldSelector" (dict
+                        "metadata.name" "{8}"
+                      )
+                    ) | nindent 18
+                  }}
+
+          # =========================
+          # YAML TAB
+          # =========================
+          - key: yaml
+            label: YAML
+            children:
+              {{ include "in-cloud.web.contentCard.yamlEditor" (dict
+                "isNameSpaced" false
+                "type" "api"
+                "k8sResourceToFetch" $clusterScopedApiResource
+                "permissionContext" (pick $clusterScopedApiPermissionContext "cluster" "apiGroup" "plural")
+                ) | nindent 14
+              }}
+
+          # =========================
+          # EVENTS TAB
+          # =========================
+          - key: events
+            label: Events
+            children:
+              # Kubernetes events related to this resource
+              {{ include "in-cloud.web.contentCard.events" . | nindent 14 }}
+
+{{ end }}

@@ -1,0 +1,209 @@
+{{- $customWebResources := default (dict) .Values.customWebResources -}}
+{{- $customFactoryResources := default (dict) $customWebResources.factory -}}
+{{- $crdFactory := index $customFactoryResources "crd-details" -}}
+{{- $crdFactoryAlias := index $customFactoryResources "customresourcedefinition-details" -}}
+{{- if or (and $crdFactory $crdFactory.enabled) (and $crdFactoryAlias $crdFactoryAlias.enabled) (and (not $crdFactory) (not $crdFactoryAlias)) }}
+{{/* Shared factory context (resource, permission context, endpoint) */}}
+{{- $crdCtx := fromYaml (include "in-cloud.web.factoryContext.clusterScopedApi" .) -}}
+{{- $crdApiResource := $crdCtx.resource -}}
+{{- $crdPermissionContext := $crdCtx.permissionContext -}}
+{{- $crdEndpoint := $crdCtx.endpoint -}}
+---
+apiVersion: front.in-cloud.io/v1alpha1
+kind: Factory
+metadata:
+  name: crd-details
+
+spec:
+  key: crd-details
+
+  # =========================
+  # Data sources
+  # =========================
+  urlsToFetch:
+    # Fetch selected CRD resource by name
+    # Primary resource request (from shared factory context)
+    {{- include "in-cloud.web.factoryContext.primaryUrlToFetchList" (dict
+        "resource" $crdApiResource
+        "fieldSelector" "metadata.name={8}"
+      ) | trim | nindent 4 }}
+
+  # Disable scroll wrapper for main content card
+  withScrollableMainContentCard: false
+
+  # =========================
+  # Sidebar tags for navigation
+  # =========================
+  sidebarTags:
+    - customresourcedefinitions-details
+    - '{5}/{6}/{7}'
+
+  # =========================
+  # Page layout
+  # =========================
+  data:
+
+    # =========================
+    # Header row (resource title + actions)
+    # =========================
+    - type: antdFlex
+      data:
+        id: header-row
+        align: center
+        justify: space-between
+        style:
+          marginBottom: 24px
+      children:
+
+        # =========================
+        # LEFT SIDE: Resource identity
+        # =========================
+        - type: antdFlex
+          data:
+            align: center
+            gap: 6
+          children:
+            {{ include "in-cloud.web.header.left" (dict
+                "k8sResourceToFetch" $crdApiResource
+                "redirectUrl" "/openapi-ui/{2}/factory/{4}/{5}/{6}/{7}/{chosenEntryValue}"
+              ) | nindent 12
+            }}
+
+        # =========================
+        # RIGHT SIDE: Resource actions
+        # =========================
+        - type: ActionsDropdown
+          data:
+            id: resource-actions
+            buttonText: Actions
+            actions:
+
+              # ---- Edit resource ----
+              {{ include "in-cloud.web.action.edit" (dict
+                  "k8sResourceToFetch" (merge (dict
+                    "name" "{reqsJsonPath[0]['.items.0.metadata.name']['-']}"
+                  ) $crdApiResource)
+                  "permissionContext" $crdPermissionContext
+                ) | nindent 14
+              }}
+
+              # ---- Edit labels ----
+              {{ include "in-cloud.web.action.editLabels" (dict
+                  "endpoint" $crdEndpoint
+                  "permissionContext" $crdPermissionContext
+                ) | nindent 14
+              }}
+
+              # ---- Edit annotations ----
+              {{ include "in-cloud.web.action.editAnnotations" (dict
+                  "endpoint" $crdEndpoint
+                  "permissionContext" $crdPermissionContext
+                ) | nindent 14
+              }}
+
+              # ---- Delete resource ----
+              {{ include "in-cloud.web.action.delete" (dict
+                  "endpoint" $crdEndpoint
+                  "redirectTo" "/openapi-ui/{2}/api-table/{5}/{6}/{7}"
+                  "permissionContext" $crdPermissionContext
+                ) | nindent 14
+              }}
+
+    # =========================
+    # Main content tabs
+    # =========================
+    - type: antdTabs
+      data:
+        defaultActiveKey: details
+        id: tabs-root
+        items:
+
+          # =========================
+          # DETAILS TAB
+          # =========================
+          - key: details
+            label: Details
+            children:
+              - type: antdFlex
+                data:
+                  id: details-stack
+                  vertical: true
+                  gap: 24
+                children:
+                  # ---- Row 1: Resource info + metadata counters ----
+                  {{ include "in-cloud.web.contentCard.resourceInfoAndMetadataRow" (dict
+                      "namespaced" false
+                      "endpoint" $crdEndpoint
+                      "permissionContext" $crdPermissionContext
+                    ) | nindent 18
+                  }}
+
+                  # ---- Row 2: CRD facts + versions ----
+                  - type: antdRow
+                    data:
+                      gutter: [24, 0]
+                    children:
+                      - type: antdCol
+                        data:
+                          span: 8
+                          xs: 24
+                          xl: 8
+                        children:
+                          {{ include "in-cloud.web.contentCard.crdRuntimeFacts" . | nindent 26 }}
+
+                      - type: antdCol
+                        data:
+                          span: 16
+                          xs: 24
+                          xl: 16
+                        children:
+                          {{ include "in-cloud.web.contentCard.crdVersionsTable" (dict
+                              "k8sResourceToFetch" $crdApiResource
+                              "fieldSelector" (dict
+                                "metadata.name" "{8}"
+                              )
+                            ) | nindent 26
+                          }}
+
+                  # =========================
+                  # Conditions (only when present)
+                  # =========================
+                  {{ include "in-cloud.web.contentCard.conditionsVisibility" (dict
+                      "k8sResourceToFetch" $crdApiResource
+                      "fieldSelector" (dict
+                        "metadata.name" "{8}"
+                      )
+                    ) | nindent 18
+                  }}
+
+          # =========================
+          # YAML TAB
+          # =========================
+          - key: yaml
+            label: YAML
+            children:
+              {{ include "in-cloud.web.contentCard.yamlEditor" (dict
+                  "isNameSpaced" false
+                  "type" "api"
+                  "k8sResourceToFetch" $crdApiResource
+                  "permissionContext" (pick $crdPermissionContext "cluster" "apiGroup" "plural")
+                ) | nindent 14
+              }}
+
+          # =========================
+          # INSTANCES TAB
+          # =========================
+          - key: instance
+            label: Instances
+            children:
+              {{ include "in-cloud.web.contentCard.crdInstancesTable" . | nindent 14 }}
+
+          # =========================
+          # EVENTS TAB
+          # =========================
+          - key: events
+            label: Events
+            children:
+              {{ include "in-cloud.web.contentCard.events" . | nindent 14 }}
+
+{{- end }}

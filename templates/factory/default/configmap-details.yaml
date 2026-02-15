@@ -1,0 +1,176 @@
+{{- $customWebResources := default (dict) .Values.customWebResources -}}
+{{- $customFactoryResources := default (dict) $customWebResources.factory -}}
+{{- $factoryConfig := index $customFactoryResources "configmap-details" -}}
+{{- if or (and $factoryConfig $factoryConfig.enabled) (not $factoryConfig) }}
+{{/* Shared factory context (resource, permission context, endpoint) */}}
+{{- $configmapCtx := fromYaml (include "in-cloud.web.factoryContext.namespacedBuiltin" .) -}}
+{{- $configmapBuiltinResource := $configmapCtx.resource -}}
+{{- $configmapPermissionContext := $configmapCtx.permissionContext -}}
+{{- $configmapEndpoint := $configmapCtx.endpoint -}}
+apiVersion: front.in-cloud.io/v1alpha1
+kind: Factory
+metadata:
+  name: configmap-details
+
+spec:
+  key: configmap-details
+
+  # =========================
+  # Data sources
+  # =========================
+  urlsToFetch:
+    # Fetch selected resource by name from target cluster
+    # Primary resource request (from shared factory context)
+    {{- include "in-cloud.web.factoryContext.primaryUrlToFetchList" (dict
+        "resource" $configmapBuiltinResource
+        "fieldSelector" "metadata.name={8}"
+      ) | trim | nindent 4 }}
+
+  # Disable scroll wrapper for main content card
+  withScrollableMainContentCard: false
+
+  # =========================
+  # Sidebar tags for navigation
+  # =========================
+  sidebarTags:
+    # Used to group resources in sidebar navigation
+    - '{6}/{7}'
+
+  # =========================
+  # Page layout
+  # =========================
+  data:
+
+    # =========================
+    # Header row (resource title + actions)
+    # =========================
+    - type: antdFlex
+      data:
+        id: header-row
+        align: center
+        justify: space-between
+        style:
+          marginBottom: 24px
+      children:
+
+        # =========================
+        # LEFT SIDE: Resource identity
+        # =========================
+        - type: antdFlex
+          data:
+            align: center
+            gap: 6
+          children:
+            {{ include "in-cloud.web.header.left" (dict
+                "k8sResourceToFetch" $configmapBuiltinResource
+                "redirectUrl" "/openapi-ui/{2}/{3}/factory/{5}/{6}/{7}/{chosenEntryValue}"
+              ) | nindent 12 
+            }}
+
+        # =========================
+        # RIGHT SIDE: Resource actions dropdown
+        # =========================
+        - type: ActionsDropdown
+          data:
+            id: resource-actions
+            buttonText: Actions
+            actions:
+
+              # ---- Edit resource manifest ----
+              {{ include "in-cloud.web.action.edit" (dict
+                  "k8sResourceToFetch" (merge (dict
+                    "name" "{reqsJsonPath[0]['.items.0.metadata.name']['-']}"
+                  ) $configmapBuiltinResource)
+                  "permissionContext" $configmapPermissionContext
+                ) | nindent 14
+              }}
+
+              # ---- Edit labels ----
+              {{ include "in-cloud.web.action.editLabels" (dict
+                  "endpoint" $configmapEndpoint
+                  "permissionContext" $configmapPermissionContext
+                ) | nindent 14
+              }}
+
+              # ---- Edit annotations ----
+              {{ include "in-cloud.web.action.editAnnotations" (dict
+                  "endpoint" $configmapEndpoint
+                  "permissionContext" $configmapPermissionContext
+                ) | nindent 14
+              }}
+
+
+              # ---- Delete resource ----
+              {{ include "in-cloud.web.action.delete" (dict
+                  "endpoint" $configmapEndpoint
+                  "redirectTo" "/openapi-ui/{2}/{3}/builtin-table/{7}?resources=metrics.k8s.io/v1beta1/pods"
+                  "permissionContext" $configmapPermissionContext
+                ) | nindent 14
+              }}
+
+    # =========================
+    # Tabs root
+    # =========================
+    - type: antdTabs
+      data:
+        id: tabs-root
+        defaultActiveKey: details
+        items:
+
+          # =========================
+          # DETAILS TAB
+          # =========================
+          - key: details
+            label: Details
+            children:
+              - type: antdFlex
+                data:
+                  id: details-stack
+                  vertical: true
+                  gap: 24
+                children:
+
+                  # ---- Row 1: Resource info + Metadata counters ----
+                  {{ include "in-cloud.web.contentCard.resourceInfoAndMetadataRow" (dict
+                      "namespaced" true
+                      "endpoint" $configmapEndpoint
+                      "permissionContext" $configmapPermissionContext
+                    ) | nindent 18 
+                  }}
+
+
+                  - type: antdRow
+                    data:
+                      gutter: [24, 0]
+                    children:
+                      - type: antdCol
+                        data:
+                          span: 24
+                        children:
+                          # Secret data card with adaptive-height payload preview
+                          {{ include "in-cloud.web.configmapCard" . | nindent 26 }}
+
+          # =========================
+          # YAML TAB
+          # =========================
+          - key: yaml
+            label: YAML
+            children:
+              {{ include "in-cloud.web.contentCard.yamlEditor" (dict
+                  "isNameSpaced" true
+                  "type" "builtin"
+                  "k8sResourceToFetch" $configmapBuiltinResource
+                  "permissionContext" (pick $configmapBuiltinResource "cluster" "namespace" "plural")
+                ) | nindent 14 
+              }}
+
+          # =========================
+          # EVENTS TAB
+          # =========================
+          - key: events
+            label: Events
+            children:
+              # Kubernetes events related to this resource
+              {{ include "in-cloud.web.contentCard.events" . | nindent 14 }}
+
+{{- end }}
