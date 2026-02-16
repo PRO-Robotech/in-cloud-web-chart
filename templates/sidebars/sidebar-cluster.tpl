@@ -12,6 +12,7 @@
 {{ $projRes := .Values.projectResource }}
 {{ $instRes := .Values.instanceResource }}
 
+
 {{- with $sidebars.home }}
   {{- if .enabled }}
 - children:
@@ -26,6 +27,7 @@
   key: home
   label: Home
   {{- end }}
+
 {{- end }}
 
 {{- if $sidebars.customItems -}}

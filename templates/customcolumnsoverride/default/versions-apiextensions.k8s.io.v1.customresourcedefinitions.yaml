@@ -1,0 +1,42 @@
+{{- $customWebResources := default (dict) .Values.customWebResources -}}
+{{- $customCcoResources := default (dict) $customWebResources.customcolumnsoverride -}}
+{{- $customCco := index $customCcoResources "versions-apiextensions.k8s.io.v1.customresourcedefinitions" -}}
+{{- if eq (include "in-cloud.web.cco.isEnabled" (dict "config" $customCco)) "true" }}
+---
+# =================================================
+# CustomColumnsOverride definition
+# =================================================
+apiVersion: front.in-cloud.io/v1alpha1
+kind: CustomColumnsOverride
+metadata:
+  # Name of this CustomColumnsOverride resource
+  name: versions-apiextensions.k8s.io.v1.customresourcedefinitions
+spec:
+  # Table columns rendered in the resource list
+  additionalPrinterColumns:
+    # =================================================
+    # Column: Name
+    # =================================================
+    - name: Name
+      jsonPath: .name
+      type: string
+    # =================================================
+    # Column: Served
+    # =================================================
+    - name: Served
+      jsonPath: .served
+      type: string
+    # =================================================
+    # Column: Storage
+    # =================================================
+    - name: Storage
+      jsonPath: .storage
+      type: string
+
+  # Trim long values for selected columns
+  additionalPrinterColumnsTrimLengths:
+    {{ include "incloud-web-resources.cco.columns-trim-lengths.name" . | nindent 4 }}
+
+  # Stable identifier used by frontend mapping
+  id: versions-apiextensions.k8s.io.v1.customresourcedefinitions
+{{- end -}}

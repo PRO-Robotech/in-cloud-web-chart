@@ -1,0 +1,167 @@
+{{- $customWebResources := default (dict) .Values.customWebResources -}}
+{{- $customFactoryResources := default (dict) $customWebResources.factory -}}
+{{- $factoryConfig := index $customFactoryResources "role-details" -}}
+{{- if or (and $factoryConfig $factoryConfig.enabled) (not $factoryConfig) }}
+{{/* Shared factory context (resource, permission context, endpoint) */}}
+{{- $roleCtx := fromYaml (include "in-cloud.web.factoryContext.namespacedApi" .) -}}
+{{- $roleApiResource := $roleCtx.resource -}}
+{{- $rolePermissionContext := $roleCtx.permissionContext -}}
+{{- $roleEndpoint := $roleCtx.endpoint -}}
+apiVersion: front.in-cloud.io/v1alpha1
+kind: Factory
+metadata:
+  name: role-details
+
+spec:
+  key: role-details
+
+  # =========================
+  # Data sources
+  # =========================
+  urlsToFetch:
+    # Fetch selected resource by name from target cluster
+    # Primary resource request (from shared factory context)
+    {{- include "in-cloud.web.factoryContext.primaryUrlToFetchList" (dict
+        "resource" $roleApiResource
+        "fieldSelector" "metadata.name={9}"
+      ) | trim | nindent 4 }}
+
+  # Disable scroll wrapper for main content card
+  withScrollableMainContentCard: false
+
+  # =========================
+  # Sidebar tags for navigation
+  # =========================
+  sidebarTags:
+    # Used to group resources in sidebar navigation
+    - '{6}/{7}/{8}'
+
+  # =========================
+  # Page layout
+  # =========================
+  data:
+
+    # =========================
+    # Header row (resource title + actions)
+    # =========================
+    - type: antdFlex
+      data:
+        id: header-row
+        align: center
+        justify: space-between
+        style:
+          marginBottom: 24px
+      children:
+
+        # =========================
+        # LEFT SIDE: Resource identity
+        # =========================
+        - type: antdFlex
+          data:
+            align: center
+            gap: 6
+          children:
+            {{ include "in-cloud.web.header.left" (dict
+                "k8sResourceToFetch" $roleApiResource
+                "redirectUrl" "/openapi-ui/{2}/{3}/factory/{5}/{6}/{7}/{8}/{chosenEntryValue}"
+              ) | nindent 12 
+            }}
+
+        # =========================
+        # RIGHT SIDE: Resource actions dropdown
+        # =========================
+        - type: ActionsDropdown
+          data:
+            id: resource-actions
+            buttonText: Actions
+            actions:
+
+              # ---- Edit resource manifest ----
+              {{ include "in-cloud.web.action.edit" (dict
+                  "k8sResourceToFetch" (merge (dict
+                    "name" "{reqsJsonPath[0]['.items.0.metadata.name']['-']}"
+                  ) $roleApiResource)
+                  "permissionContext" $rolePermissionContext
+                ) | nindent 14
+              }}
+
+              # ---- Edit labels ----
+              {{ include "in-cloud.web.action.editLabels" (dict
+                  "endpoint" $roleEndpoint
+                  "permissionContext" $rolePermissionContext
+                ) | nindent 14
+              }}
+
+              # ---- Edit annotations ----
+              {{ include "in-cloud.web.action.editAnnotations" (dict
+                  "endpoint" $roleEndpoint
+                  "permissionContext" $rolePermissionContext
+                ) | nindent 14
+              }}
+
+              # ---- Delete resource ----
+              {{ include "in-cloud.web.action.delete" (dict
+                  "endpoint" $roleEndpoint
+                  "redirectTo" "/openapi-ui/{2}/{3}/api-table/{6}/{7}/{8}"
+                  "permissionContext" $rolePermissionContext
+                ) | nindent 14
+              }}
+
+    # =========================
+    # Tabs root
+    # =========================
+    - type: antdTabs
+      data:
+        id: tabs-root
+        defaultActiveKey: details
+        items:
+
+          # =========================
+          # DETAILS TAB
+          # =========================
+          - key: details
+            label: Details
+            children:
+              - type: antdFlex
+                data:
+                  id: details-stack
+                  vertical: true
+                  gap: 24
+                children:
+
+                  # ---- Row 1: Resource info + Metadata counters ----
+                  {{ include "in-cloud.web.contentCard.resourceInfoAndMetadataRow" (dict
+                      "namespaced" true
+                      "endpoint" $roleEndpoint
+                      "permissionContext" $rolePermissionContext
+                    ) | nindent 18 
+                  }}
+
+                  # ---- Row 2: Runtime facts and selectors ----
+                  - type: antdRow
+                    data:
+                      gutter: [24, 0]
+                    children:
+
+                      # Resource runtime details
+                      - type: antdCol
+                        data:
+                          span: 24
+                        children:
+                          {{ include "in-cloud.web.contentCard.roleRules" . | nindent 26 }}
+
+          # =========================
+          # YAML TAB
+          # =========================
+          - key: yaml
+            label: YAML
+            children:
+              {{ include "in-cloud.web.contentCard.yamlEditor" (dict
+                  "isNameSpaced" true
+                  "type" "api"
+                  "k8sResourceToFetch" $roleApiResource
+                  "permissionContext" $rolePermissionContext
+                ) | nindent 14 
+              }}
+
+{{- end }}

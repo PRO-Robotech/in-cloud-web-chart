@@ -1,0 +1,46 @@
+{{- $customWebResources := default (dict) .Values.customWebResources -}}
+{{- $customNavigationResources := default (dict) $customWebResources.navigation -}}
+{{- $customNavigation := index $customNavigationResources "navigation" -}}
+{{- if or (and $customNavigation $customNavigation.enabled) (not $customNavigation) }}
+{{- $navigation := default (dict) .Values.navigation -}}
+{{- $instances := default (dict) $navigation.instances -}}
+{{- $namespaces := default (dict) $navigation.namespaces -}}
+{{- $projects := default (dict) $navigation.projects -}}
+---
+# Primary navigation resource with configurable route mappings.
+apiVersion: front.in-cloud.io/v1alpha1
+kind: Navigation
+metadata:
+  name: {{ default "navigation" $navigation.name }}
+spec:
+  # Mapping from base factory identifiers to details factory names.
+  {{- if or (not (hasKey $navigation "baseFactoriesMappingEnabled")) $navigation.baseFactoriesMappingEnabled }}
+  baseFactoriesMapping:
+    {{- toYaml (default (dict) $navigation.baseFactoriesMapping) | nindent 4 }}
+  {{- end }}
+
+  # Cluster instances selector.
+  {{- if or (not (hasKey $instances "enabled")) $instances.enabled }}
+  instances:
+    aliasPath: {{ default "{reqsJsonPath[0]['.metadata.name']}" $instances.aliasPath | quote }}
+    change: {{ default "/openapi-ui/{selectedCluster}/{value}/builtin-table/pods?resources=metrics.k8s.io/v1beta1/pods" $instances.change | quote }}
+    clear: {{ default "/openapi-ui/{selectedCluster}/builtin-table/pods?resources=metrics.k8s.io/v1beta1/pods" $instances.clear | quote }}
+    mapOptionsPattern: {{ default "{reqsJsonPath[0]['.metadata.name']}" $instances.mapOptionsPattern | quote }}
+  {{- end }}
+
+  # Namespace selector.
+  {{- if or (not (hasKey $namespaces "enabled")) $namespaces.enabled }}
+  namespaces:
+    aliasPath: {{ default "{reqsJsonPath[0]['.metadata.name']}" $namespaces.aliasPath | quote }}
+    change: {{ default "/openapi-ui/{selectedCluster}/{value}/builtin-table/pods" $namespaces.change | quote }}
+    clear: {{ default "/openapi-ui/{selectedCluster}/builtin-table/namespaces" $namespaces.clear | quote }}
+  {{- end }}
+
+  # Project selector.
+  {{- if or (not (hasKey $projects "enabled")) $projects.enabled }}
+  projects:
+    aliasPath: {{ default "{reqsJsonPath[0]['.metadata.name']}" $projects.aliasPath | quote }}
+    change: {{ default "/openapi-ui/{selectedCluster}/{value}/builtin-table/pods?resources=metrics.k8s.io/v1beta1/pods" $projects.change | quote }}
+    clear: {{ default "/openapi-ui/{selectedCluster}/builtin-table/pods?resources=metrics.k8s.io/v1beta1/pods" $projects.clear | quote }}
+  {{- end }}
+{{- end -}}

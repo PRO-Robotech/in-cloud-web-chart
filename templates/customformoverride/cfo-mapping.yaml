@@ -10,4 +10,4 @@ spec:
     default-/apps/v1/daemonsets: "default-/apps/v1/daemonsets"
     default-/apps/v1/deployments: "default-/apps/v1/deployments"
     default-/apps/v1/replicasets: "default-/apps/v1/replicasets"
-    default-/apps/v1/replicasets: "default-/apps/v1/statefulsets"
+    default-/apps/v1/statefulsets: "default-/apps/v1/statefulsets"

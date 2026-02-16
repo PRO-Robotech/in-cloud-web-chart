@@ -1,0 +1,70 @@
+{{- $customWebResources := default (dict) .Values.customWebResources -}}
+{{- $customCcoResources := default (dict) $customWebResources.customcolumnsoverride -}}
+{{- $rbacRulesCco := index $customCcoResources "rbac-rules" -}}
+{{- if eq (include "in-cloud.web.cco.isEnabled" (dict "config" $rbacRulesCco)) "true" }}
+---
+# =================================================
+# CustomColumnsOverride definition
+# =================================================
+apiVersion: front.in-cloud.io/v1alpha1
+kind: CustomColumnsOverride
+metadata:
+  # Name of this CustomColumnsOverride resource
+  name: factory-k8s-rbac-rules
+spec:
+  # =================================================
+  # Table columns rendered in RBAC rules list
+  # =================================================
+  additionalPrinterColumns:
+    # =================================================
+    # API groups covered by this rule
+    # =================================================
+    - jsonPath: .apiGroups
+      name: Api groups
+      type: array
+
+    # =================================================
+    # Kubernetes resources covered by this rule
+    # =================================================
+    - jsonPath: .resources
+      name: Resources
+      type: array
+
+    # =================================================
+    # Explicit resource names covered by this rule
+    # =================================================
+    - jsonPath: .resourceNames
+      name: Resource Names
+      type: array
+
+    # =================================================
+    # Non-resource URLs covered by this rule
+    # =================================================
+    - jsonPath: .nonResourceURLs
+      name: Non resource URLs
+      type: array
+
+    # =================================================
+    # Allowed verbs in this rule
+    # =================================================
+    - jsonPath: .verbs
+      name: Verbs
+      type: array
+
+  # Trim long values for selected columns
+  additionalPrinterColumnsTrimLengths:
+    {{ include "incloud-web-resources.cco.columns-trim-lengths.name" . | nindent 4 }}
+    {{ include "incloud-web-resources.cco.columns-trim-lengths.rbac-resources" . | nindent 4 }}
+    {{ include "incloud-web-resources.cco.columns-trim-lengths.rbac-resources-name" . | nindent 4 }}
+    {{ include "incloud-web-resources.cco.columns-trim-lengths.rbac-verbs" . | nindent 4 }}
+  # Fallback values for empty or missing fields
+  additionalPrinterColumnsUndefinedValues:
+    {{ include "incloud-web-resources.cco.columns-undefined-values.api-groups" . | nindent 4 }}
+    {{ include "incloud-web-resources.cco.columns-undefined-values.resources" . | nindent 4 }}
+    {{ include "incloud-web-resources.cco.columns-undefined-values.verbs-empty" . | nindent 4 }}
+    {{ include "incloud-web-resources.cco.columns-undefined-values.resource-names" . | nindent 4 }}
+    {{ include "incloud-web-resources.cco.columns-undefined-values.non-resource-urls" . | nindent 4 }}
+    {{ include "incloud-web-resources.cco.columns-undefined-values.verbs-dash" . | nindent 4 }}
+  # Stable identifier used by frontend mapping
+  id: factory-k8s-rbac-rules
+{{- end -}}

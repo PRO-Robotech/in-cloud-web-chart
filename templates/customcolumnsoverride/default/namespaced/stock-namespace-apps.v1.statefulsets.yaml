@@ -1,0 +1,61 @@
+{{- $customWebResources := default (dict) .Values.customWebResources -}}
+{{- $customCcoResources := default (dict) $customWebResources.customcolumnsoverride -}}
+{{- $customCco := index $customCcoResources "stock-namespace-apps.v1.statefulsets" -}}
+{{- if eq (include "in-cloud.web.cco.isEnabled" (dict "config" $customCco)) "true" }}
+---
+# =================================================
+# CustomColumnsOverride definition
+# =================================================
+apiVersion: front.in-cloud.io/v1alpha1
+kind: CustomColumnsOverride
+metadata:
+  # Name of this CustomColumnsOverride resource
+  name: stock-namespace-apps.v1.statefulsets
+spec:
+  # Table columns rendered in the resource list
+  additionalPrinterColumns:
+    # =================================================
+    # Column: Name
+    # =================================================
+    - name: Name
+      type: factory
+      {{ include "in-cloud.web.cco.props.badgeLink" (list $
+          "/openapi-ui/{2}/{reqsJsonPath[0]['.metadata.namespace']['-']}/factory/statefulset-details/apps/v1/statefulsets/{reqsJsonPath[0]['.metadata.name']['-']}"
+        ) | nindent 6
+      }}
+    # =================================================
+    # Column: Labels
+    # =================================================
+    - name: Labels
+      type: factory
+      {{ include "in-cloud.web.cco.props.labelsEditor" (dict
+          "endpoint" "/api/clusters/{2}/k8s/apis/apps/v1/namespaces/{3}/statefulsets/{6}"
+          "linkPrefix" "/openapi-ui/{2}/{3}/search?kinds=apps~v1~statefulsets"
+        ) | nindent 6
+      }}
+    # =================================================
+    # Column: Pod Selector
+    # =================================================
+    - name: Pod Selector
+      type: factory
+      {{ include "in-cloud.web.cco.props.podSelector" (dict
+          "jsonPath" ".spec.template.metadata.labels"
+          "linkPrefix" "/openapi-ui/{2}/{3}/search?kinds=~v1~pods"
+        ) | nindent 6
+      }}
+    # =================================================
+    # Column: Created
+    # =================================================
+    - name: Created
+      type: factory
+      {{ include "in-cloud.web.cco.props.created" . | nindent 6 }}
+
+  # Trim long values for selected columns
+  additionalPrinterColumnsTrimLengths:
+    {{ include "incloud-web-resources.cco.columns-trim-lengths.name" . | nindent 4 }}
+    {{ include "incloud-web-resources.cco.columns-trim-lengths.labels" . | nindent 4 }}
+    {{ include "incloud-web-resources.cco.columns-trim-lengths.pod-selector" . | nindent 4 }}
+
+  # Stable identifier used by frontend mapping
+  id: stock-namespace-/apps/v1/statefulsets
+{{- end -}}

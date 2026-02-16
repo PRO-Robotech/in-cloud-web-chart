@@ -4,6 +4,7 @@ kind: CustomFormsOverride
 metadata:
   name: default-apps.v1.replicasets
 spec:
+  forceViewMode: Manual
   customizationId: "default-/apps/v1/replicasets"
   hidden:
     {{ include "incloud-web-chart.customformoverride.hidden.metadata.system" . | nindent 4 }}

@@ -1,0 +1,63 @@
+{{- $customWebResources := default (dict) .Values.customWebResources -}}
+{{- $customCcoResources := default (dict) $customWebResources.customcolumnsoverride -}}
+{{- $customCco := index $customCcoResources "factory-status-conditions" -}}
+{{- if eq (include "in-cloud.web.cco.isEnabled" (dict "config" $customCco)) "true" }}
+---
+# =================================================
+# CustomColumnsOverride definition
+# =================================================
+apiVersion: front.in-cloud.io/v1alpha1
+kind: CustomColumnsOverride
+metadata:
+  # Name of this CustomColumnsOverride resource
+  name: factory-status-conditions
+spec:
+  # Table columns rendered in the resource list
+  additionalPrinterColumns:
+    # =================================================
+    # Column: Type
+    # =================================================
+    - name: Type
+      type: string
+      jsonPath: .type
+    # =================================================
+    # Column: Status
+    # =================================================
+    - name: Status
+      type: bool
+      jsonPath: .status
+    # =================================================
+    # Column: Updated
+    # =================================================
+    - name: Updated
+      type: factory
+      {{ include "in-cloud.web.cco.props.timestamp" (dict
+          "jsonPath" ".lastTransitionTime"
+          "value" "{reqsJsonPath[0]['.lastTransitionTime']['-']}"
+        ) | nindent 6
+      }}
+    # =================================================
+    # Column: Reason
+    # =================================================
+    - name: Reason
+      type: string
+      jsonPath: .reason
+    # =================================================
+    # Column: Message
+    # =================================================
+    - name: Message
+      type: string
+      jsonPath: .message
+
+  # Trim long values for selected columns
+  additionalPrinterColumnsTrimLengths:
+    {{ include "incloud-web-resources.cco.columns-trim-lengths.status-message" . | nindent 4 }}
+
+  # Fallback values for empty or missing fields
+  additionalPrinterColumnsUndefinedValues:
+    {{ include "incloud-web-resources.cco.columns-undefined-values.reason" . | nindent 4 }}
+    {{ include "incloud-web-resources.cco.columns-undefined-values.message" . | nindent 4 }}
+
+  # Stable identifier used by frontend mapping
+  id: factory-status-conditions
+{{- end -}}

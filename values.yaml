@@ -191,6 +191,139 @@ defaultWebResources:
       base-factory-namespaced-builtin: true
       namespace-details: true
 
+customWebResources:
+  # All CCO resources are enabled by default when key is absent.
+  # Add only explicit overrides here, for example:
+  # customcolumnsoverride:
+  #   stock-cluster-v1.services:
+  #     enabled: false
+  customcolumnsoverride: {}
+
+  # All Navigation resources are enabled by default when key is absent.
+  # Keep only explicit overrides or feature flags.
+  # navigation:
+  #   navigation:
+  #     enabled: false
+  navigation: {}
+
+  # All Factory resources are enabled by default when key is absent.
+  # Keep only explicit overrides or feature flags.
+  factory:
+    pod-details:
+      enabled: true
+      enableMonitoringTab: true
+    node-details:
+      enabled: true
+      enableConfigReportsAquaTab: true
+
+
+# --- Navigation ------------------------------------------------------------
+navigation:
+  # Name of Navigation custom resource.
+  name: navigation
+
+  # Enable or disable rendering of the baseFactoriesMapping block.
+  baseFactoriesMappingEnabled: true
+  baseFactoriesMapping:
+    base-factory-clusterscoped-api-apiextensions.k8s.io-v1-customresourcedefinitions: crd-details
+    base-factory-clusterscoped-api-apps-v1-daemonsets: daemonset-details
+    base-factory-clusterscoped-api-apps-v1-deployments: deployment-details
+    base-factory-clusterscoped-api-apps-v1-instance-daemonsets: instance-daemonset-details
+    base-factory-clusterscoped-api-apps-v1-instance-deployments: instance-deployment-details
+    base-factory-clusterscoped-api-apps-v1-instance-replicasets: instance-replicaset-details
+    base-factory-clusterscoped-api-apps-v1-instance-statefulsets: instance-statefulset-details
+    base-factory-clusterscoped-api-apps-v1-replicasets: replicaset-details
+    base-factory-clusterscoped-api-apps-v1-statefulsets: statefulset-details
+    base-factory-clusterscoped-api-autoscaling-v2-horizontalpodautoscalers: horizontalpodautoscaler-details
+    base-factory-clusterscoped-api-autoscaling-v2-instance-horizontalpodautoscalers: instance-horizontalpodautoscaler-details
+    base-factory-clusterscoped-api-batch-v1-cronjobs: cronjob-details
+    base-factory-clusterscoped-api-batch-v1-instance-cronjobs: instance-cronjob-details
+    base-factory-clusterscoped-api-batch-v1-instance-jobs: instance-job-details
+    base-factory-clusterscoped-api-batch-v1-jobs: job-details
+    base-factory-clusterscoped-api-cert-manager.io-v1-certificates: certificate-details
+    base-factory-clusterscoped-api-networking.k8s.io-v1-instance-networkpolicies: instance-networkpolicy-details
+    base-factory-clusterscoped-api-networking.k8s.io-v1-networkpolicies: networkpolicy-details
+    base-factory-clusterscoped-api-policy-v1-instance-poddisruptionbudgets: instance-poddisruptionbudget-details
+    base-factory-clusterscoped-api-policy-v1-poddisruptionbudgets: poddisruptionbudget-details
+    base-factory-clusterscoped-api-rbac.authorization.k8s.io-v1-clusterrolebindings: clusterrolebinding-details
+    base-factory-clusterscoped-api-rbac.authorization.k8s.io-v1-clusterroles: clusterrole-details
+    base-factory-clusterscoped-api-rbac.authorization.k8s.io-v1-rolebindings: rolebinding-details
+    base-factory-clusterscoped-api-rbac.authorization.k8s.io-v1-roles: role-details
+    base-factory-clusterscoped-builtin-v1-configmaps: configmap-details
+    base-factory-clusterscoped-builtin-v1-instance-configmaps: instance-configmap-details
+    base-factory-clusterscoped-builtin-v1-instance-pods: instance-pod-details
+    base-factory-clusterscoped-builtin-v1-instance-replicationcontrollers: instance-replicationcontroller-details
+    base-factory-clusterscoped-builtin-v1-instance-secrets: instance-secret-details
+    base-factory-clusterscoped-builtin-v1-instance-serviceaccounts: instance-serviceaccount-details
+    base-factory-clusterscoped-builtin-v1-instance-services: instance-service-details
+    base-factory-clusterscoped-builtin-v1-nodes: node-details
+    base-factory-clusterscoped-builtin-v1-pods: pod-details
+    base-factory-clusterscoped-builtin-v1-replicationcontrollers: replicationcontroller-details
+    base-factory-clusterscoped-builtin-v1-secrets: secret-details
+    base-factory-clusterscoped-builtin-v1-serviceaccounts: serviceaccount-details
+    base-factory-clusterscoped-builtin-v1-services: service-details
+    base-factory-namespaced-api-apiextensions.k8s.io-v1-customresourcedefinitions: crd-details
+    base-factory-namespaced-api-apps-v1-daemonsets: daemonset-details
+    base-factory-namespaced-api-apps-v1-deployments: deployment-details
+    base-factory-namespaced-api-apps-v1-instance-daemonsets: instance-daemonset-details
+    base-factory-namespaced-api-apps-v1-instance-deployments: instance-deployment-details
+    base-factory-namespaced-api-apps-v1-instance-replicasets: instance-replicaset-details
+    base-factory-namespaced-api-apps-v1-instance-statefulsets: instance-statefulset-details
+    base-factory-namespaced-api-apps-v1-replicasets: replicaset-details
+    base-factory-namespaced-api-apps-v1-statefulsets: statefulset-details
+    base-factory-namespaced-api-argoproj.io-v1alpha1-applications: argocd-application-details
+    base-factory-namespaced-api-argoproj.io-v1alpha1-appprojects: argocd-appproject-details
+    base-factory-namespaced-api-autoscaling-v2-horizontalpodautoscalers: horizontalpodautoscaler-details
+    base-factory-namespaced-api-autoscaling-v2-instance-horizontalpodautoscalers: instance-horizontalpodautoscaler-details
+    base-factory-namespaced-api-batch-v1-cronjobs: cronjob-details
+    base-factory-namespaced-api-batch-v1-instance-cronjobs: instance-cronjob-details
+    base-factory-namespaced-api-batch-v1-instance-jobs: instance-job-details
+    base-factory-namespaced-api-batch-v1-jobs: job-details
+    base-factory-namespaced-api-cert-manager.io-v1-certificates: certificate-details
+    base-factory-namespaced-api-networking.k8s.io-v1-instance-networkpolicies: instance-networkpolicy-details
+    base-factory-namespaced-api-networking.k8s.io-v1-networkpolicies: networkpolicy-details
+    base-factory-namespaced-api-policy-v1-instance-poddisruptionbudgets: instance-poddisruptionbudget-details
+    base-factory-namespaced-api-policy-v1-poddisruptionbudgets: poddisruptionbudget-details
+    base-factory-namespaced-api-rbac.authorization.k8s.io-v1-clusterrolebindings: clusterrolebinding-details
+    base-factory-namespaced-api-rbac.authorization.k8s.io-v1-clusterroles: clusterrole-details
+    base-factory-namespaced-api-rbac.authorization.k8s.io-v1-rolebindings: rolebinding-details
+    base-factory-namespaced-api-rbac.authorization.k8s.io-v1-roles: role-details
+    base-factory-namespaced-builtin-v1-configmaps: configmap-details
+    base-factory-namespaced-builtin-v1-instance-configmaps: instance-configmap-details
+    base-factory-namespaced-builtin-v1-instance-pods: instance-pod-details
+    base-factory-namespaced-builtin-v1-instance-replicationcontrollers: instance-replicationcontroller-details
+    base-factory-namespaced-builtin-v1-instance-secrets: instance-secret-details
+    base-factory-namespaced-builtin-v1-instance-serviceaccounts: instance-serviceaccount-details
+    base-factory-namespaced-builtin-v1-instance-services: instance-service-details
+    base-factory-namespaced-builtin-v1-pods: pod-details
+    base-factory-namespaced-builtin-v1-replicationcontrollers: replicationcontroller-details
+    base-factory-namespaced-builtin-v1-secrets: secret-details
+    base-factory-namespaced-builtin-v1-serviceaccounts: serviceaccount-details
+    base-factory-namespaced-builtin-v1-services: service-details
+
+  # Cluster "instances" selector behavior.
+  instances:
+    enabled: true
+    aliasPath: "{reqsJsonPath[0]['.metadata.name']}"
+    change: "/openapi-ui/{selectedCluster}/{value}/builtin-table/pods?resources=metrics.k8s.io/v1beta1/pods"
+    clear: "/openapi-ui/{selectedCluster}/builtin-table/pods?resources=metrics.k8s.io/v1beta1/pods"
+    mapOptionsPattern: "{reqsJsonPath[0]['.metadata.name']}"
+
+  # Namespace selector behavior.
+  namespaces:
+    enabled: true
+    aliasPath: "{reqsJsonPath[0]['.metadata.name']}"
+    change: "/openapi-ui/{selectedCluster}/{value}/builtin-table/pods"
+    clear: "/openapi-ui/{selectedCluster}/builtin-table/namespaces"
+
+  # Project selector behavior.
+  projects:
+    enabled: true
+    aliasPath: "{reqsJsonPath[0]['.metadata.name']}"
+    change: "/openapi-ui/{selectedCluster}/{value}/builtin-table/pods?resources=metrics.k8s.io/v1beta1/pods"
+    clear: "/openapi-ui/{selectedCluster}/builtin-table/pods?resources=metrics.k8s.io/v1beta1/pods"
+
+
 # --- Global ----------------------------------------------------------------
 nameOverride: ""                  # Overrides chart name; leave empty to use default
 fullnameOverride: "" # Overrides full release name; leave empty to use default
@@ -954,56 +1087,91 @@ sidebars:
   # Mapping of resource keys to API endpoints and detail views
   keysAndTags:
     clusterrolebindings:
+      - rbac.authorization.k8s.io/v1/clusterrolebindings
       - clusterrolebinding-details
     clusterroles:
+      - rbac.authorization.k8s.io/v1/clusterroles
       - clusterrole-details
     configmaps:
+      - v1/configmaps
       - configmap-details
     cronjobs:
+      - batch/v1/cronjobs
       - cronjob-details
     customresourcedefinitions:
+      - apiextensions.k8s.io/v1/customresourcedefinitions
       - customresourcedefinition-details
     daemonsets:
+      - apps/v1/daemonsets
       - daemonset-details
     deployments:
+      - apps/v1/deployments
       - deployment-details
     horizontalpodautoscalers:
+      - autoscaling/v2/horizontalpodautoscalers
       - horizontalpodautoscaler-details
     ingresses:
+      - networking.k8s.io/v1/ingresses
       - ingresse-details
     jobs:
+      - batch/v1/jobs
       - job-details
     limitranges:
+      - v1/limitranges
       - limitrange-details
     namespaces:
+      - v1/namespaces
       - namespace-details
     networkpolicies:
+      - networking.k8s.io/v1/networkpolicies
       - networkpolicy-details
     nodes:
+      - v1/nodes
       - node-details
     persistentvolumeclaims:
+      - v1/persistentvolumeclaims
       - persistentvolumeclaim-details
     persistentvolumes:
+      - v1/persistentvolumes
       - persistentvolume-details
     poddisruptionbudgets:
+      - policy/v1/poddisruptionbudgets
       - poddisruptionbudget-details
     pods:
+      - v1/pods
       - pod-details
     replicasets:
+      - apps/v1/replicasets
       - replicaset-details
     resourcequotas:
+      - v1/resourcequotas
       - resourcequota-details
     rolebindings:
+      - rbac.authorization.k8s.io/v1/rolebindings
       - rolebinding-details
     roles:
+      - rbac.authorization.k8s.io/v1/roles
       - role-details
     secrets:
+      - v1/secrets
       - secret-details
     serviceaccounts:
+      - v1/serviceaccounts
       - serviceaccount-details
     services:
+      - v1/services
       - service-details
     statefulsets:
+      - apps/v1/statefulsets
       - statefulset-details
     storageclasses:
+      - storage.k8s.io/v1/storageclasses
       - storageclass-details
+
+monitoring:
+  promqlUrl: https://demo.in-cloud.io/monitoring/api/v1/
+  grafanaDatasource: P4169E866C3094E38
+  grafanaBaseUrl: https://grafana.in-cloud.io
+  grafanaDashboardPaths:
+    podDetails: k8s_views_pods/kubernetes-views-pods
+    nodeDetails: k8s_views_nodes/kubernetes-views-nodes

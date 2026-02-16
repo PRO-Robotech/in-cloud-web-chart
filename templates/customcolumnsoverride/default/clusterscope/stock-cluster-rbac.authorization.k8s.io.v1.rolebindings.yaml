@@ -1,0 +1,93 @@
+{{- $customWebResources := default (dict) .Values.customWebResources -}}
+{{- $customCcoResources := default (dict) $customWebResources.customcolumnsoverride -}}
+{{- $customCco := index $customCcoResources "stock-cluster-rbac.authorization.k8s.io.v1.rolebindings" -}}
+{{- if eq (include "in-cloud.web.cco.isEnabled" (dict "config" $customCco)) "true" }}
+---
+# =================================================
+# CustomColumnsOverride definition
+# =================================================
+apiVersion: front.in-cloud.io/v1alpha1
+kind: CustomColumnsOverride
+metadata:
+  # Name of this CustomColumnsOverride resource
+  name: stock-cluster-rbac.authorization.k8s.io.v1.rolebindings
+spec:
+  # Table columns rendered in the resource list
+  additionalPrinterColumns:
+    # =================================================
+    # Column: Name
+    # =================================================
+    - name: Name
+      type: factory
+      {{ include "in-cloud.web.cco.props.badgeLink" (list $
+          "/openapi-ui/{2}/{reqsJsonPath[0]['.metadata.namespace']['-']}/factory/rolebinding-details/rbac.authorization.k8s.io/v1/rolebindings/{reqsJsonPath[0]['.metadata.name']['-']}"
+        ) | nindent 6
+      }}
+    # =================================================
+    # Column: Namespace
+    # =================================================
+    - name: Namespace
+      type: factory
+      {{ include "in-cloud.web.cco.props.namespaceBadgeLink" . | nindent 6 }}
+    # =================================================
+    # Column: Role ref
+    # =================================================
+    - name: Role ref
+      type: factory
+      {{ include "in-cloud.web.cco.props.badgeLink" (list $
+          "/openapi-ui/{2}/{reqsJsonPath[0]['.metadata.namespace']['-']}/factory/role-details/rbac.authorization.k8s.io/v1/roles/{reqsJsonPath[0]['.roleRef.name']['-']}"
+          (dict
+          "name" "Role ref"
+          "jsonPath" ".roleRef.name"
+          "badge" "Role"
+          "text" "{reqsJsonPath[0]['.roleRef.name']['-']}"
+          )
+        ) | nindent 6
+      }}
+    # =================================================
+    # Column: Service accounts
+    # =================================================
+    - name: Service accounts
+      type: factory
+      {{ include "in-cloud.web.cco.props.ownerRefs" (dict
+          "jsonPath" ".subjects[?(@.kind==\"ServiceAccount\")].name"
+          "jsonPathToArrayOfRefs" ".subjects[?(@.kind==\"ServiceAccount\")]"
+          "forcedNamespace" "{reqsJsonPath[0]['.metadata.namespace']['-']}"
+          "forcedApiVersion" (list (dict "apiVersion" "v1" "kind" "ServiceAccount"))
+        ) | nindent 6
+      }}
+    # =================================================
+    # Column: Users
+    # =================================================
+    - name: Users
+      type: array
+      jsonPath: .subjects[?(@.kind=="User")].name
+    # =================================================
+    # Column: Groups
+    # =================================================
+    - name: Groups
+      type: array
+      jsonPath: .subjects[?(@.kind=="Group")].name
+    # =================================================
+    # Column: Created
+    # =================================================
+    - name: Created
+      type: factory
+      {{ include "in-cloud.web.cco.props.created" . | nindent 6 }}
+
+  # Trim long values for selected columns
+  additionalPrinterColumnsTrimLengths:
+    {{ include "incloud-web-resources.cco.columns-trim-lengths.name" . | nindent 4 }}
+    {{ include "incloud-web-resources.cco.columns-trim-lengths.rbac-role-ref" . | nindent 4 }}
+
+  # Fallback values for empty or missing fields
+  additionalPrinterColumnsUndefinedValues:
+    {{ include "incloud-web-resources.cco.columns-undefined-values.role-ref" . | nindent 4 }}
+    {{ include "incloud-web-resources.cco.columns-undefined-values.users" . | nindent 4 }}
+    {{ include "incloud-web-resources.cco.columns-undefined-values.groups" . | nindent 4 }}
+    {{ include "incloud-web-resources.cco.columns-undefined-values.service-accounts" . | nindent 4 }}
+    {{ include "incloud-web-resources.cco.columns-undefined-values.namespace" . | nindent 4 }}
+
+  # Stable identifier used by frontend mapping
+  id: stock-cluster-/rbac.authorization.k8s.io/v1/rolebindings
+{{- end -}}

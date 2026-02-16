@@ -1,0 +1,106 @@
+{{- $customWebResources := default (dict) .Values.customWebResources -}}
+{{- $customCcoResources := default (dict) $customWebResources.customcolumnsoverride -}}
+{{- $customCco := index $customCcoResources "stock-namespace-v1.pods" -}}
+{{- if eq (include "in-cloud.web.cco.isEnabled" (dict "config" $customCco)) "true" }}
+---
+# =================================================
+# CustomColumnsOverride definition
+# =================================================
+apiVersion: front.in-cloud.io/v1alpha1
+kind: CustomColumnsOverride
+metadata:
+  # Name of this CustomColumnsOverride resource
+  name: stock-namespace-v1.pods
+spec:
+  # Table columns rendered in the resource list
+  additionalPrinterColumns:
+    # =================================================
+    # Column: Name
+    # =================================================
+    - name: Name
+      type: factory
+      {{ include "in-cloud.web.cco.props.badgeLink" (list $
+          "/openapi-ui/{2}/{reqsJsonPath[0]['.metadata.namespace']['-']}/factory/pod-details/v1/pods/{reqsJsonPath[0]['.metadata.name']['-']}"
+        ) | nindent 6
+      }}
+    # =================================================
+    # Column: Node
+    # =================================================
+    - name: Node
+      type: factory
+      {{ include "in-cloud.web.cco.props.badgeLink" (list $
+          "/openapi-ui/{2}/factory/node-details/v1/nodes/{reqsJsonPath[0]['.spec.nodeName']['-']}"
+          (dict
+          "name" "Node"
+          "jsonPath" ".spec.nodeName"
+          "badge" "Node"
+          "text" "{reqsJsonPath[0]['.spec.nodeName']['-']}"
+          )
+        ) | nindent 6
+      }}
+    # =================================================
+    # Column: Restart Policy
+    # =================================================
+    - name: Restart Policy
+      type: string
+      jsonPath: .spec.restartPolicy
+    # =================================================
+    # Column: Pod IP
+    # =================================================
+    - name: Pod IP
+      type: string
+      jsonPath: .status.podIP
+    # =================================================
+    # Column: QOS
+    # =================================================
+    - name: QOS
+      type: string
+      jsonPath: .status.qosClass
+    # =================================================
+    # Column: Memory
+    # =================================================
+    - name: Memory
+      type: factory
+      {{ include "in-cloud.web.cco.props.memory" (dict
+          "value" "{reqsJsonPath[0]['.additionalReqsData.0.items[?(@.metadata.name==\"{reqsJsonPath[0][\".metadata.name\"]}\")].containers[*].usage.memory']['-']}"
+        ) | nindent 6
+      }}
+    # =================================================
+    # Column: CPU
+    # =================================================
+    - name: CPU
+      type: factory
+      {{ include "in-cloud.web.cco.props.cpu" (dict
+          "value" "{reqsJsonPath[0]['.additionalReqsData.0.items[?(@.metadata.name==\"{reqsJsonPath[0][\".metadata.name\"]}\")].containers[*].usage.cpu']['-']}"
+        ) | nindent 6
+      }}
+    # =================================================
+    # Column: Status
+    # =================================================
+    - name: Status
+      type: factory
+      {{ include "in-cloud.web.cco.props.statusPod" . | nindent 6 }}
+    # =================================================
+    # Column: Created
+    # =================================================
+    - name: Created
+      type: factory
+      {{ include "in-cloud.web.cco.props.created" . | nindent 6 }}
+
+  # Additional sorters and filters for selected columns
+  additionalPrinterColumnsCustomSortersAndFilters:
+    {{ include "incloud-web-resources.cco.columns-custom-sorters-and-filters.memory" . | nindent 4 }}
+    {{ include "incloud-web-resources.cco.columns-custom-sorters-and-filters.cpu" . | nindent 4 }}
+
+  # Trim long values for selected columns
+  additionalPrinterColumnsTrimLengths:
+    {{ include "incloud-web-resources.cco.columns-trim-lengths.name" . | nindent 4 }}
+
+  # Fallback values for empty or missing fields
+  additionalPrinterColumnsUndefinedValues:
+    {{ include "incloud-web-resources.cco.columns-undefined-values.node" . | nindent 4 }}
+    {{ include "incloud-web-resources.cco.columns-undefined-values.pod-ip" . | nindent 4 }}
+
+  # Stable identifier used by frontend mapping
+  id: stock-namespace-/v1/pods
+{{- end -}}

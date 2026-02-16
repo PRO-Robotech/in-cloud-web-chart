@@ -69,6 +69,7 @@ spec:
                         type: string
                       link:
                         type: string
+
                       resourcesList:
                         type: object
                         additionalProperties: true
@@ -93,6 +94,9 @@ spec:
                             type: string
                           jsonPathToName:
                             type: string
+                          linkToResourceList:
+                            type: string
+
                       children:
                         type: array
                         items:
@@ -108,6 +112,7 @@ spec:
                               type: string
                             link:
                               type: string
+
                             resourcesList:
                               type: object
                               additionalProperties: true
@@ -132,5 +137,8 @@ spec:
                                   type: string
                                 jsonPathToName:
                                   type: string
+                                linkToResourceList:
+                                  type: string
+
       subresources:
         status: {}
