@@ -1,0 +1,57 @@
+{{- $customWebResources := default (dict) .Values.customWebResources -}}
+{{- $customCcoResources := default (dict) $customWebResources.customcolumnsoverride -}}
+{{- $customCco := index $customCcoResources "stock-cluster-apiextensions.k8s.io.v1.customresourcedefinitions" -}}
+{{- if eq (include "in-cloud.web.cco.isEnabled" (dict "config" $customCco)) "true" }}
+---
+# =================================================
+# CustomColumnsOverride definition
+# =================================================
+apiVersion: front.in-cloud.io/v1alpha1
+kind: CustomColumnsOverride
+metadata:
+  # Name of this CustomColumnsOverride resource
+  name: stock-cluster-apiextensions.k8s.io.v1.customresourcedefinitions
+spec:
+  # Table columns rendered in the resource list
+  additionalPrinterColumns:
+    # =================================================
+    # Column: Name
+    # =================================================
+    - name: Name
+      type: factory
+      {{ include "in-cloud.web.cco.props.badgeLink" (list $
+          "/openapi-ui/{2}/factory/crd-details/apiextensions.k8s.io/v1/customresourcedefinitions/{reqsJsonPath[0]['.metadata.name']['-']}"
+        ) | nindent 6
+      }}
+    # =================================================
+    # Column: Group
+    # =================================================
+    - name: Group
+      type: string
+      jsonPath: .spec.group
+    # =================================================
+    # Column: Latest Version
+    # =================================================
+    - name: Latest Version
+      type: string
+      jsonPath: .status.storedVersions[0]
+    # =================================================
+    # Column: Namespaced
+    # =================================================
+    - name: Namespaced
+      type: string
+      jsonPath: .status.conditions[?(@.type=='NamesAccepted')].status
+    # =================================================
+    # Column: Established
+    # =================================================
+    - name: Established
+      type: string
+      jsonPath: .status.conditions[?(@.type=='Established')].status
+
+  # Trim long values for selected columns
+  additionalPrinterColumnsTrimLengths:
+    {{ include "incloud-web-resources.cco.columns-trim-lengths.name" . | nindent 4 }}
+
+  # Stable identifier used by frontend mapping
+  id: stock-cluster-/apiextensions.k8s.io/v1/customresourcedefinitions
+{{- end -}}

@@ -1,0 +1,295 @@
+{{- $customWebResources := default (dict) .Values.customWebResources -}}
+{{- $customFactoryResources := default (dict) $customWebResources.factory -}}
+{{- $factoryConfig := index $customFactoryResources "pod-details" -}}
+{{- if or (and $factoryConfig $factoryConfig.enabled) (not $factoryConfig) }}
+{{/* Shared factory context (resource, permission context, endpoint) */}}
+{{- $podCtx := fromYaml (include "in-cloud.web.factoryContext.namespacedBuiltin" .) -}}
+{{- $podBuiltinResource := $podCtx.resource -}}
+{{- $podPermissionContext := $podCtx.permissionContext -}}
+{{- $podEndpoint := $podCtx.endpoint -}}
+apiVersion: front.in-cloud.io/v1alpha1
+kind: Factory
+metadata:
+  name: pod-details
+
+spec:
+  key: pod-details
+
+  # =========================
+  # Data sources
+  # =========================
+  urlsToFetch:
+    # Fetch selected resource by name from target cluster
+    # Primary resource request (from shared factory context)
+    {{- include "in-cloud.web.factoryContext.primaryUrlToFetchList" (dict
+        "resource" $podBuiltinResource
+        "fieldSelector" "metadata.name={8}"
+      ) | trim | nindent 4 }}
+
+    # Related pods metrics request (metrics.k8s.io)
+    {{- include "in-cloud.web.factoryContext.metricsPodsUrlToFetchList" (dict
+        "withNamespace" false
+      ) | trim | nindent 4 }}
+
+  # Disable scroll wrapper for main content card
+  withScrollableMainContentCard: false
+
+  # =========================
+  # Sidebar tags for navigation
+  # =========================
+  sidebarTags:
+    # Used to group resources in sidebar navigation
+    - '{6}/{7}'
+
+  # =========================
+  # Page layout
+  # =========================
+  data:
+
+    # =========================
+    # Header row (resource title + actions)
+    # =========================
+    - type: antdFlex
+      data:
+        id: header-row
+        align: center
+        justify: space-between
+        style:
+          marginBottom: 24px
+      children:
+
+        # =========================
+        # LEFT SIDE: Resource identity
+        # =========================
+        - type: antdFlex
+          data:
+            align: center
+            gap: 6
+          children:
+            {{ include "in-cloud.web.header.left" (dict
+                "k8sResourceToFetch" $podBuiltinResource
+                "redirectUrl" "/openapi-ui/{2}/{3}/factory/{5}/{6}/{7}/{chosenEntryValue}"
+              ) | nindent 12 
+            }}
+
+            # pod availability badge
+            - type: DefaultDiv
+              data:
+                id: pod-status-badge
+                style:
+                  display: inline-flex
+                  alignItems: center
+                  gap: 6px
+                  fontSize: 13
+                  fontWeight: 500
+                  color: "#065f46"
+              children:
+                {{- include "in-cloud.web.statusText.podAvailability" (dict
+                    "itemPath" ".items.0"
+                  ) | nindent 16
+                }}
+
+        # =========================
+        # RIGHT SIDE: Resource actions dropdown
+        # =========================
+        - type: ActionsDropdown
+          data:
+            id: resource-actions
+            buttonText: Actions
+            actions:
+
+              # ---- Edit resource manifest ----
+              {{ include "in-cloud.web.action.edit" (dict
+                  "k8sResourceToFetch" (merge (dict
+                    "name" "{reqsJsonPath[0]['.items.0.metadata.name']['-']}"
+                  ) $podBuiltinResource)
+                  "permissionContext" $podPermissionContext
+                ) | nindent 14
+              }}
+
+              # ---- Edit labels ----
+              {{ include "in-cloud.web.action.editLabels" (dict
+                  "endpoint" $podEndpoint
+                  "permissionContext" $podPermissionContext
+                ) | nindent 14
+              }}
+
+              # ---- Edit annotations ----
+              {{ include "in-cloud.web.action.editAnnotations" (dict
+                  "endpoint" $podEndpoint
+                  "permissionContext" $podPermissionContext
+                ) | nindent 14
+              }}
+
+
+              # ---- Delete resource ----
+              {{ include "in-cloud.web.action.delete" (dict
+                  "endpoint" $podEndpoint
+                  "redirectTo" "/openapi-ui/{2}/{3}/builtin-table/{7}?resources=metrics.k8s.io/v1beta1/pods"
+                  "permissionContext" $podPermissionContext
+                ) | nindent 14
+              }}
+
+    # =========================
+    # Tabs root
+    # =========================
+    - type: antdTabs
+      data:
+        id: tabs-root
+        defaultActiveKey: details
+        items:
+
+          # =========================
+          # DETAILS TAB
+          # =========================
+          - key: details
+            label: Details
+            children:
+              - type: antdFlex
+                data:
+                  id: details-stack
+                  vertical: true
+                  gap: 24
+                children:
+
+                  # ---- Row 1: Resource info + Metadata counters ----
+                  {{ include "in-cloud.web.contentCard.resourceInfoAndMetadataRow" (dict
+                      "namespaced" true
+                      "endpoint" $podEndpoint
+                      "permissionContext" $podPermissionContext
+                    ) | nindent 18 
+                  }}
+
+                  # ---- Row 2: Runtime facts and selectors ----
+                  {{ include "in-cloud.web.contentCard.runtimeFactsAndLabelsRow" (dict
+                      "runtimeTemplate" "in-cloud.web.contentCard.podRuntimeFacts"
+                      "runtimeContext" .
+                      "runtimeSpan" 8
+                      "labelsSpan" 6
+                      "labelsContext" (dict
+                        "podJsonPathToLabels" ".items.0.metadata.labels"
+                        "nodJsonPathToLabels" ".items.0.spec.nodeSelector"
+                      )
+                    ) | nindent 18
+                  }}
+
+
+                  {{ include "in-cloud.web.contentCard.genericVisibilityInclude" (dict
+                      "containerId" "init-containers-container"
+                      "value" "{reqsJsonPath[0]['.items.0.status.initContainerStatuses']['-']}"
+                      "withResetSpacing" true
+                      "includeTemplate" "in-cloud.web.contentCard.initContainersList"
+                      "includeContext" .
+                    ) | nindent 18
+                  }}
+
+                  {{ include "in-cloud.web.contentCard.genericVisibilityInclude" (dict
+                      "containerId" "containers-container"
+                      "value" "{reqsJsonPath[0]['.items.0.status.containerStatuses']['-']}"
+                      "withResetSpacing" true
+                      "includeTemplate" "in-cloud.web.contentCard.containersList"
+                      "includeContext" .
+                    ) | nindent 18
+                  }}
+
+                  # =========================
+                  # Conditions (only when present)
+                  # =========================
+                  {{ include "in-cloud.web.contentCard.conditionsVisibility" (dict
+                      "k8sResourceToFetch" $podBuiltinResource
+                      "fieldSelector" (dict
+                        "metadata.name" "{8}"
+                      )
+                    ) | nindent 18
+                  }}
+
+          # =========================
+          # YAML TAB
+          # =========================
+          - key: yaml
+            label: YAML
+            children:
+              {{ include "in-cloud.web.contentCard.yamlEditor" (dict
+                  "isNameSpaced" true
+                  "type" "builtin"
+                  "k8sResourceToFetch" $podBuiltinResource
+                  "permissionContext" (pick $podBuiltinResource "cluster" "namespace" "plural")
+                ) | nindent 14 
+              }}
+
+          # =========================
+          # POD LOGS TAB
+          # =========================
+          - key: logs
+            label: Logs
+            children:
+              {{- include "in-cloud.web.contentCard.podLogs" . | nindent 14 }}
+
+          # =========================
+          # POD TERMINAL TAB
+          # =========================
+          - key: terminal
+            label: Terminal
+            children:
+              {{- include "in-cloud.web.contentCard.podTerminal" . | nindent 14 }}
+
+          # =========================
+          # EVENTS TAB
+          # =========================
+          - key: events
+            label: Events
+            children:
+              # Kubernetes events related to this resource
+              {{ include "in-cloud.web.contentCard.events" . | nindent 14 }}
+
+          # =========================
+          # MONITORING TAB
+          # =========================
+          {{- if (index .Values.customWebResources.factory "pod-details").enableMonitoringTab }}
+          - key: monitoring
+            label: Monitoring
+            children:
+              # Embedded Grafana dashboard for node metrics
+              {{- include "in-cloud.web.iframe.monitoring.pod" (dict
+                  "grafanaBaseUrl" .Values.monitoring.grafanaBaseUrl
+                  "grafanaDashboardPath"  .Values.monitoring.grafanaDashboardPaths.podDetails
+                  "grafanaDatasource" .Values.monitoring.grafanaDatasource
+                ) | nindent 14
+              }}
+          {{- end -}}
+
+          # =========================
+          # AQUA SECURITY TAB (optional)
+          # =========================
+          {{- if (index .Values.customWebResources.factory "node-details").enableConfigReportsAquaTab }}
+          - key: reports
+            label: Reports
+            children:
+              {{- include "in-cloud.web.contentCard.aquaReport" (dict
+                  "fetchUrl" "/api/clusters/{2}/k8s/apis/aquasecurity.github.io/v1alpha1/namespaces/{3}/vulnerabilityreports"
+                  "pathToItems" ".items[*].report.vulnerabilities"
+                  "customizationId" "factory-aquasecurity.github.io.v1alpha1.vulnerabilityreports"
+                  "labelSelector" (dict
+                    "trivy-operator.resource.name" "{reqsJsonPath[0]['.items.0.metadata.ownerReferences[?(@.kind=='ReplicaSet' || @.kind=='DaemonSet' || @.kind=='StatefulSet')].name']['-']}"
+                    "trivy-operator.resource.kind" "{reqsJsonPath[0]['.items.0.metadata.ownerReferences[?(@.kind=='ReplicaSet' || @.kind=='DaemonSet' || @.kind=='StatefulSet')].kind']['-']}"
+
+                  )
+                ) | nindent 14
+              }}
+
+          - key: config-reports
+            label: Config reports
+            children:
+              {{- include "in-cloud.web.contentCard.aquaReport" (dict
+                  "fetchUrl" "/api/clusters/{2}/k8s/apis/aquasecurity.github.io/v1alpha1/namespaces/{3}/configauditreports"
+                  "pathToItems" ".items[*].report.checks"
+                  "customizationId" "factory-aquasecurity.github.io.v1alpha1.configauditreports"
+                  "labelSelector" (dict
+                    "trivy-operator.resource.name" "{reqsJsonPath[0]['.items.0.metadata.ownerReferences[?(@.kind=='ReplicaSet' || @.kind=='DaemonSet' || @.kind=='StatefulSet')].name']['-']}"
+                    "trivy-operator.resource.kind" "{reqsJsonPath[0]['.items.0.metadata.ownerReferences[?(@.kind=='ReplicaSet' || @.kind=='DaemonSet' || @.kind=='StatefulSet')].kind']['-']}"
+                  )
+                ) | nindent 14
+              }}
+          {{- end }}
+
+{{- end }}

@@ -1,0 +1,74 @@
+{{- $customWebResources := default (dict) .Values.customWebResources -}}
+{{- $customCcoResources := default (dict) $customWebResources.customcolumnsoverride -}}
+{{- $customCco := index $customCcoResources "container-status-init-containers-list" -}}
+{{- if eq (include "in-cloud.web.cco.isEnabled" (dict "config" $customCco)) "true" }}
+---
+# =================================================
+# CustomColumnsOverride definition
+# =================================================
+apiVersion: front.in-cloud.io/v1alpha1
+kind: CustomColumnsOverride
+metadata:
+  # Name of this CustomColumnsOverride resource
+  name: container-status-init-containers-list
+spec:
+  # Table columns rendered in the resource list
+  additionalPrinterColumns:
+    # =================================================
+    # Column: Name
+    # =================================================
+    - name: Name
+      type: string
+      jsonPath: .name
+    # =================================================
+    # Column: Image
+    # =================================================
+    - name: Image
+      type: string
+      jsonPath: .imageID
+    # =================================================
+    # Column: Started
+    # =================================================
+    - name: Started
+      type: bool
+      jsonPath: .started
+    # =================================================
+    # Column: Ready
+    # =================================================
+    - name: Ready
+      type: bool
+      jsonPath: .ready
+    # =================================================
+    # Column: RestartCount
+    # =================================================
+    - name: RestartCount
+      type: string
+      jsonPath: .restartCount
+    # =================================================
+    # Column: WaitingdReason
+    # =================================================
+    - name: WaitingdReason
+      type: string
+      jsonPath: .state.waiting.reason
+    # =================================================
+    # Column: TerminatedReason
+    # =================================================
+    - name: TerminatedReason
+      type: string
+      jsonPath: .state.terminated.reason
+
+  # Trim long values for selected columns
+  additionalPrinterColumnsTrimLengths:
+    {{ include "incloud-web-resources.cco.columns-trim-lengths.name" . | nindent 4 }}
+    {{ include "incloud-web-resources.cco.columns-trim-lengths.container-image" . | nindent 4 }}
+
+  # Fallback values for empty or missing fields
+  additionalPrinterColumnsUndefinedValues:
+    - key: TerminatedReason
+      value: "-"
+    - key: WaitingdReason
+      value: "-"
+
+  # Stable identifier used by frontend mapping
+  id: container-status-init-containers-list
+{{- end -}}

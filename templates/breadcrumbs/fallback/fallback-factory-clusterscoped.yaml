@@ -1,0 +1,32 @@
+---
+apiVersion: front.in-cloud.io/v1alpha1
+kind: Breadcrumb
+metadata:
+  name: fallback-factory-clusterscoped-api
+spec:
+  id: "fallback-factory-clusterscoped-api"
+  breadcrumbItems:
+    - key: group-version
+      label: "{5}/{6}/{7}"
+      link: "/openapi-ui/{cluster}/api-table/{5}/{6}/{7}"
+    - key: resource-name
+      label: "{8}"
+    - key: details
+      label: "Details"
+
+---
+apiVersion: front.in-cloud.io/v1alpha1
+kind: Breadcrumb
+metadata:
+  name: fallback-factory-clusterscoped-builtin
+spec:
+  id: "fallback-factory-clusterscoped-builtin"
+  breadcrumbItems:
+    - key: group-version
+      label: "{5}/{6}"
+      link: "/openapi-ui/{cluster}/builtin-table/{6}"
+    - key: resource-name
+      label: "{7}"
+    - key: details
+      label: "Details"
+

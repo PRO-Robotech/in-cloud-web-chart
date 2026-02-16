@@ -1,0 +1,23 @@
+---
+apiVersion: front.in-cloud.io/v1alpha1
+kind: Breadcrumb
+metadata:
+  name: fallback-table-namespaced-api
+spec:
+  id: "fallback-table-namespaced-api"
+  breadcrumbItems:
+    - key: api
+      label: "{5}/{6}/{7}"
+---
+apiVersion: front.in-cloud.io/v1alpha1
+kind: Breadcrumb
+metadata:
+  name: fallback-table-namespaced-builtin
+spec:
+  id: "fallback-table-namespaced-builtin"
+  breadcrumbItems:
+    - key: api
+      label: "v1/{5}"
+
+
+

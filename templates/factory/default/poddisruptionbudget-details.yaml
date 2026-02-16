@@ -1,0 +1,210 @@
+{{- $customWebResources := default (dict) .Values.customWebResources -}}
+{{- $customFactoryResources := default (dict) $customWebResources.factory -}}
+{{- $factoryConfig := index $customFactoryResources "poddisruptionbudget-details" -}}
+{{- if or (and $factoryConfig $factoryConfig.enabled) (not $factoryConfig) }}
+{{/* Shared factory context (resource, permission context, endpoint) */}}
+{{- $poddisruptionbudgetCtx := fromYaml (include "in-cloud.web.factoryContext.namespacedApi" .) -}}
+{{- $poddisruptionbudgetApiResource := $poddisruptionbudgetCtx.resource -}}
+{{- $poddisruptionbudgetPermissionContext := $poddisruptionbudgetCtx.permissionContext -}}
+{{- $poddisruptionbudgetEndpoint := $poddisruptionbudgetCtx.endpoint -}}
+apiVersion: front.in-cloud.io/v1alpha1
+kind: Factory
+metadata:
+  name: poddisruptionbudget-details
+
+spec:
+  key: poddisruptionbudget-details
+
+  # =========================
+  # Data sources
+  # =========================
+  urlsToFetch:
+    # Fetch selected resource by name from target cluster
+    # Primary resource request (from shared factory context)
+    {{- include "in-cloud.web.factoryContext.primaryUrlToFetchList" (dict
+        "resource" $poddisruptionbudgetApiResource
+        "fieldSelector" "metadata.name={9}"
+      ) | trim | nindent 4 }}
+
+    # Related pods metrics request (metrics.k8s.io)
+    {{- include "in-cloud.web.factoryContext.metricsPodsUrlToFetchList" (dict
+        "withNamespace" true
+      ) | trim | nindent 4 }}
+
+  # Disable scroll wrapper for main content card
+  withScrollableMainContentCard: false
+
+  # =========================
+  # Sidebar tags for navigation
+  # =========================
+  sidebarTags:
+    # Used to group resources in sidebar navigation
+    - '{6}/{7}/{8}'
+
+  # =========================
+  # Page layout
+  # =========================
+  data:
+
+    # =========================
+    # Header row (resource title + actions)
+    # =========================
+    - type: antdFlex
+      data:
+        id: header-row
+        align: center
+        justify: space-between
+        style:
+          marginBottom: 24px
+      children:
+
+        # =========================
+        # LEFT SIDE: Resource identity
+        # =========================
+        - type: antdFlex
+          data:
+            align: center
+            gap: 6
+          children:
+            {{ include "in-cloud.web.header.left" (dict
+                "k8sResourceToFetch" $poddisruptionbudgetApiResource
+                "redirectUrl" "/openapi-ui/{2}/{3}/factory/{5}/{6}/{7}/{8}/{chosenEntryValue}"
+              ) | nindent 12 
+            }}
+
+        # =========================
+        # RIGHT SIDE: Resource actions dropdown
+        # =========================
+        - type: ActionsDropdown
+          data:
+            id: resource-actions
+            buttonText: Actions
+            actions:
+
+              # ---- Edit resource manifest ----
+              {{ include "in-cloud.web.action.edit" (dict
+                  "k8sResourceToFetch" (merge (dict
+                    "name" "{reqsJsonPath[0]['.items.0.metadata.name']['-']}"
+                  ) $poddisruptionbudgetApiResource)
+                  "permissionContext" $poddisruptionbudgetPermissionContext
+                ) | nindent 14
+              }}
+
+              # ---- Edit labels ----
+              {{ include "in-cloud.web.action.editLabels" (dict
+                  "endpoint" $poddisruptionbudgetEndpoint
+                  "permissionContext" $poddisruptionbudgetPermissionContext
+                ) | nindent 14
+              }}
+
+              # ---- Edit annotations ----
+              {{ include "in-cloud.web.action.editAnnotations" (dict
+                  "endpoint" $poddisruptionbudgetEndpoint
+                  "permissionContext" $poddisruptionbudgetPermissionContext
+                ) | nindent 14
+              }}
+
+
+              # ---- Delete resource ----
+              {{ include "in-cloud.web.action.delete" (dict
+                  "endpoint" $poddisruptionbudgetEndpoint
+                  "redirectTo" "/openapi-ui/{2}/{3}/api-table/{6}/{7}/{8}"
+                  "permissionContext" $poddisruptionbudgetPermissionContext
+                ) | nindent 14
+              }}
+
+    # =========================
+    # Tabs root
+    # =========================
+    - type: antdTabs
+      data:
+        id: tabs-root
+        defaultActiveKey: details
+        items:
+
+          # =========================
+          # DETAILS TAB
+          # =========================
+          - key: details
+            label: Details
+            children:
+              - type: antdFlex
+                data:
+                  id: details-stack
+                  vertical: true
+                  gap: 24
+                children:
+
+                  # ---- Row 1: Resource info + Metadata counters ----
+                  {{ include "in-cloud.web.contentCard.resourceInfoAndMetadataRow" (dict
+                      "namespaced" true
+                      "endpoint" $poddisruptionbudgetEndpoint
+                      "permissionContext" $poddisruptionbudgetPermissionContext
+                    ) | nindent 18 
+                  }}
+
+                  # ---- Row 2: Runtime facts ----
+                  - type: antdRow
+                    data:
+                      gutter: [24, 0]
+                    children:
+
+                      # Resource runtime details
+                      - type: antdCol
+                        data:
+                          span: 8
+                        children:
+                          {{ include "in-cloud.web.contentCard.poddisruptionbudgetRuntimeFacts" . | nindent 26 }}
+
+                  # =========================
+                  # Conditions (only when present)
+                  # =========================
+                  {{ include "in-cloud.web.contentCard.conditionsVisibility" (dict
+                      "k8sResourceToFetch" $poddisruptionbudgetApiResource
+                      "fieldSelector" (dict
+                        "metadata.name" "{9}"
+                      )
+                    ) | nindent 18
+                  }}
+
+          # =========================
+          # YAML TAB
+          # =========================
+          - key: yaml
+            label: YAML
+            children:
+              {{ include "in-cloud.web.contentCard.yamlEditor" (dict
+                  "isNameSpaced" true
+                  "type" "api"
+                  "k8sResourceToFetch" $poddisruptionbudgetApiResource
+                  "permissionContext" $poddisruptionbudgetPermissionContext
+                ) | nindent 14 
+              }}
+
+          # =========================
+          # PODS TAB
+          # =========================
+          - key: pods
+            label: Pods
+            children:
+              # Related Pods list
+              {{- include "in-cloud.web.contentCard.podList" (dict
+                  "ifNamespaced" true
+                  "labelSelectorFull" (dict
+                    "reqIndex" 0
+                    "pathToLabels"  ".items.0.spec.selector.matchLabels"
+                  )
+                ) | nindent 14 
+              }}
+
+          # =========================
+          # EVENTS TAB
+          # =========================
+          - key: events
+            label: Events
+            children:
+              # Kubernetes events related to this resource
+              {{ include "in-cloud.web.contentCard.events" . | nindent 14 }}
+
+
+{{- end }}

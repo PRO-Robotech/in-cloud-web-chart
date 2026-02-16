@@ -171,7 +171,7 @@ clusters:
 # --- Default Web Resources ---------------------------------------------------------------
 # This parameter group allows you to disable the default resources. 
 # This is necessary if you plan to define your own resources 
-# (e.g., via the incloud-web-resources chart) or manage them by another means.
+# (e.g., via the incloud-web-chart chart) or manage them by another means.
 defaultWebResources:
   breadcrumbs:
     default:
@@ -190,6 +190,139 @@ defaultWebResources:
       base-factory-namespaced-api: true
       base-factory-namespaced-builtin: true
       namespace-details: true
+
+customWebResources:
+  # All CCO resources are enabled by default when key is absent.
+  # Add only explicit overrides here, for example:
+  # customcolumnsoverride:
+  #   stock-cluster-v1.services:
+  #     enabled: false
+  customcolumnsoverride: {}
+
+  # All Navigation resources are enabled by default when key is absent.
+  # Keep only explicit overrides or feature flags.
+  # navigation:
+  #   navigation:
+  #     enabled: false
+  navigation: {}
+
+  # All Factory resources are enabled by default when key is absent.
+  # Keep only explicit overrides or feature flags.
+  factory:
+    pod-details:
+      enabled: true
+      enableMonitoringTab: true
+    node-details:
+      enabled: true
+      enableConfigReportsAquaTab: true
+
+
+# --- Navigation ------------------------------------------------------------
+navigation:
+  # Name of Navigation custom resource.
+  name: navigation
+
+  # Enable or disable rendering of the baseFactoriesMapping block.
+  baseFactoriesMappingEnabled: true
+  baseFactoriesMapping:
+    base-factory-clusterscoped-api-apiextensions.k8s.io-v1-customresourcedefinitions: crd-details
+    base-factory-clusterscoped-api-apps-v1-daemonsets: daemonset-details
+    base-factory-clusterscoped-api-apps-v1-deployments: deployment-details
+    base-factory-clusterscoped-api-apps-v1-instance-daemonsets: instance-daemonset-details
+    base-factory-clusterscoped-api-apps-v1-instance-deployments: instance-deployment-details
+    base-factory-clusterscoped-api-apps-v1-instance-replicasets: instance-replicaset-details
+    base-factory-clusterscoped-api-apps-v1-instance-statefulsets: instance-statefulset-details
+    base-factory-clusterscoped-api-apps-v1-replicasets: replicaset-details
+    base-factory-clusterscoped-api-apps-v1-statefulsets: statefulset-details
+    base-factory-clusterscoped-api-autoscaling-v2-horizontalpodautoscalers: horizontalpodautoscaler-details
+    base-factory-clusterscoped-api-autoscaling-v2-instance-horizontalpodautoscalers: instance-horizontalpodautoscaler-details
+    base-factory-clusterscoped-api-batch-v1-cronjobs: cronjob-details
+    base-factory-clusterscoped-api-batch-v1-instance-cronjobs: instance-cronjob-details
+    base-factory-clusterscoped-api-batch-v1-instance-jobs: instance-job-details
+    base-factory-clusterscoped-api-batch-v1-jobs: job-details
+    base-factory-clusterscoped-api-cert-manager.io-v1-certificates: certificate-details
+    base-factory-clusterscoped-api-networking.k8s.io-v1-instance-networkpolicies: instance-networkpolicy-details
+    base-factory-clusterscoped-api-networking.k8s.io-v1-networkpolicies: networkpolicy-details
+    base-factory-clusterscoped-api-policy-v1-instance-poddisruptionbudgets: instance-poddisruptionbudget-details
+    base-factory-clusterscoped-api-policy-v1-poddisruptionbudgets: poddisruptionbudget-details
+    base-factory-clusterscoped-api-rbac.authorization.k8s.io-v1-clusterrolebindings: clusterrolebinding-details
+    base-factory-clusterscoped-api-rbac.authorization.k8s.io-v1-clusterroles: clusterrole-details
+    base-factory-clusterscoped-api-rbac.authorization.k8s.io-v1-rolebindings: rolebinding-details
+    base-factory-clusterscoped-api-rbac.authorization.k8s.io-v1-roles: role-details
+    base-factory-clusterscoped-builtin-v1-configmaps: configmap-details
+    base-factory-clusterscoped-builtin-v1-instance-configmaps: instance-configmap-details
+    base-factory-clusterscoped-builtin-v1-instance-pods: instance-pod-details
+    base-factory-clusterscoped-builtin-v1-instance-replicationcontrollers: instance-replicationcontroller-details
+    base-factory-clusterscoped-builtin-v1-instance-secrets: instance-secret-details
+    base-factory-clusterscoped-builtin-v1-instance-serviceaccounts: instance-serviceaccount-details
+    base-factory-clusterscoped-builtin-v1-instance-services: instance-service-details
+    base-factory-clusterscoped-builtin-v1-nodes: node-details
+    base-factory-clusterscoped-builtin-v1-pods: pod-details
+    base-factory-clusterscoped-builtin-v1-replicationcontrollers: replicationcontroller-details
+    base-factory-clusterscoped-builtin-v1-secrets: secret-details
+    base-factory-clusterscoped-builtin-v1-serviceaccounts: serviceaccount-details
+    base-factory-clusterscoped-builtin-v1-services: service-details
+    base-factory-namespaced-api-apiextensions.k8s.io-v1-customresourcedefinitions: crd-details
+    base-factory-namespaced-api-apps-v1-daemonsets: daemonset-details
+    base-factory-namespaced-api-apps-v1-deployments: deployment-details
+    base-factory-namespaced-api-apps-v1-instance-daemonsets: instance-daemonset-details
+    base-factory-namespaced-api-apps-v1-instance-deployments: instance-deployment-details
+    base-factory-namespaced-api-apps-v1-instance-replicasets: instance-replicaset-details
+    base-factory-namespaced-api-apps-v1-instance-statefulsets: instance-statefulset-details
+    base-factory-namespaced-api-apps-v1-replicasets: replicaset-details
+    base-factory-namespaced-api-apps-v1-statefulsets: statefulset-details
+    base-factory-namespaced-api-argoproj.io-v1alpha1-applications: argocd-application-details
+    base-factory-namespaced-api-argoproj.io-v1alpha1-appprojects: argocd-appproject-details
+    base-factory-namespaced-api-autoscaling-v2-horizontalpodautoscalers: horizontalpodautoscaler-details
+    base-factory-namespaced-api-autoscaling-v2-instance-horizontalpodautoscalers: instance-horizontalpodautoscaler-details
+    base-factory-namespaced-api-batch-v1-cronjobs: cronjob-details
+    base-factory-namespaced-api-batch-v1-instance-cronjobs: instance-cronjob-details
+    base-factory-namespaced-api-batch-v1-instance-jobs: instance-job-details
+    base-factory-namespaced-api-batch-v1-jobs: job-details
+    base-factory-namespaced-api-cert-manager.io-v1-certificates: certificate-details
+    base-factory-namespaced-api-networking.k8s.io-v1-instance-networkpolicies: instance-networkpolicy-details
+    base-factory-namespaced-api-networking.k8s.io-v1-networkpolicies: networkpolicy-details
+    base-factory-namespaced-api-policy-v1-instance-poddisruptionbudgets: instance-poddisruptionbudget-details
+    base-factory-namespaced-api-policy-v1-poddisruptionbudgets: poddisruptionbudget-details
+    base-factory-namespaced-api-rbac.authorization.k8s.io-v1-clusterrolebindings: clusterrolebinding-details
+    base-factory-namespaced-api-rbac.authorization.k8s.io-v1-clusterroles: clusterrole-details
+    base-factory-namespaced-api-rbac.authorization.k8s.io-v1-rolebindings: rolebinding-details
+    base-factory-namespaced-api-rbac.authorization.k8s.io-v1-roles: role-details
+    base-factory-namespaced-builtin-v1-configmaps: configmap-details
+    base-factory-namespaced-builtin-v1-instance-configmaps: instance-configmap-details
+    base-factory-namespaced-builtin-v1-instance-pods: instance-pod-details
+    base-factory-namespaced-builtin-v1-instance-replicationcontrollers: instance-replicationcontroller-details
+    base-factory-namespaced-builtin-v1-instance-secrets: instance-secret-details
+    base-factory-namespaced-builtin-v1-instance-serviceaccounts: instance-serviceaccount-details
+    base-factory-namespaced-builtin-v1-instance-services: instance-service-details
+    base-factory-namespaced-builtin-v1-pods: pod-details
+    base-factory-namespaced-builtin-v1-replicationcontrollers: replicationcontroller-details
+    base-factory-namespaced-builtin-v1-secrets: secret-details
+    base-factory-namespaced-builtin-v1-serviceaccounts: serviceaccount-details
+    base-factory-namespaced-builtin-v1-services: service-details
+
+  # Cluster "instances" selector behavior.
+  instances:
+    enabled: true
+    aliasPath: "{reqsJsonPath[0]['.metadata.name']}"
+    change: "/openapi-ui/{selectedCluster}/{value}/builtin-table/pods?resources=metrics.k8s.io/v1beta1/pods"
+    clear: "/openapi-ui/{selectedCluster}/builtin-table/pods?resources=metrics.k8s.io/v1beta1/pods"
+    mapOptionsPattern: "{reqsJsonPath[0]['.metadata.name']}"
+
+  # Namespace selector behavior.
+  namespaces:
+    enabled: true
+    aliasPath: "{reqsJsonPath[0]['.metadata.name']}"
+    change: "/openapi-ui/{selectedCluster}/{value}/builtin-table/pods"
+    clear: "/openapi-ui/{selectedCluster}/builtin-table/namespaces"
+
+  # Project selector behavior.
+  projects:
+    enabled: true
+    aliasPath: "{reqsJsonPath[0]['.metadata.name']}"
+    change: "/openapi-ui/{selectedCluster}/{value}/builtin-table/pods?resources=metrics.k8s.io/v1beta1/pods"
+    clear: "/openapi-ui/{selectedCluster}/builtin-table/pods?resources=metrics.k8s.io/v1beta1/pods"
+
 
 # --- Global ----------------------------------------------------------------
 nameOverride: ""                  # Overrides chart name; leave empty to use default
@@ -348,7 +481,7 @@ bff:
   # Container image configuration
   image:
     repository: prorobotech/openapi-ui-k8s-bff
-    tag: v1.2.0-9dea64b4
+    tag: release-1.3.0-3f37f37a
     pullPolicy: IfNotPresent
 
   # Networking configuration for the container
@@ -359,7 +492,6 @@ bff:
   env:
     BASE_API_GROUP: "front.in-cloud.io"
     BASE_API_VERSION: "v1alpha1"
-    DEBUG_CONTAINER_IMAGE: "nicolaka/netshoot:v0.13"
     LOGGER: "TRUE"
     LOGGER_WITH_HEADERS: "TRUE"
     PORT: "8082"
@@ -373,6 +505,7 @@ bff:
     BASE_ALLOWED_AUTH_HEADERS: user-agent,accept,content-type,origin,referer,accept-encoding,cookie
     BASE_NAVIGATION_RESOURCE_PLURAL: "navigations"
     BASE_NAVIGATION_RESOURCE_NAME: "fallback"
+    # MF_PLUGINS_JSON: '{"plugin-example":{"name":"plugin-example","entry":"http://127.0.0.1:8081/openapi-ui-plugin/assets/remoteEntry.js","exposedModule":"./App"}}'
 
   envFrom: []
 
@@ -449,7 +582,7 @@ web:
   # Container image configuration
   image:
     repository: prorobotech/openapi-ui
-    tag: v1.2.0-f77b3241
+    tag: release-1.3.0-888db8eb
     pullPolicy: IfNotPresent
 
   # Networking configuration for the container
@@ -472,6 +605,8 @@ web:
     CUSTOMIZATION_API_VERSION: "v1alpha1"
     CUSTOMIZATION_NAVIGATION_RESOURCE_PLURAL: "navigations"
     CUSTOMIZATION_NAVIGATION_RESOURCE_NAME: "fallback"
+    CUSTOMIZATION_CFOMAPPING_RESOURCE_PLURAL: "cfomappings"
+    CUSTOMIZATION_CFOMAPPING_RESOURCE_NAME: "default"
     INSTANCES_API_GROUP: "in-cloud.io"
     INSTANCES_PLURAL: "instances"
     INSTANCES_API_VERSION: "v1alpha1"
@@ -486,6 +621,9 @@ web:
     PROJECTS_PLURAL: "projects"
     PROJECTS_API_VERSION: "v1alpha1"
     USE_NAMESPACE_NAV: true
+    USE_NEW_NAVIGATION: true
+    HIDE_NAVIGATION: true
+    BREADCRUMBS_NO_MARGIN_TOP: true
     REMOVE_BACKLINK: true
     REMOVE_BACKLINK_TEXT: true
     DOCS_URL: https://in-cloud.io/docs/tech-docs/introduction/
@@ -496,6 +634,9 @@ web:
     BASE_FACTORY_CLUSTERSCOPED_BUILTIN_KEY: "base-factory-clusterscoped-builtin"
     BASE_NAMESPACE_FACTORY_KEY: "namespace-details/v1/namespaces"
     CUSTOMIZATION_SIDEBAR_FALLBACK_ID: "fallback"
+    CUSTOMIZATION_BREADCRUMBS_FALLBACK_ID: "fallback"
+    CUSTOMIZATION_CFO_FALLBACK_ID: "fallback"
+    # MF_PLUGINS_NO_CLUSTER: '{"plugin-header":{"name":"plugin-header","entry":"http://127.0.0.1:8081/openapi-ui-plugin/assets/remoteEntry.js","exposedModule":"./App"},"plugin-navigation":{"name":"plugin-navigation","entry":"http://127.0.0.1:8081/openapi-ui-plugin/assets/remoteEntry.js","exposedModule":"./App"},"plugin-sidebar":{"name":"plugin-sidebar","entry":"http://127.0.0.1:8081/openapi-ui-plugin/assets/remoteEntry.js","exposedModule":"./App"}}'
   envFrom: []
 
   # Resource requests and limits for CPU, memory and ephemeral storage
@@ -643,6 +784,90 @@ nginx:
   terminationMessagePath: /dev/termination-log
   terminationMessagePolicy: File
 
+moduleExample:
+  # Main toggle for enabling or disabling the moduleExample service
+  enabled: false
+
+  # Basic identification settings for the moduleExample container
+  name: module-example
+
+  # Container image configuration
+  image:
+    repository: prorobotech/openapi-ui-plugin-example
+    tag: master-a1a1bddb
+    pullPolicy: IfNotPresent
+
+  # Networking configuration for the container
+  extraContainerPorts: []
+  # Networking configuration for the container
+  containerPort: 8083
+
+  # Environment variables that configure moduleExample behavior and integration with Kubernetes API
+  env:
+    PORT: "8083"
+    CORS_ALLOWED_ORIGINS: "http://127.0.0.1:8081"
+    BASEPREFIX: /openapi-ui-plugin
+
+  envFrom: []
+
+  # Resource requests and limits for CPU, memory and ephemeral storage
+  resources:
+    limits:
+      cpu: 100m
+      memory: 128Mi
+      ephemeral-storage: 50Mi
+    requests:
+      cpu: 100m
+      memory: 128Mi
+      ephemeral-storage: 50Mi
+
+  # Security context for the container runtime
+  securityContext:
+    enabled: true
+    allowPrivilegeEscalation: false
+    capabilities:
+      drop:
+        - ALL
+    privileged: false
+    readOnlyRootFilesystem: false
+    runAsGroup: 0
+    runAsNonRoot: true
+    runAsUser: 101
+
+  # Liveness probe to monitor container health
+  livenessProbe:
+    enabled: false
+    # httpGet:
+    #   path: /healthcheck
+    #   port: 8080
+    #   scheme: HTTP
+    # initialDelaySeconds: 3
+    # periodSeconds: 10
+    # timeoutSeconds: 2
+    # successThreshold: 1
+    # failureThreshold: 3
+
+  # Readiness probe to control traffic routing only when ready
+  readinessProbe:
+    enabled: false
+    # httpGet:
+    #   path: /ready
+    #   port: 8080
+    #   scheme: HTTP
+    # initialDelaySeconds: 3
+    # periodSeconds: 10
+    # timeoutSeconds: 2
+    # successThreshold: 1
+    # failureThreshold: 3
+
+  # Additional volumes that can be mounted into the container
+  volumeMounts: []
+
+  # Termination message configuration
+  terminationMessagePath: /dev/termination-log
+  terminationMessagePolicy: File
+
+
 
 # --- Labels/Selectors ------------------------------------------------------
 selectorLabels:
@@ -655,3 +880,298 @@ extraTemplateMetadata:
   labels: {}
 
 extraObjects: []
+# affinity: {}
+podDisruptionBudget:
+  minAvailable: 1
+
+strategy:
+  rollingUpdate:
+    maxUnavailable: 1
+    maxSurge: 1
+
+basePrefix: openapi-ui
+
+sidebars:
+  # Cluster-level sidebar (when no namespace/project context is selected)
+  # Displays global cluster resources and overview
+  cluster:
+    # Configuration for custom sidebar navigation items
+    # customItems allows you to define additional sidebar sections with custom structure
+    #
+    # Each item should be structured as:
+    # - key: unique-identifier     # Unique key for the sidebar section
+    #   label: "Display Name"      # Display text (supports URL templating)
+    #   children:                  # Optional nested items array
+    #     - key: child-unique-id
+    #       label: "Child Name"
+    #       link: /openapi-ui/{cluster}/api-table/apiGroup/apiVersion/resourceName
+    #     - key: child-unique-id
+    #       label: "Child Name"
+    #       link: /openapi-ui/{2}/api-table/apiGroup/apiVersion/resourceName
+    # URL Templating in labels:
+    # Use {n} pattern to insert URL path segments, where n is the segment index (1-based)
+    # Example paths:
+    # /openapi-ui/cluster-name/builtin-table/namespaces
+    #   {1} = "openapi-ui", {2} = "cluster-name", {3} = "builtin-table", {4} = "namespaces"
+    #   {cluster} = "cluster-name"
+    customItems: []
+
+    home:
+      enabled: true
+      items:
+        search: true
+        projects: false
+        instances: false
+
+    # Workloads management section
+    workloads:
+      enabled: true
+      items:
+        pods: true
+        deployments: true
+        statefulsets: true
+        secrets: true
+        configmaps: true
+        cronjobs: true
+        jobs: true
+        daemonsets: true
+        replicasets: true
+        horizontalpodautoscalers: true  # HPA configurations
+        poddisruptionbudgets: true  # PDB configurations
+      extraItems: []
+
+    # Networking resources section
+    networking:
+      enabled: true
+      items:
+        services: true
+        networkpolicies: true
+        ingresses: true
+      extraItems: []
+
+    # Storage resources section
+    storage:
+      enabled: true
+      items:
+        persistentvolumes: true  # Cluster-wide PVs
+        persistentvolumeclaims: true  # Namespace-scoped PVCs
+        storageclasses: true  # Storage classes
+      extraItems: []
+
+    # Compute resources section
+    compute:
+      enabled: true
+      items:
+        nodes: true  # Cluster nodes
+      extraItems: []
+
+    # User and access management section
+    usermanagement:
+      enabled: true
+      items:
+        serviceaccounts: true  # Namespace-scoped service accounts
+        roles: true  # Namespace-scoped roles
+        rolebindings: true  # Namespace-scoped role bindings
+        clusterroles: true  # Cluster-wide roles
+        clusterrolebindings: true  # Cluster-wide role bindings
+      extraItems: []
+
+    # Cluster administration section
+    administration:
+      enabled: true
+      items:
+        namespaces: true  # Namespace management
+        limitranges: true  # Resource limits
+        resourcequotas: true  # Resource quotas
+        customresourcedefinitions: true  # CRD management
+      extraItems: []
+
+  # Namespaced-level sidebar (when namespace or project context is selected)
+  # Displays resources scoped to the selected namespace/project
+  namespaced:
+    # Configuration for custom sidebar navigation items
+    # customItems allows you to define additional sidebar sections with custom structure
+    #
+    # Each item should be structured as:
+    # - key: unique-identifier     # Unique key for the sidebar section
+    #   label: "Display Name"      # Display text (supports URL templating)
+    #   children:                  # Optional nested items array
+    #     - key: child-unique-id
+    #       label: "Child Name"
+    #       link: /openapi-ui/{cluster}/{namespace}/api-table/apiGroup/apiVersion/resourceName
+    #     - key: child-unique-id
+    #       label: "Child Name"
+    #       link: /openapi-ui/{2}/{3}/api-table/apiGroup/apiVersion/resourceName
+    # URL Templating in labels:
+    # Use {n} pattern to insert URL path segments, where n is the segment index (1-based)
+    # Example paths:
+    # /openapi-ui/cluster-name/namespace/builtin-table/pods
+    #   {1} = "openapi-ui", {2} = "cluster-name", {3} = "namespace", etc.
+    #   {cluster} = "cluster-name"
+    #   {namespace} = "namespace"
+    customItems: []
+
+    home:
+      enabled: true
+      items:
+        search: true
+        projects: false
+        instances: false
+
+    # Workloads within the namespace
+    workloads:
+      enabled: true
+      items:
+        pods: true
+        deployments: true
+        statefulsets: true
+        secrets: true
+        configmaps: true
+        cronjobs: true
+        jobs: true
+        daemonsets: true
+        replicasets: true
+        horizontalpodautoscalers: true
+        poddisruptionbudgets: true
+      extraItems: []
+
+    # Networking within the namespace
+    networking:
+      enabled: true
+      items:
+        services: true
+        networkpolicies: true
+        ingresses: true
+      extraItems: []
+
+    # Storage resources within the namespace
+    storage:
+      enabled: true
+      items:
+        persistentvolumes: true
+        persistentvolumeclaims: true  # Namespace-scoped PVCs
+        storageclasses: true
+      extraItems: []
+
+    # Compute resources (typically cluster-scoped, but visible in context)
+    compute:
+      enabled: true
+      items:
+        nodes: true
+      extraItems: []
+
+    # User management within the namespace
+    usermanagement:
+      enabled: true
+      items:
+        serviceaccounts: true  # Namespace-scoped service accounts
+        roles: true  # Namespace-scoped roles
+        rolebindings: true  # Namespace-scoped role bindings
+        clusterroles: true  # Cluster-wide roles (visible in context)
+        clusterrolebindings: true  # Cluster-wide bindings (visible in context)
+      extraItems: []
+
+    # Administration within the namespace
+    administration:
+      enabled: true
+      items:
+        namespaces: true  # Current namespace management
+        limitranges: true  # Namespace resource limits
+        resourcequotas: true  # Namespace resource quotas
+        customresourcedefinitions: true  # CRDs (cluster-wide but visible)
+      extraItems: []
+
+  # Mapping of resource keys to API endpoints and detail views
+  extrakeysAndTags: {}
+  
+  # Mapping of resource keys to API endpoints and detail views
+  keysAndTags:
+    clusterrolebindings:
+      - rbac.authorization.k8s.io/v1/clusterrolebindings
+      - clusterrolebinding-details
+    clusterroles:
+      - rbac.authorization.k8s.io/v1/clusterroles
+      - clusterrole-details
+    configmaps:
+      - v1/configmaps
+      - configmap-details
+    cronjobs:
+      - batch/v1/cronjobs
+      - cronjob-details
+    customresourcedefinitions:
+      - apiextensions.k8s.io/v1/customresourcedefinitions
+      - customresourcedefinition-details
+    daemonsets:
+      - apps/v1/daemonsets
+      - daemonset-details
+    deployments:
+      - apps/v1/deployments
+      - deployment-details
+    horizontalpodautoscalers:
+      - autoscaling/v2/horizontalpodautoscalers
+      - horizontalpodautoscaler-details
+    ingresses:
+      - networking.k8s.io/v1/ingresses
+      - ingresse-details
+    jobs:
+      - batch/v1/jobs
+      - job-details
+    limitranges:
+      - v1/limitranges
+      - limitrange-details
+    namespaces:
+      - v1/namespaces
+      - namespace-details
+    networkpolicies:
+      - networking.k8s.io/v1/networkpolicies
+      - networkpolicy-details
+    nodes:
+      - v1/nodes
+      - node-details
+    persistentvolumeclaims:
+      - v1/persistentvolumeclaims
+      - persistentvolumeclaim-details
+    persistentvolumes:
+      - v1/persistentvolumes
+      - persistentvolume-details
+    poddisruptionbudgets:
+      - policy/v1/poddisruptionbudgets
+      - poddisruptionbudget-details
+    pods:
+      - v1/pods
+      - pod-details
+    replicasets:
+      - apps/v1/replicasets
+      - replicaset-details
+    resourcequotas:
+      - v1/resourcequotas
+      - resourcequota-details
+    rolebindings:
+      - rbac.authorization.k8s.io/v1/rolebindings
+      - rolebinding-details
+    roles:
+      - rbac.authorization.k8s.io/v1/roles
+      - role-details
+    secrets:
+      - v1/secrets
+      - secret-details
+    serviceaccounts:
+      - v1/serviceaccounts
+      - serviceaccount-details
+    services:
+      - v1/services
+      - service-details
+    statefulsets:
+      - apps/v1/statefulsets
+      - statefulset-details
+    storageclasses:
+      - storage.k8s.io/v1/storageclasses
+      - storageclass-details
+
+monitoring:
+  promqlUrl: https://demo.in-cloud.io/monitoring/api/v1/
+  grafanaDatasource: P4169E866C3094E38
+  grafanaBaseUrl: https://grafana.in-cloud.io
+  grafanaDashboardPaths:
+    podDetails: k8s_views_pods/kubernetes-views-pods
+    nodeDetails: k8s_views_nodes/kubernetes-views-nodes

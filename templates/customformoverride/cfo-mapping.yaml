@@ -1,0 +1,13 @@
+apiVersion: front.in-cloud.io/v1alpha1
+kind: CFOMapping
+metadata:
+  name: default
+spec:
+  mappings:
+    default-/v1/secrets: "default-/v1/secrets"
+    default-/v1/configmaps: "default-/v1/configmaps"
+
+    default-/apps/v1/daemonsets: "default-/apps/v1/daemonsets"
+    default-/apps/v1/deployments: "default-/apps/v1/deployments"
+    default-/apps/v1/replicasets: "default-/apps/v1/replicasets"
+    default-/apps/v1/statefulsets: "default-/apps/v1/statefulsets"

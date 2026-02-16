@@ -1,0 +1,51 @@
+{{- $customWebResources := default (dict) .Values.customWebResources -}}
+{{- $customCcoResources := default (dict) $customWebResources.customcolumnsoverride -}}
+{{- $customCco := index $customCcoResources "stock-namespace-policy.v1.poddisruptionbudgets" -}}
+{{- if eq (include "in-cloud.web.cco.isEnabled" (dict "config" $customCco)) "true" }}
+---
+# =================================================
+# CustomColumnsOverride definition
+# =================================================
+apiVersion: front.in-cloud.io/v1alpha1
+kind: CustomColumnsOverride
+metadata:
+  # Name of this CustomColumnsOverride resource
+  name: stock-namespace-policy.v1.poddisruptionbudgets
+spec:
+  # Table columns rendered in the resource list
+  additionalPrinterColumns:
+    # =================================================
+    # Column: Name
+    # =================================================
+    - name: Name
+      type: factory
+      {{ include "in-cloud.web.cco.props.badgeLink" (list $
+          "/openapi-ui/{2}/{reqsJsonPath[0]['.metadata.namespace']['-']}/factory/poddisruptionbudget-details/policy/v1/poddisruptionbudgets/{reqsJsonPath[0]['.metadata.name']['-']}"
+        ) | nindent 6
+      }}
+    # =================================================
+    # Column: Pod Selector
+    # =================================================
+    - name: Pod Selector
+      type: factory
+      {{ include "in-cloud.web.cco.props.podSelector" (dict
+          "jsonPath" ".spec.selector.matchLabels"
+          "linkPrefix" "/openapi-ui/{2}/{3}/search?kinds=~v1~pods"
+        ) | nindent 6
+      }}
+    # =================================================
+    # Column: Created
+    # =================================================
+    - name: Created
+      type: factory
+      {{ include "in-cloud.web.cco.props.created" . | nindent 6 }}
+
+  # Trim long values for selected columns
+  additionalPrinterColumnsTrimLengths:
+    {{ include "incloud-web-resources.cco.columns-trim-lengths.name" . | nindent 4 }}
+
+  additionalPrinterColumnsUndefinedValues: []
+
+  # Stable identifier used by frontend mapping
+  id: stock-namespace-/policy/v1/poddisruptionbudgets
+{{- end -}}

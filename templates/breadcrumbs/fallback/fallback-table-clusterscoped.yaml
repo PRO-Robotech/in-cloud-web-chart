@@ -1,0 +1,20 @@
+---
+apiVersion: front.in-cloud.io/v1alpha1
+kind: Breadcrumb
+metadata:
+  name: fallback-table-clusterscoped-api
+spec:
+  id: "fallback-table-clusterscoped-api"
+  breadcrumbItems:
+    - key: api
+      label: "{4}/{5}/{6}"
+---
+apiVersion: front.in-cloud.io/v1alpha1
+kind: Breadcrumb
+metadata:
+  name: fallback-table-clusterscoped-builtin
+spec:
+  id: "fallback-table-clusterscoped-builtin"
+  breadcrumbItems:
+    - key: api
+      label: "v1/{4}"

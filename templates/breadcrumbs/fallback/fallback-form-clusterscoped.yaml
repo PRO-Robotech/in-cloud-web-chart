@@ -1,0 +1,57 @@
+---
+apiVersion: front.in-cloud.io/v1alpha1
+kind: Breadcrumb
+metadata:
+  name: fallback-form-clusterscoped-api
+spec:
+  id: "fallback-form-clusterscoped-api"
+  breadcrumbItems:
+    - key: create-api-res-clusterscoped-table
+      label: "{5}/{6}/{7}"
+      link: "/openapi-ui/{cluster}/api-table/{5}/{6}/{7}"
+    - key: create-api-res-clusterscoped-plural
+      label: Create
+---
+apiVersion: front.in-cloud.io/v1alpha1
+kind: Breadcrumb
+metadata:
+  name: fallback-form-clusterscoped-api-edit
+spec:
+  id: "fallback-form-clusterscoped-api-edit"
+  breadcrumbItems:
+    - key: update-api-res-clusterscoped-table
+      label: "{5}/{6}/{7}"
+      link: "/openapi-ui/{cluster}/api-table/{5}/{6}/{7}"
+    - key: update-api-res-clusterscoped-name
+      label: "{8}"
+    - key: update-api-res-clusterscoped-plural
+      label: Update
+---
+apiVersion: front.in-cloud.io/v1alpha1
+kind: Breadcrumb
+metadata:
+  name: fallback-form-clusterscoped-builtin
+spec:
+  id: "fallback-form-clusterscoped-builtin"
+  breadcrumbItems:
+    - key: create-builtin-res-clusterscoped-table
+      label: "v1/{6}"
+      link: "/openapi-ui/{cluster}/builtin-table/{6}"
+    - key: create-builtin-res-clusterscoped-plural
+      label: Create
+---
+apiVersion: front.in-cloud.io/v1alpha1
+kind: Breadcrumb
+metadata:
+  name: fallback-form-clusterscoped-builtin-edit
+spec:
+  id: "fallback-form-clusterscoped-builtin-edit"
+  breadcrumbItems:
+    - key: update-builtin-res-clusterscoped-table
+      label: "v1/{6}"
+      link: "/openapi-ui/{cluster}/builtin-table/{6}"
+    - key: update-builtin-res-clusterscoped-name
+      label: "{7}"
+    - key: update-builtin-res-clusterscoped-plural
+      label: Update
+

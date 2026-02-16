@@ -1,0 +1,44 @@
+{{- $customWebResources := default (dict) .Values.customWebResources -}}
+{{- $customCcoResources := default (dict) $customWebResources.customcolumnsoverride -}}
+{{- $customCco := index $customCcoResources "factory-service-details-port-mapping" -}}
+{{- if eq (include "in-cloud.web.cco.isEnabled" (dict "config" $customCco)) "true" }}
+---
+# =================================================
+# CustomColumnsOverride definition
+# =================================================
+apiVersion: front.in-cloud.io/v1alpha1
+kind: CustomColumnsOverride
+metadata:
+  # Name of this CustomColumnsOverride resource
+  name: factory-service-details-port-mapping
+spec:
+  # Table columns rendered in the resource list
+  additionalPrinterColumns:
+    # =================================================
+    # Column: Name
+    # =================================================
+    - name: Name
+      type: string
+      jsonPath: .name
+    # =================================================
+    # Column: Port
+    # =================================================
+    - name: Port
+      type: string
+      jsonPath: .port
+    # =================================================
+    # Column: Protocol
+    # =================================================
+    - name: Protocol
+      type: string
+      jsonPath: .protocol
+    # =================================================
+    # Column: Pod port or name
+    # =================================================
+    - name: Pod port or name
+      type: string
+      jsonPath: .targetPort
+
+  # Stable identifier used by frontend mapping
+  id: factory-service-details-port-mapping
+{{- end -}}
