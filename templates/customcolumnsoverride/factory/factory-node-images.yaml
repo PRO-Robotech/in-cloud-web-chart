@@ -1,0 +1,46 @@
+{{- $customWebResources := default (dict) .Values.customWebResources -}}
+{{- $customCcoResources := default (dict) $customWebResources.customcolumnsoverride -}}
+{{- $customCco := index $customCcoResources "factory-node-images" -}}
+{{- if eq (include "in-cloud.web.cco.isEnabled" (dict "config" $customCco)) "true" }}
+---
+# =================================================
+# CustomColumnsOverride definition
+# =================================================
+apiVersion: front.in-cloud.io/v1alpha1
+kind: CustomColumnsOverride
+metadata:
+  # Name of this CustomColumnsOverride resource
+  name: factory-node-images
+spec:
+  # Table columns rendered in the resource list
+  additionalPrinterColumns:
+    # =================================================
+    # Column: ImageID
+    # =================================================
+    - name: ImageID
+      type: string
+      jsonPath: .names[0]
+    # =================================================
+    # Column: Size
+    # =================================================
+    - name: Size
+      type: factory
+      jsonPath: .sizeBytes
+      {{ include "in-cloud.web.cco.props.memory" (dict
+          "value" "{reqsJsonPath[0]['.sizeBytes']['-']}"
+        ) | nindent 6
+      }}
+
+  # Sorters and filters for computed resource metrics
+  additionalPrinterColumnsCustomSortersAndFilters:
+    - key: Size
+      type: memory
+
+  # Trim long values for selected columns
+  additionalPrinterColumnsTrimLengths:
+    {{ include "incloud-web-resources.cco.columns-trim-lengths.node-image-id" . | nindent 4 }}
+    {{ include "incloud-web-resources.cco.columns-trim-lengths.node-image-size" . | nindent 4 }}
+
+  # Stable identifier used by frontend mapping
+  id: factory-node-images
+{{- end -}}

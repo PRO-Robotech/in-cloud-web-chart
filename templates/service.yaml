@@ -35,5 +35,6 @@ spec:
       port: {{ .port }}                              # Port exposed by the Service
       targetPort: {{ .targetPort | default .port }}  # Target port on the pod/container
       protocol: {{ .protocol | default "TCP" }}      # Protocol (default is TCP)
+      nodePort: {{ .nodePort | default nil }}    # NodePort (if type is NodePort)
     {{- end }}
 {{- end }}

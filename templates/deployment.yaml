@@ -20,8 +20,8 @@ spec:
     # Rolling update strategy configuration
     type: RollingUpdate
     rollingUpdate:
-      maxSurge: 25%
-      maxUnavailable: 25%
+      maxUnavailable: {{ .Values.strategy.rollingUpdate.maxUnavailable }}
+      maxSurge: {{ .Values.strategy.rollingUpdate.maxSurge }}
 
   template:
     metadata:
@@ -89,10 +89,27 @@ spec:
       tolerations:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-      {{- with .Values.affinity }}
+
+      {{- if hasKey .Values "affinity" }}
       affinity:
-        {{- toYaml . | nindent 8 }}
-      {{- end }}
+      {{- toYaml .Values.affinity | nindent 8 }}
+      {{- else }}
+      affinity:
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            - topologyKey: kubernetes.io/hostname
+              labelSelector:
+                matchLabels:
+                  {{- include "incloud-web.selectorLabels" . | nindent 18 }}
+                  {{- with .Values.podLabels }}
+                  {{- toYaml . | nindent 18 }}
+                  {{- end }}
+                  {{- with .Values.extraTemplateMetadata.labels }}
+                  {{- toYaml . | nindent 18 }}
+                  {{- end }}
+                  {{- end }}
+
+
       {{- with .Values.topologySpreadConstraints }}
       topologySpreadConstraints:
         {{- toYaml . | nindent 8 }}
@@ -309,6 +326,61 @@ spec:
 
           terminationMessagePath: {{ .Values.nginx.terminationMessagePath | quote }}
           terminationMessagePolicy: {{ .Values.nginx.terminationMessagePolicy | quote }}
+        {{- end }}
+
+        # -------------------- Module Example Container --------------------
+        {{- if .Values.moduleExample.enabled }}
+        - name: {{ .Values.moduleExample.name }}
+          image: "{{ .Values.moduleExample.image.repository }}:{{ .Values.moduleExample.image.tag }}"
+          imagePullPolicy: {{ .Values.moduleExample.image.pullPolicy }}
+
+          # Ports
+          ports:
+            - name: http
+              containerPort: {{ .Values.moduleExample.containerPort }}
+              protocol: TCP
+            {{- with .Values.moduleExample.extraContainerPorts }}
+            {{- toYaml . | nindent 12 }}
+            {{- end }}
+
+          # Env
+          {{- with .Values.moduleExample.env }}
+          env:
+            {{- include "incloud-web.env" . | nindent 12 }}
+          {{- end }}
+          {{- with .Values.moduleExample.envFrom }}
+          envFrom:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+
+          # Probes (enabled-gated, 'enabled' key stripped)
+          {{- if .Values.moduleExample.livenessProbe.enabled }}
+          livenessProbe:
+            {{- omit .Values.moduleExample.livenessProbe "enabled" | toYaml | nindent 12 }}
+          {{- end }}
+          {{- if .Values.moduleExample.readinessProbe.enabled }}
+          readinessProbe:
+            {{- omit .Values.moduleExample.readinessProbe "enabled" | toYaml | nindent 12 }}
+          {{- end }}
+
+          # Security context (enabled-gated, 'enabled' key stripped)
+          {{- if .Values.moduleExample.securityContext.enabled }}
+          securityContext:
+            {{- omit .Values.moduleExample.securityContext "enabled" | toYaml | nindent 12 }}
+          {{- end }}
+
+          # Resources / mounts
+          {{- with .Values.moduleExample.resources }}
+          resources:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- with .Values.moduleExample.volumeMounts }}
+          volumeMounts:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+
+          terminationMessagePath: {{ .Values.moduleExample.terminationMessagePath | quote }}
+          terminationMessagePolicy: {{ .Values.moduleExample.terminationMessagePolicy | quote }}
         {{- end }}
 
       # Extra raw PodSpec fields (if provided)

@@ -1,0 +1,67 @@
+{{- $customWebResources := default (dict) .Values.customWebResources -}}
+{{- $customCcoResources := default (dict) $customWebResources.customcolumnsoverride -}}
+{{- $customCco := index $customCcoResources "container-spec-containers-list" -}}
+{{- if eq (include "in-cloud.web.cco.isEnabled" (dict "config" $customCco)) "true" }}
+---
+# =================================================
+# CustomColumnsOverride definition
+# =================================================
+apiVersion: front.in-cloud.io/v1alpha1
+kind: CustomColumnsOverride
+metadata:
+  # Name of this CustomColumnsOverride resource
+  name: container-spec-containers-list
+spec:
+  # Table columns rendered in the resource list
+  additionalPrinterColumns:
+    # =================================================
+    # Column: Name
+    # =================================================
+    - name: Name
+      type: string
+      jsonPath: .name
+    # =================================================
+    # Column: Image
+    # =================================================
+    - name: Image
+      type: string
+      jsonPath: .image
+    # =================================================
+    # Column: Resources requests
+    # =================================================
+    - name: Resources requests
+      type: array
+      jsonPath: .resources.requests
+    # =================================================
+    # Column: Resources limits
+    # =================================================
+    - name: Resources limits
+      type: array
+      jsonPath: .resources.limits
+    # =================================================
+    # Column: Ports
+    # =================================================
+    - name: Ports
+      type: array
+      jsonPath: .ports[*].containerPort
+
+  # Trim long values for selected columns
+  additionalPrinterColumnsTrimLengths:
+    {{ include "incloud-web-resources.cco.columns-trim-lengths.container-image" . | nindent 4 }}
+
+  # Fallback values for empty or missing fields
+  additionalPrinterColumnsUndefinedValues:
+    - key: Name
+      value: "-"
+    - key: Image
+      value: "-"
+    - key: Resources limits
+      value: "-"
+    - key: Resources requests
+      value: "-"
+    - key: Ports
+      value: "-"
+
+  # Stable identifier used by frontend mapping
+  id: container-spec-containers-list
+{{- end -}}

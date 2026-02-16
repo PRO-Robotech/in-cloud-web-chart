@@ -1,0 +1,126 @@
+{{- define "in-cloud.web.contentCard.genericResourceListCard" -}}
+- type: ContentCard
+  data:
+    id: {{ .cardId }}
+    style:
+      marginBottom: 24px
+  children:
+    - type: EnrichedTable
+      data:
+        id: {{ .tableId }}
+        baseprefix: /openapi-ui
+        cluster: "{2}"
+        customizationId: {{ .customizationId | quote }}
+
+        k8sResourceToFetch:
+          {{- if .apiGroup }}
+          apiGroup: {{ .apiGroup | quote }}
+          {{- end }}
+          apiVersion: {{ .apiVersion | quote }}
+          plural: {{ .plural | quote }}
+          {{- if .ifNamespaced }}
+          namespace: "{3}"
+          {{- end }}
+
+        dataForControls:
+          cluster: "{2}"
+          {{- if .apiGroup }}
+          apiGroup: {{ .apiGroup | quote }}
+          {{- end }}
+          apiVersion: {{ .apiVersion | quote }}
+          plural: {{ .plural | quote }}
+          {{- if .ifNamespaced }}
+          namespace: "{3}"
+          {{- end }}
+
+        # Label selector (optional, from parent resource podTemplate.labels)
+        {{- with .labelSelectorFull }}
+        labelSelectorFull:
+          {{- toYaml . | nindent 10 }}
+        {{- end }}
+
+        # Field selector (optional)
+        {{- with .fieldSelector }}
+        fieldSelector:
+          {{- toYaml . | nindent 10 }}
+        {{- end }}
+
+        # Path to items list in the response
+        pathToItems: ".items"
+
+        additionalReqsDataToEachItem:
+          - 1
+{{- end -}}
+
+{{- define "in-cloud.web.contentCard.genericContainersTableCard" -}}
+- type: ContentCard
+  data:
+    id: {{ .cardId }}
+    title: {{ .title | quote }}
+  children:
+
+    # =========================
+    # Header: icon + title
+    # =========================
+    - type: DefaultDiv
+      data:
+        id: {{ .titleRowId }}
+        style:
+          display: flex
+          gap: 12px
+          marginBottom: 12px
+          alignItems: center
+      children:
+        - type: antdIcons
+          data:
+            id: {{ .iconId }}
+            iconName: AppstoreOutlined
+            iconProps:
+              size: 24
+              color: token.colorInfo
+              style:
+                fontSize: 24
+                color: token.colorInfo
+
+        - type: antdText
+          data:
+            id: {{ .titleTextId }}
+            text: {{ .title | quote }}
+            style:
+              fontSize: 16px
+              lineHeight: 24px
+
+    # =========================
+    # Table (full width)
+    # =========================
+    - type: EnrichedTable
+      data:
+        id: {{ .tableId }}
+        cluster: "{2}"
+        customizationId: {{ .customizationId | quote }}
+        baseprefix: "/openapi-ui"
+        withoutControls: true
+        pathToItems: {{ .pathToItems }}
+        pathToKey: .name
+        k8sResourceToFetch:
+          {{- toYaml .k8sResourceToFetch | nindent 10 }}
+        fieldSelector:
+          metadata.name: {{ .nameFieldSelector | quote }}
+        additionalReqsDataToEachItem:
+          - 1
+{{- end -}}
+
+{{- define "in-cloud.web.contentCard.genericVisibilityInclude" -}}
+{{- $includeContext := default (dict) .includeContext }}
+- type: VisibilityContainer
+  data:
+    id: {{ .containerId }}
+    value: {{ .value | quote }}
+    {{- if .withResetSpacing }}
+    style:
+      margin: 0
+      padding: 0
+    {{- end }}
+  children:
+    {{ include .includeTemplate $includeContext | nindent 4 }}
+{{- end -}}

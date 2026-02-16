@@ -1,0 +1,14 @@
+---
+apiVersion: front.in-cloud.io/v1alpha1
+kind: Breadcrumb
+metadata:
+  name: fallback-search-page
+spec:
+  id: fallback-search-page
+  breadcrumbItems:
+    - key: search
+      label: "search"
+    - key: resources
+      label: "resources"
+
+

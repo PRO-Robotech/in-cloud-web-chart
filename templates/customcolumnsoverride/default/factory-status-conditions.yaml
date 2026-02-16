@@ -1,0 +1,72 @@
+---
+# =================================================
+# CustomColumnsOverride definition
+# =================================================
+apiVersion: front.in-cloud.io/v1alpha1
+kind: CustomColumnsOverride
+metadata:
+  # Name of this CustomColumnsOverride resource
+  name: base-factory-status-conditions
+spec:
+  # =================================================
+  # Table columns rendered in conditions list
+  # =================================================
+  additionalPrinterColumns:
+    # =================================================
+    # Condition type
+    # =================================================
+    - jsonPath: .type
+      name: Type
+      type: string
+    # =================================================
+    # Condition status (True/False)
+    # =================================================
+    - jsonPath: .status
+      name: Status
+      type: bool
+    # =================================================
+    # Last transition timestamp
+    # =================================================
+    - customProps:
+        disableEventBubbling: true
+        items:
+        - children:
+          - data:
+              id: time-icon
+              text: "\U0001F310"
+            type: antdText
+          - data:
+              formatter: timestamp
+              id: time-value
+              text: '{reqsJsonPath[0][".lastTransitionTime"]["-"]}'
+            type: parsedText
+          data:
+            align: center
+            gap: 6
+            id: time-block
+          type: antdFlex
+      jsonPath: .lastTransitionTime
+      name: Updated
+      type: factory
+    # =================================================
+    # Transition reason
+    # =================================================
+    - jsonPath: .reason
+      name: Reason
+      type: string
+    # =================================================
+    # Human readable transition message
+    # =================================================
+    - jsonPath: .message
+      name: Message
+      type: string
+  # Trim long values for selected columns
+  additionalPrinterColumnsTrimLengths:
+    - key: Message
+      value: 64
+  # Fallback values for empty or missing fields
+  additionalPrinterColumnsUndefinedValues:
+    {{ include "incloud-web-resources.cco.columns-undefined-values.reason" . | nindent 4 }}
+    {{ include "incloud-web-resources.cco.columns-undefined-values.message" . | nindent 4 }}
+  # Stable identifier used by frontend mapping
+  id: factory-status-conditions
