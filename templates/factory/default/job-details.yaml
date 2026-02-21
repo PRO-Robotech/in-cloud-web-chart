@@ -106,6 +106,12 @@ spec:
                 ) | nindent 14
               }}
 
+              # ---- Rerun last job ----
+              {{- include "in-cloud.web.action.rerunLast" (dict
+                  "createEndpoint" "/api/clusters/{2}/k8s/apis/{6}/{7}/namespaces/{3}/{8}"
+                  "permissionContext" $jobPermissionContext
+                ) | nindent 14
+              }}
 
               # ---- Delete resource ----
               {{ include "in-cloud.web.action.delete" (dict

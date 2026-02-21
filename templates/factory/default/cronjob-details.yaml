@@ -106,6 +106,28 @@ spec:
                 ) | nindent 14
               }}
 
+              # ---- Suspend CronJob ----
+              {{- include "in-cloud.web.action.cronJobSuspend" (dict
+                  "endpoint" $cronjobEndpoint
+                  "permissionContext" $cronjobPermissionContext
+                ) | nindent 14
+              }}
+
+              # ---- Resume CronJob ----
+              {{- include "in-cloud.web.action.cronJobResume" (dict
+                  "endpoint" $cronjobEndpoint
+                  "permissionContext" $cronjobPermissionContext
+                ) | nindent 14
+              }}
+
+              # ---- Trigger manual run ----
+              {{- include "in-cloud.web.action.triggerRun" (dict
+                  "createEndpoint" "/api/clusters/{2}/k8s/apis/{6}/{7}/namespaces/{3}/jobs"
+                  "permissionContext" (merge (dict
+                    "plural" "jobs"
+                  ) $cronjobPermissionContext)
+                ) | nindent 14
+              }}
 
               # ---- Delete resource ----
               {{ include "in-cloud.web.action.delete" (dict

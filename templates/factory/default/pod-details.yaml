@@ -121,6 +121,21 @@ spec:
                 ) | nindent 14
               }}
 
+              # ---- Edit tolerations ----
+              {{ include "in-cloud.web.action.editTolerations" (dict
+                  "endpoint" $podEndpoint
+                  "permissionContext" $podPermissionContext
+                ) | nindent 14
+              }}
+
+              # ---- Evict pod ----
+              {{- include "in-cloud.web.action.evict" (dict
+                  "endpoint" (printf "%s/eviction" $podEndpoint)
+                  "permissionContext" (merge (dict
+                    "subresource" "eviction"
+                  ) $podPermissionContext)
+                ) | nindent 14
+              }}
 
               # ---- Delete resource ----
               {{ include "in-cloud.web.action.delete" (dict

@@ -105,6 +105,19 @@ spec:
                 ) | nindent 14
               }}
 
+              {{- include "in-cloud.web.action.scale" (dict
+                  "endpoint" (printf "%s/scale" $statefulsetEndpoint)
+                  "permissionContext" (merge (dict
+                    "subresource" "scale"
+                  ) $statefulsetPermissionContext)
+                ) | nindent 14
+              }}
+
+              {{- include "in-cloud.web.action.rolloutRestart" (dict
+                  "endpoint" $statefulsetEndpoint
+                  "permissionContext" $statefulsetPermissionContext
+                ) | nindent 14
+              }}
 
               # ---- Delete resource ----
               {{ include "in-cloud.web.action.delete" (dict
