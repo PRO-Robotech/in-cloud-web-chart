@@ -481,7 +481,7 @@ bff:
   # Container image configuration
   image:
     repository: prorobotech/openapi-ui-k8s-bff
-    tag: release-1.4.0-af51762f
+    tag: release-1.4.0-e17ba412
     pullPolicy: IfNotPresent
 
   # Networking configuration for the container
@@ -505,6 +505,7 @@ bff:
     BASE_ALLOWED_AUTH_HEADERS: user-agent,accept,content-type,origin,referer,accept-encoding,cookie
     BASE_NAVIGATION_RESOURCE_PLURAL: "navigations"
     BASE_NAVIGATION_RESOURCE_NAME: "fallback"
+    WS_LOG_BLACKLIST_PATHS: '["error.config.headers.authorization","headers.authorization","headers.cookie"]'
     # MF_PLUGINS_JSON: '{"plugin-example":{"name":"plugin-example","entry":"http://127.0.0.1:8081/openapi-ui-plugin/assets/remoteEntry.js","exposedModule":"./App"}}'
 
   envFrom: []
@@ -582,7 +583,7 @@ web:
   # Container image configuration
   image:
     repository: prorobotech/openapi-ui
-    tag: release-1.4.0-ec6849fc
+    tag: release-1.4.0-7d3e3831
     pullPolicy: IfNotPresent
 
   # Networking configuration for the container
