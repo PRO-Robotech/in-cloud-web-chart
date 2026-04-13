@@ -5,7 +5,7 @@ description: Chart for configuring Kubernetes Web UI InCloud
 type: application
 
 # Chart (packaging) version — semver. Bump on ANY template/values change.
-version: 1.2.1
+version: 1.4.0
 
 # Application version — free-form string. Tie it to app images/tags you ship.
 # Tip: keep it in sync with image tags from values.yaml.
@@ -34,8 +34,8 @@ sources:
 
 maintainers:
   - name: PRO-Robotech
-    email: info@prorobotech.ru
-    url: https://t.me/incloud_ru
+    email: info@in-cloud.io
+    url: https://t.me/in_cloud_en
 
 # Optional dependencies (uncomment if you add subcharts)
 dependencies:

@@ -3,9 +3,12 @@
 {{- $customCco := index $customCcoResources "factory-v1.pods" -}}
 {{- if eq (include "in-cloud.web.cco.isEnabled" (dict "config" $customCco)) "true" }}
 ---
-# =================================================
-# CustomColumnsOverride definition
-# =================================================
+# ============================================================================
+# CustomColumnsOverride: factory-v1.pods
+# ----------------------------------------------------------------------------
+# Embedded table columns for Pods within Factory detail pages.
+# Toggled via: customWebResources.customcolumnsoverride["factory-v1.pods"]
+# ============================================================================
 apiVersion: front.in-cloud.io/v1alpha1
 kind: CustomColumnsOverride
 metadata:
@@ -61,6 +64,9 @@ spec:
     # =================================================
     - name: Memory
       type: factory
+      {{/*
+        additionalReqsData[0]: kubelet pod metrics summary — per-container memory usage for this pod
+      */}}
       {{ include "in-cloud.web.cco.props.memory" (dict
           "value" "{reqsJsonPath[0]['.additionalReqsData.0.items[?(@.metadata.name==\"{reqsJsonPath[0][\".metadata.name\"]}\")].containers[*].usage.memory']['-']}"
         ) | nindent 6
@@ -70,6 +76,7 @@ spec:
     # =================================================
     - name: CPU
       type: factory
+      {{/* additionalReqsData[0]: same kubelet pod metrics — per-container CPU usage */}}
       {{ include "in-cloud.web.cco.props.cpu" (dict
           "value" "{reqsJsonPath[0]['.additionalReqsData.0.items[?(@.metadata.name==\"{reqsJsonPath[0][\".metadata.name\"]}\")].containers[*].usage.cpu']['-']}"
         ) | nindent 6
@@ -86,6 +93,12 @@ spec:
     - name: Created
       type: factory
       {{ include "in-cloud.web.cco.props.created" . | nindent 6 }}
+    # =================================================
+    # Column: Actions
+    # =================================================
+    - name: Actions
+      type: factory
+      {{ include "in-cloud.web.cco.props.actions.pod" . | nindent 6 }}
 
   # Sorters and filters for computed resource metrics
   additionalPrinterColumnsCustomSortersAndFilters:
@@ -100,6 +113,11 @@ spec:
   additionalPrinterColumnsUndefinedValues:
     {{ include "incloud-web-resources.cco.columns-undefined-values.node" . | nindent 4 }}
     {{ include "incloud-web-resources.cco.columns-undefined-values.pod-ip" . | nindent 4 }}
+
+  # Tooltips for standard columns
+  additionalPrinterColumnsTooltips:
+    {{ include "incloud-web-resources.cco.columns-tooltips.name" . | nindent 4 }}
+    {{ include "incloud-web-resources.cco.columns-tooltips.created" . | nindent 4 }}
 
   # Stable identifier used by frontend mapping
   id: factory-/v1/pods

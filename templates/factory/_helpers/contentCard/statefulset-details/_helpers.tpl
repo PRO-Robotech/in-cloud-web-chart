@@ -1,3 +1,4 @@
+{{/* StatefulSet-specific detail cards: rollout strategy and replica status. */}}
 {{- define "in-cloud.web.contentCard.statefulsetRuntimeFacts" -}}
 # Content card with StatefulSet runtime facts (two columns)
 - type: ContentCard

@@ -1,3 +1,4 @@
+{{/* NetworkPolicy-specific detail cards: selectors and high-level port policy summary. */}}
 {{- define "in-cloud.web.contentCard.networkpolicyRuntimeFacts" -}}
 # Content card with NetworkPolicy runtime facts
 - type: ContentCard
@@ -58,12 +59,14 @@
                     - type: LabelsToSearchParams
                       data:
                         id: networkpolicy-pod-selector
+                        {{/* Which parallel fetch result (reqsJsonPath index) to read */}}
                         reqIndex: 0
                         jsonPathToLabels: ".items.0.spec.podSelector.matchLabels"
                         linkPrefix: "/openapi-ui/{2}/{3}/search?kinds=~v1~pods"
                         errorText: "Selects all pods in namespace"
                         textLink: Search
                         renderLabelsAsRows: true
+                        errorMode: 'default'
 
                 - type: antdFlex
                   data:

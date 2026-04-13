@@ -1,4 +1,5 @@
 {{- define "in-cloud.web.contentCard.resourceInfo" -}}
+# Resource info card: kind, creation time, optional namespace column, OwnerRefs.
 - type: ContentCard
   data:
     id: resource-info-card
@@ -10,6 +11,7 @@
     - type: DefaultDiv
       data:
         id: resource-info-card-title
+        # AntD: flex row (icon + title)
         style:
           display: flex
           gap: 12px
@@ -38,6 +40,7 @@
     # =========================
     # Main content grid
     # =========================
+    # AntD grid layout
     - type: antdRow
       data:
         gutter: [24, 0]
@@ -64,6 +67,7 @@
                     text: "{reqsJsonPath[0]['.items.0.metadata.creationTimestamp']['-']}"
 
         {{- if .namespaced }}
+        {{/* When true, resource is namespaced — show Namespace column */}}
 
         # -------------------------
         # Namespace
@@ -133,13 +137,16 @@
                       data:
                         id: refs
                         baseprefix: /openapi-ui
+                        # Target cluster for resolving owner references
                         cluster: '{2}'
                         #forcedNamespace: '{3}'
+                        # Request index in factory context for owner ref data
                         reqIndex: 0
                         errorText: error getting refs
                         notArrayErrorText: refs on path are not arr
                         emptyArrayErrorText: "-"
                         isNotRefsArrayErrorText: objects in arr are not refs
+                        # JSONPath to ownerReferences array in the fetched resource
                         jsonPathToArrayOfRefs: ".items.0.metadata.ownerReferences"
                         baseFactoryClusterSceopedAPIKey: base-factory-clusterscoped-api
                         baseFactoryClusterSceopedBuiltinKey: base-factory-clusterscoped-builtin

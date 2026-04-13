@@ -13,6 +13,12 @@
   "plural" "{8}"
 -}}
 {{- $daemonsetEndpoint := $daemonsetCtx.endpoint -}}
+# ============================================================================
+# Factory: daemonset-details
+# ----------------------------------------------------------------------------
+# Detail page for DaemonSets.
+# Toggled via: customWebResources.factory["daemonset-details"].enabled (default: true)
+# ============================================================================
 apiVersion: front.in-cloud.io/v1alpha1
 kind: Factory
 metadata:
@@ -20,6 +26,10 @@ metadata:
 
 spec:
   key: daemonset-details
+
+  # Indexes into urlsToFetch whose responses are available via reqsJsonPath[N] in the component tree
+  effectiveReqIndexes:
+    - 0
 
   # =========================
   # Data sources
@@ -112,6 +122,7 @@ spec:
               }}
 
 
+              # Rolling restart of Pods (rollout restart)
               {{- include "in-cloud.web.action.rolloutRestart" (dict
                 "endpoint" $daemonsetEndpoint
                 "permissionContext" $daemonsetRolloutPermissionContext
@@ -131,7 +142,12 @@ spec:
     - type: antdTabs
       data:
         id: tabs-root
+        # Tab selected by default when the page loads
         defaultActiveKey: details
+        # Persist the active tab key in the URL hash for bookmarking and refresh
+        syncActiveKeyWithHash: true
+        # Show "Open in new tab" context action on each tab header
+        allowOpenInNewBrowserTab: true
         items:
 
           # =========================
@@ -168,6 +184,7 @@ spec:
                     ) | nindent 18
                   }}
 
+                  # ---- Init containers ----
                   {{ include "in-cloud.web.contentCard.genericVisibilityInclude" (dict
                       "containerId" "init-containers-container"
                       "value" "{reqsJsonPath[0]['.items.0.spec.template.spec.initContainers']['-']}"
@@ -177,6 +194,7 @@ spec:
                     ) | nindent 18
                   }}
 
+                  # ---- Containers ----
                   {{ include "in-cloud.web.contentCard.genericVisibilityInclude" (dict
                       "containerId" "containers-container"
                       "value" "{reqsJsonPath[0]['.items.0.spec.template.spec.containers']['-']}"
@@ -186,9 +204,15 @@ spec:
                     ) | nindent 18
                   }}
 
-                  # =========================
-                  # Conditions (only when present)
-                  # =========================
+                  # ---- Volumes ----
+                  {{ include "in-cloud.web.contentCard.volumes" (dict
+                      "reqIndex" 0
+                      "jsonPathToSpec" ".items.0.spec.template.spec"
+                      "errorText" "No efficient data in spec"
+                    ) | nindent 18
+                  }}
+
+                  # ---- Conditions ----
                   {{ include "in-cloud.web.contentCard.conditionsVisibility" (dict
                       "k8sResourceToFetch" $daemonsetApiResource
                       "fieldSelector" (dict
@@ -239,6 +263,7 @@ spec:
           # =========================
           # AQUA SECURITY TAB (optional)
           # =========================
+          # When customWebResources.factory["node-details"].enableConfigReportsAquaTab is true
           {{- if (index .Values.customWebResources.factory "node-details").enableConfigReportsAquaTab }}
           - key: reports
             label: Reports

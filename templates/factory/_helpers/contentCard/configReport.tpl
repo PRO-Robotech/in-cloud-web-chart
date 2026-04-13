@@ -1,8 +1,10 @@
 {{- define "in-cloud.web.contentCard.aquaReport" -}}
-# Content card with configuration/security report table
+# Aqua (config audit) report table: security/configuration checks for the current resource via
+# openapi-ui.
 - type: ContentCard
   data:
     id: config-report-card
+    # AntD: card spacing
     style:
       marginBottom: 24px
   children:
@@ -16,11 +18,11 @@
         baseprefix: "/openapi-ui"
         # Target cluster identifier
         cluster: "{2}"
-        # UI customization preset for Trivy Operator reports table
+        # CCO id: table columns/presentation for Aqua/config audit reports
         customizationId: {{ .customizationId | quote }}
-        # API endpoint to fetch ClusterInfraAssessmentReports
+        # URL the UI calls to load report payload (BFF/proxy or direct API)
         fetchUrl: {{ .fetchUrl | quote }}
-        # Label selector to bind report to current resource (kind/name)
+        # Label selector to bind report rows to the current resource
         {{- if index . "labelSelector" }}
         labelSelector:
           {{- toYaml (index . "labelSelector") | nindent 10 }}

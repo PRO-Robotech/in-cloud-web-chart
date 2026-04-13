@@ -7,6 +7,12 @@
 {{- $podBuiltinResource := $podCtx.resource -}}
 {{- $podPermissionContext := $podCtx.permissionContext -}}
 {{- $podEndpoint := $podCtx.endpoint -}}
+# ============================================================================
+# Factory: pod-details
+# ----------------------------------------------------------------------------
+# Detail page for Pods.
+# Toggled via: customWebResources.factory["pod-details"].enabled (default: true)
+# ============================================================================
 apiVersion: front.in-cloud.io/v1alpha1
 kind: Factory
 metadata:
@@ -14,6 +20,10 @@ metadata:
 
 spec:
   key: pod-details
+
+  # Indexes into urlsToFetch whose responses are available via reqsJsonPath[N] in the component tree
+  effectiveReqIndexes:
+    - 0
 
   # =========================
   # Data sources
@@ -69,7 +79,7 @@ spec:
             {{ include "in-cloud.web.header.left" (dict
                 "k8sResourceToFetch" $podBuiltinResource
                 "redirectUrl" "/openapi-ui/{2}/{3}/factory/{5}/{6}/{7}/{chosenEntryValue}"
-              ) | nindent 12 
+              ) | nindent 12
             }}
 
             # pod availability badge
@@ -86,7 +96,7 @@ spec:
               children:
                 {{- include "in-cloud.web.statusText.podAvailability" (dict
                     "itemPath" ".items.0"
-                  ) | nindent 16
+                  ) | nindent 14
                 }}
 
         # =========================
@@ -121,6 +131,21 @@ spec:
                 ) | nindent 14
               }}
 
+              # ---- Edit tolerations ----
+              {{ include "in-cloud.web.action.editTolerations" (dict
+                  "endpoint" $podEndpoint
+                  "permissionContext" $podPermissionContext
+                ) | nindent 14
+              }}
+
+              # ---- Evict pod ----
+              {{- include "in-cloud.web.action.evict" (dict
+                  "endpoint" (printf "%s/eviction" $podEndpoint)
+                  "permissionContext" (merge (dict
+                    "subresource" "eviction"
+                  ) $podPermissionContext)
+                ) | nindent 14
+              }}
 
               # ---- Delete resource ----
               {{ include "in-cloud.web.action.delete" (dict
@@ -130,13 +155,19 @@ spec:
                 ) | nindent 14
               }}
 
+
     # =========================
     # Tabs root
     # =========================
     - type: antdTabs
       data:
         id: tabs-root
+        # Tab selected by default when the page loads
         defaultActiveKey: details
+        # Persist the active tab key in the URL hash for bookmarking and refresh
+        syncActiveKeyWithHash: true
+        # Show "Open in new tab" context action on each tab header
+        allowOpenInNewBrowserTab: true
         items:
 
           # =========================
@@ -157,7 +188,7 @@ spec:
                       "namespaced" true
                       "endpoint" $podEndpoint
                       "permissionContext" $podPermissionContext
-                    ) | nindent 18 
+                    ) | nindent 16 
                   }}
 
                   # ---- Row 2: Runtime facts and selectors ----
@@ -170,37 +201,45 @@ spec:
                         "podJsonPathToLabels" ".items.0.metadata.labels"
                         "nodJsonPathToLabels" ".items.0.spec.nodeSelector"
                       )
-                    ) | nindent 18
+                    ) | nindent 16
                   }}
 
 
+                  # ---- Init containers ----
                   {{ include "in-cloud.web.contentCard.genericVisibilityInclude" (dict
                       "containerId" "init-containers-container"
                       "value" "{reqsJsonPath[0]['.items.0.status.initContainerStatuses']['-']}"
                       "withResetSpacing" true
                       "includeTemplate" "in-cloud.web.contentCard.initContainersList"
                       "includeContext" .
-                    ) | nindent 18
+                    ) | nindent 16
                   }}
 
+                  # ---- Containers ----
                   {{ include "in-cloud.web.contentCard.genericVisibilityInclude" (dict
                       "containerId" "containers-container"
                       "value" "{reqsJsonPath[0]['.items.0.status.containerStatuses']['-']}"
                       "withResetSpacing" true
                       "includeTemplate" "in-cloud.web.contentCard.containersList"
                       "includeContext" .
-                    ) | nindent 18
+                    ) | nindent 16
                   }}
 
-                  # =========================
-                  # Conditions (only when present)
-                  # =========================
+                  # ---- Volumes ----
+                  {{ include "in-cloud.web.contentCard.volumes" (dict
+                      "reqIndex" 0
+                      "jsonPathToSpec" ".items.0.spec"
+                      "errorText" "No efficient data in spec"
+                    ) | nindent 16
+                  }}
+
+                  # ---- Conditions ----
                   {{ include "in-cloud.web.contentCard.conditionsVisibility" (dict
                       "k8sResourceToFetch" $podBuiltinResource
                       "fieldSelector" (dict
                         "metadata.name" "{8}"
                       )
-                    ) | nindent 18
+                    ) | nindent 16
                   }}
 
           # =========================
@@ -245,6 +284,7 @@ spec:
           # =========================
           # MONITORING TAB
           # =========================
+          # When customWebResources.factory["pod-details"].enableMonitoringTab is true
           {{- if (index .Values.customWebResources.factory "pod-details").enableMonitoringTab }}
           - key: monitoring
             label: Monitoring
@@ -261,6 +301,7 @@ spec:
           # =========================
           # AQUA SECURITY TAB (optional)
           # =========================
+          # When customWebResources.factory["node-details"].enableConfigReportsAquaTab is true
           {{- if (index .Values.customWebResources.factory "node-details").enableConfigReportsAquaTab }}
           - key: reports
             label: Reports

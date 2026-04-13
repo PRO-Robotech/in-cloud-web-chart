@@ -1,15 +1,19 @@
+{{/*
+  UsageGraphCard for Pod detail views: PromQL queries via query/usedQuery/requestedQuery/limitQuery;
+  baseUrl from values.monitoring.promqlUrl; range = graph window; valueStrategy = UI value handling.
+*/}}
 {{- define "in-cloud.web.usageGraph.pod.cpu" -}}
 - type: UsageGraphCard
   data:
     title: CPU, cores
-    # Base URL of Prometheus-compatible API (overridable via values)
+    # baseUrl: Prometheus HTTP API root (factory passes .Values.monitoring.promqlUrl as baseUrl).
     baseUrl: {{ .baseUrl | default "https://demo.in-cloud.io/monitoring/api/v1/" | quote }}
     containerStyle:
       # Card container height
       height: 250px
-    # Strategy used by UI to interpret values
+    # valueStrategy: how UsageGraphCard interprets series (cpu | memory | storage).
     valueStrategy: cpu
-    # Time range for the graph
+    # range: PromQL/graph time window (e.g. 15m).
     range: 15m
     # Auto refresh interval in ms
     refetchInterval: 10000
@@ -24,6 +28,8 @@
     minColor: "#2A7B9B"
     midColor: "#57C785"
     maxColor: "#EDDD53"
+    # query / usedQuery / requestedQuery / limitQuery: PromQL expressions (usage, requests,
+    # capacity).
     # Main query: actual CPU usage per node instance
     query: |
       sum by (instance) (
@@ -72,11 +78,11 @@
 - type: UsageGraphCard
   data:
     title: Memory, GB
-    # Base URL of Prometheus-compatible API (overridable via values)
+    # baseUrl: Prometheus HTTP API root (factory passes .Values.monitoring.promqlUrl as baseUrl).
     baseUrl: {{ .baseUrl | default "https://demo.in-cloud.io/monitoring/api/v1/" | quote }}
-    # Strategy used by UI to interpret values
+    # valueStrategy: how UsageGraphCard interprets series (cpu | memory | storage).
     valueStrategy: memory
-    # Time range for the graph
+    # range: PromQL/graph time window (e.g. 15m).
     range: 15m
     # Auto refresh interval in ms
     refetchInterval: 10000
@@ -144,11 +150,11 @@
 - type: UsageGraphCard
   data:
     title: Storage, bytes
-    # Base URL of Prometheus-compatible API (overridable via values)
+    # baseUrl: Prometheus HTTP API root (factory passes .Values.monitoring.promqlUrl as baseUrl).
     baseUrl: {{ .baseUrl | default "https://demo.in-cloud.io/monitoring/api/v1/" | quote }}
-    # Strategy used by UI to interpret values
+    # valueStrategy: how UsageGraphCard interprets series (cpu | memory | storage).
     valueStrategy: storage
-    # Time range for the graph
+    # range: PromQL/graph time window (e.g. 15m).
     range: 15m
     # Auto refresh interval in ms
     refetchInterval: 10000

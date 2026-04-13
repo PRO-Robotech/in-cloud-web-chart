@@ -1,12 +1,26 @@
+# ============================================================================
+# CustomFormsOverride: fallback
+# ----------------------------------------------------------------------------
+# Default CFO when there is no CFOMapping entry for the GVR or no more
+# specific CustomFormsOverride is found. Minimal spec.hidden and a neutral schema.
+# Deployed with the chart; "disabling" means not referencing this CFO from
+# CFOMapping / not using it as fallback in platform configuration.
+# ============================================================================
 apiVersion: front.in-cloud.io/v1alpha1
 kind: CustomFormsOverride
 metadata:
   name: fallback
 spec:
+  # Stable customization identifier; must match what the platform
+  # expects for the fallback CFO (see configuration / references to this resource).
   customizationId: fallback
+  # hidden: list of field paths to hide from the form (see helpers in hidden.metadata.tpl).
   hidden:
     {{ include "incloud-web-chart.customformoverride.hidden.metadata.system" . | nindent 4 }}
     {{ include "incloud-web-chart.customformoverride.hidden.metadata.api" . | nindent 4 }}
     {{ include "incloud-web-chart.customformoverride.hidden.status" . | nindent 4 }}
+  # Empty schema: do not override the API OpenAPI schema — use the resource's
+  # original schema as-is.
   schema: {}
+  # merge: merge this schema/hidden with the API schema rather than replacing it entirely.
   strategy: merge

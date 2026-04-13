@@ -7,12 +7,21 @@
 {{- $namespaces := default (dict) $navigation.namespaces -}}
 {{- $projects := default (dict) $navigation.projects -}}
 ---
-# Primary navigation resource with configurable route mappings.
+# ============================================================================
+# Navigation: {{ default "navigation" $navigation.name }}
+# ----------------------------------------------------------------------------
+# Primary Navigation CR: selectors (instances, namespaces, projects), optional
+# baseFactoriesMapping, metrics/query params, and path from the cluster list.
+# Rendered unless disabled: .Values.customWebResources.navigation.navigation.enabled=false.
+# ============================================================================
 apiVersion: front.in-cloud.io/v1alpha1
 kind: Navigation
 metadata:
   name: {{ default "navigation" $navigation.name }}
 spec:
+  # Route placeholders (defaults below): {selectedCluster} — UI cluster context;
+  # {value} — selected instance/namespace/project; ~recordValue~ — cluster id when
+  # jumping from the cluster list; aliasPath/mapOptionsPattern use frontend JSONPath.
   # Mapping from base factory identifiers to details factory names.
   {{- if or (not (hasKey $navigation "baseFactoriesMappingEnabled")) $navigation.baseFactoriesMappingEnabled }}
   baseFactoriesMapping:
@@ -43,4 +52,9 @@ spec:
     change: {{ default "/openapi-ui/{selectedCluster}/{value}/builtin-table/pods?resources=metrics.k8s.io/v1beta1/pods" $projects.change | quote }}
     clear: {{ default "/openapi-ui/{selectedCluster}/builtin-table/pods?resources=metrics.k8s.io/v1beta1/pods" $projects.clear | quote }}
   {{- end }}
+
+  # Default landing path from cluster list (pods table with metrics); override via
+  # .Values.navigation.pathToNavigateFromClusterList. Differs from navigations/fallback.yaml
+  # (nodes).
+  pathToNavigateFromClusterList: {{ $navigation.pathToNavigateFromClusterList | default "/openapi-ui/~recordValue~/builtin-table/pods?resources=metrics.k8s.io/v1beta1/pods" | quote }}
 {{- end -}}

@@ -8,6 +8,12 @@
 {{- $clusterrolebindingPermissionContext := $clusterrolebindingCtx.permissionContext -}}
 {{- $clusterrolebindingEndpoint := $clusterrolebindingCtx.endpoint -}}
 ---
+# ============================================================================
+# Factory: clusterrolebinding-details
+# ----------------------------------------------------------------------------
+# Detail page for ClusterRoleBindings.
+# Toggled via: customWebResources.factory["clusterrolebinding-details"].enabled (default: true)
+# ============================================================================
 apiVersion: front.in-cloud.io/v1alpha1
 kind: Factory
 metadata:
@@ -15,6 +21,10 @@ metadata:
 
 spec:
   key: clusterrolebinding-details
+
+  # Indexes into urlsToFetch whose responses are available via reqsJsonPath[N] in the component tree
+  effectiveReqIndexes:
+    - 0
 
   # =========================
   # Data sources
@@ -112,7 +122,12 @@ spec:
     # =========================
     - type: antdTabs
       data:
+        # Tab selected by default when the page loads
         defaultActiveKey: details
+        # Persist the active tab key in the URL hash for bookmarking and refresh
+        syncActiveKeyWithHash: true
+        # Show "Open in new tab" context action on each tab header
+        allowOpenInNewBrowserTab: true
         id: tabs-root
         items:
 

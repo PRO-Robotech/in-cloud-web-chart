@@ -1,3 +1,7 @@
+{{/*
+  AggregatedCounterCard helpers: compact counter badge cards for resource metadata and lists (e.g. counts of
+  labels, annotations, taints, or status.images), often with edit or table drill-down in the active panel.
+*/}}
 {{- define "in-cloud.web.aggregatedCounterCard.labels" -}}
 - type: AggregatedCounterCard
   data:

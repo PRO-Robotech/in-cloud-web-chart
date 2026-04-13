@@ -5,6 +5,7 @@ on:
       - 'release/*'
       - 'feature/*'
       - 'hotfix/*'
+      - 'test/*'
     tags:
       - 'v[0-9]+.[0-9]+.[0-9]+'
       - 'v[0-9]+.[0-9]+.[0-9]+rc[0-9]+'
@@ -30,6 +31,12 @@ jobs:
           if [[ "$BRANCH" == feature/* ]]; then
             NAME="${BRANCH#feature/}"
             VERSION="0.0.0-feature-${NAME}-${SHORT_SHA}"
+          elif [[ "$BRANCH" == test/* ]]; then
+            NAME="${BRANCH#test/}"
+            VERSION="0.0.0-test-${NAME}-${SHORT_SHA}"
+          elif [[ "$BRANCH" == hotfix/* ]]; then
+            NAME="${BRANCH#hotfix/}"
+            VERSION="0.0.0-hotfix-${NAME}-${SHORT_SHA}"
           elif [[ "$BRANCH" == release/* ]]; then
             NAME="${BRANCH#release/}"
             VERSION="${NAME}-${SHORT_SHA}"
@@ -41,6 +48,10 @@ jobs:
           echo "Using chart version: $VERSION"
 
           yq -i ".version = \"${VERSION}\"" Chart.yaml
+
+      - name: Lint
+        run: helm lint "${{ env.CHART_DIR }}"
+
 
       - name: Package & Push
         run: |

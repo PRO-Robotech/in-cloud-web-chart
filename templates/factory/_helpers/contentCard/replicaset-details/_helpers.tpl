@@ -1,3 +1,4 @@
+{{/* ReplicaSet-specific detail cards: replica counts and status. */}}
 {{- define "in-cloud.web.contentCard.replicasetRuntimeFacts" -}}
 # Content card with ReplicaSet runtime facts (two columns, status split into two columns)
 - type: ContentCard

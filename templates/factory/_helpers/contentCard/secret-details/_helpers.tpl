@@ -1,3 +1,4 @@
+{{/* Secret-specific detail card: decoded key/value preview. */}}
 {{- define "in-cloud.web.secretCard" -}}
 # Content card with Secret data preview
 - type: ContentCard
@@ -14,6 +15,7 @@
       data:
         id: example-secret-base64
         type: base64
+        {{/* Which parallel fetch result (reqsJsonPath index) to read */}}
         reqIndex: "0"
         jsonPathToSecrets: .items.0.data
         multiline: true

@@ -3,15 +3,22 @@
 {{- $customCco := index $customCcoResources "factory-aquasecurity.github.io.v1alpha1.clusterinfraassessmentreports" -}}
 {{- if eq (include "in-cloud.web.cco.isEnabled" (dict "config" $customCco)) "true" }}
 ---
-# =================================================
-# CustomColumnsOverride definition
-# =================================================
+# ============================================================================
+# CustomColumnsOverride: factory-aquasecurity.github.io.v1alpha1.clusterinfraassessmentreports
+# ----------------------------------------------------------------------------
+# Embedded table columns for Aqua ClusterInfraAssessmentReport findings within Factory detail pages.
+# Toggled via:
+# customWebResources.customcolumnsoverride["factory-
+# aquasecurity.github.io.v1alpha1.clusterinfraassessmentreports"]
+# ============================================================================
 apiVersion: front.in-cloud.io/v1alpha1
 kind: CustomColumnsOverride
 metadata:
   # Name of this CustomColumnsOverride resource
   name: factory-aquasecurity.github.io.v1alpha1.clusterinfraassessmentreports
 spec:
+  # No additionalReqsData or urlsToFetch: values come from each row; external links use jsonPath +
+  # static AVD URL template.
   # Table columns rendered in the resource list
   additionalPrinterColumns:
     # =================================================
@@ -25,6 +32,7 @@ spec:
     # =================================================
     - name: checkID
       type: factory
+      {{/* factory/link column: clickable check ID with external AVD documentation URL */}}
       {{ include "in-cloud.web.cco.props.link" (dict
           "jsonPath" ".checkID"
           "text" "{reqsJsonPath[0]['.checkID']['-']}"
@@ -48,6 +56,12 @@ spec:
   additionalPrinterColumnsTrimLengths:
     - key: title
       value: 128
+
+  # Tooltips for standard columns
+  additionalPrinterColumnsTooltips:
+    {{/* Shared i18n tooltips for standard list columns (e.g. name, created) */}}
+    {{ include "incloud-web-resources.cco.columns-tooltips.name" . | nindent 4 }}
+    {{ include "incloud-web-resources.cco.columns-tooltips.created" . | nindent 4 }}
 
   # Stable identifier used by frontend mapping
   id: factory-aquasecurity.github.io.v1alpha1.clusterinfraassessmentreports

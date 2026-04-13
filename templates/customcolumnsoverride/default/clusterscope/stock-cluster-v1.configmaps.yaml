@@ -3,9 +3,12 @@
 {{- $customCco := index $customCcoResources "stock-cluster-v1.configmaps" -}}
 {{- if eq (include "in-cloud.web.cco.isEnabled" (dict "config" $customCco)) "true" }}
 ---
-# =================================================
-# CustomColumnsOverride definition
-# =================================================
+# ============================================================================
+# CustomColumnsOverride: stock-cluster-v1.configmaps
+# ----------------------------------------------------------------------------
+# Table columns for ConfigMap (cluster-scoped).
+# Toggled via: customWebResources.customcolumnsoverride["stock-cluster-v1.configmaps"]
+# ============================================================================
 apiVersion: front.in-cloud.io/v1alpha1
 kind: CustomColumnsOverride
 metadata:
@@ -35,6 +38,12 @@ spec:
     - name: Created
       type: factory
       {{ include "in-cloud.web.cco.props.created" . | nindent 6 }}
+    # =================================================
+    # Column: Actions
+    # =================================================
+    - name: Actions
+      type: factory
+      {{ include "in-cloud.web.cco.props.actions.namespacedBuiltin" (dict "apiVersion" "v1" "plural" "configmaps") | nindent 6 }}
 
   # Trim long values for selected columns
   additionalPrinterColumnsTrimLengths:
@@ -43,6 +52,11 @@ spec:
   # Fallback values for empty or missing fields
   additionalPrinterColumnsUndefinedValues:
     {{ include "incloud-web-resources.cco.columns-undefined-values.namespace" . | nindent 4 }}
+
+  # Tooltips for standard columns
+  additionalPrinterColumnsTooltips:
+    {{ include "incloud-web-resources.cco.columns-tooltips.name" . | nindent 4 }}
+    {{ include "incloud-web-resources.cco.columns-tooltips.created" . | nindent 4 }}
 
   # Stable identifier used by frontend mapping
   id: stock-cluster-/v1/configmaps

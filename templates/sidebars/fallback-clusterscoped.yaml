@@ -1,9 +1,19 @@
+# ============================================================================
+# Sidebar: fallback-clusterscoped
+# ----------------------------------------------------------------------------
+# Default cluster-scoped sidebar: menu tree from sidebar-cluster.tpl; optional tag
+# filters from Helm values (see keysAndTags below).
+# Replace or disable by deploying another Sidebar CR and wiring the UI to its spec.id.
+# ============================================================================
 apiVersion: front.in-cloud.io/v1alpha1
 kind: Sidebar
 metadata:
   name: fallback-clusterscoped
 spec:
+  # Resolved by the SPA together with Breadcrumb/Navigation; must match UI config.
   id: fallback
+  # Optional filters: .Values.sidebars.keysAndTags plus .Values.sidebars.extrakeysAndTags
+  # (merged YAML) constrain or label menu entries for this deployment.
   keysAndTags:
     {{- with .Values.sidebars.keysAndTags }}
     {{- toYaml . | nindent 4 }}
@@ -11,5 +21,7 @@ spec:
     {{- with .Values.sidebars.extrakeysAndTags }}
     {{- toYaml . | nindent 4 }}
     {{- end }}
+  # Nested YAML: each top-level item has key, label, optional children[]; link strings
+  # use {cluster} and paths from sidebar-cluster.tpl (builtin-table vs api-table).
   menuItems:
     {{- include "incloud-web-chart.sidebar.menu.items.cluster" . | nindent 4 }}

@@ -1,10 +1,24 @@
+# ============================================================================
+# Navigation: fallback
+# ----------------------------------------------------------------------------
+# Minimal Navigation CR: URL templates for project, instance, and namespace
+# selectors plus the landing route when opening a cluster from the cluster list.
+# Prefer templates/navigations/navigation.yaml for full control; disable or replace
+# via custom WebResources/navigation if your deployment ships another Navigation id.
+# ============================================================================
 apiVersion: front.in-cloud.io/v1alpha1
 kind: Navigation
 metadata:
   name: fallback
 spec:
+  # projects / instances / namespaces: three parallel selectors. Each drives the
+  # same URL shape; the UI uses the section that matches the current scope
+  # (project vs instance vs namespace). "clear" is the route with no selection;
+  # "change" is after the user picks a value.
   projects:
+    # {selectedCluster}: cluster context from the UI. No project selected.
     clear: "/openapi-ui/{selectedCluster}/builtin-table/pods"
+    # {value}: selected project identifier inserted into the path.
     change: "/openapi-ui/{selectedCluster}/{value}/builtin-table/pods"
   instances:
     clear: "/openapi-ui/{selectedCluster}/builtin-table/pods"
@@ -12,3 +26,8 @@ spec:
   namespaces:
     clear: "/openapi-ui/{selectedCluster}/builtin-table/pods"
     change: "/openapi-ui/{selectedCluster}/{value}/builtin-table/pods"
+
+  # Target when navigating from the global cluster list into a cluster. Unlike
+  # the primary navigation template (defaults to pods), this path opens the
+  # cluster-scoped Nodes table. ~recordValue~ is replaced with the cluster id.
+  pathToNavigateFromClusterList: /openapi-ui/~recordValue~/builtin-table/nodes

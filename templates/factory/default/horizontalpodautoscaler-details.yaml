@@ -7,6 +7,12 @@
 {{- $hpaApiResource := $hpaCtx.resource -}}
 {{- $hpaPermissionContext := $hpaCtx.permissionContext -}}
 {{- $hpaEndpoint := $hpaCtx.endpoint -}}
+# ============================================================================
+# Factory: horizontalpodautoscaler-details
+# ----------------------------------------------------------------------------
+# Detail page for HorizontalPodAutoscalers.
+# Toggled via: customWebResources.factory["horizontalpodautoscaler-details"].enabled (default: true)
+# ============================================================================
 apiVersion: front.in-cloud.io/v1alpha1
 kind: Factory
 metadata:
@@ -14,6 +20,10 @@ metadata:
 
 spec:
   key: horizontalpodautoscaler-details
+
+  # Indexes into urlsToFetch whose responses are available via reqsJsonPath[N] in the component tree
+  effectiveReqIndexes:
+    - 0
 
   # =========================
   # Data sources
@@ -114,7 +124,12 @@ spec:
     - type: antdTabs
       data:
         id: tabs-root
+        # Tab selected by default when the page loads
         defaultActiveKey: details
+        # Persist the active tab key in the URL hash for bookmarking and refresh
+        syncActiveKeyWithHash: true
+        # Show "Open in new tab" context action on each tab header
+        allowOpenInNewBrowserTab: true
         items:
 
           # =========================
@@ -151,9 +166,7 @@ spec:
                         children:
                           {{ include "in-cloud.web.contentCard.horizontalpodautoscalerRuntimeFacts" . | nindent 26 }}
 
-                  # =========================
-                  # Conditions (only when present)
-                  # =========================
+                  # ---- Conditions ----
                   {{ include "in-cloud.web.contentCard.conditionsVisibility" (dict
                       "k8sResourceToFetch" $hpaApiResource
                       "fieldSelector" (dict

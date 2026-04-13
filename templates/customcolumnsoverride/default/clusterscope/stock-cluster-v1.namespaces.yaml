@@ -1,8 +1,11 @@
 {{- if (index .Values.defaultWebResources.customcolumnsoverride "stock-cluster-v1_namespaces") }}
 ---
-# =================================================
-# CustomColumnsOverride definition
-# =================================================
+# ============================================================================
+# CustomColumnsOverride: stock-cluster-v1.namespaces
+# ----------------------------------------------------------------------------
+# Table columns for Namespace (cluster-scoped).
+# Toggled via: defaultWebResources.customcolumnsoverride["stock-cluster-v1_namespaces"]
+# ============================================================================
 apiVersion: front.in-cloud.io/v1alpha1
 kind: CustomColumnsOverride
 metadata:
@@ -38,9 +41,21 @@ spec:
     - name: Created
       type: factory
       {{ include "in-cloud.web.cco.props.created" . | nindent 6 }}
+    # =================================================
+    # Column: Actions
+    # =================================================
+    - name: Actions
+      type: factory
+      {{ include "in-cloud.web.cco.props.actions.clusterScopedBuiltin" (dict "apiVersion" "v1" "plural" "namespaces") | nindent 6 }}
   # Trim long values for selected columns
   additionalPrinterColumnsTrimLengths:
     {{ include "incloud-web-resources.cco.columns-trim-lengths.name" . | nindent 4 }}
+
+  # Tooltips for standard columns
+  additionalPrinterColumnsTooltips:
+    {{ include "incloud-web-resources.cco.columns-tooltips.name" . | nindent 4 }}
+    {{ include "incloud-web-resources.cco.columns-tooltips.created" . | nindent 4 }}
+
   # Stable identifier used by frontend mapping
   id: stock-cluster-/v1/namespaces
 {{- end -}}

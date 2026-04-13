@@ -7,6 +7,12 @@
 {{- $deploymentApiResource := $deploymentCtx.resource -}}
 {{- $deploymentPermissionContext := $deploymentCtx.permissionContext -}}
 {{- $deploymentEndpoint := $deploymentCtx.endpoint -}}
+# ============================================================================
+# Factory: deployment-details
+# ----------------------------------------------------------------------------
+# Detail page for Deployments.
+# Toggled via: customWebResources.factory["deployment-details"].enabled (default: true)
+# ============================================================================
 apiVersion: front.in-cloud.io/v1alpha1
 kind: Factory
 metadata:
@@ -14,6 +20,10 @@ metadata:
 
 spec:
   key: deployment-details
+
+  # Indexes into urlsToFetch whose responses are available via reqsJsonPath[N] in the component tree
+  effectiveReqIndexes:
+    - 0
 
   # =========================
   # Data sources
@@ -122,18 +132,21 @@ spec:
                 ) | nindent 14
               }}
 
+              # Pause rollouts (spec.paused=true)
               {{- include "in-cloud.web.action.suspend" (dict
                   "endpoint" $deploymentEndpoint
                   "permissionContext" $deploymentPermissionContext
                 ) | nindent 14 
               }}
 
+              # Resume rollouts (spec.paused=false)
               {{- include "in-cloud.web.action.resume" (dict
                   "endpoint" $deploymentEndpoint
                   "permissionContext" $deploymentPermissionContext
                 ) | nindent 14 
               }}
 
+              # Change desired replica count via the scale subresource
               {{- include "in-cloud.web.action.scale" (dict
                   "endpoint" (printf "%s/scale" $deploymentEndpoint)
                   "permissionContext" (merge (dict
@@ -142,6 +155,7 @@ spec:
                 ) | nindent 14 
               }}
 
+              # Rolling restart of Pods (rollout restart)
               {{- include "in-cloud.web.action.rolloutRestart" (dict
                   "endpoint" $deploymentEndpoint
                   "permissionContext" $deploymentPermissionContext
@@ -162,7 +176,12 @@ spec:
     - type: antdTabs
       data:
         id: tabs-root
+        # Tab selected by default when the page loads
         defaultActiveKey: details
+        # Persist the active tab key in the URL hash for bookmarking and refresh
+        syncActiveKeyWithHash: true
+        # Show "Open in new tab" context action on each tab header
+        allowOpenInNewBrowserTab: true
         items:
 
           # =========================
@@ -199,6 +218,7 @@ spec:
                     ) | nindent 18
                   }}
 
+                  # ---- Init containers ----
                   {{ include "in-cloud.web.contentCard.genericVisibilityInclude" (dict
                       "containerId" "init-containers-container"
                       "value" "{reqsJsonPath[0]['.items.0.spec.template.spec.initContainers']['-']}"
@@ -208,6 +228,7 @@ spec:
                     ) | nindent 18
                   }}
 
+                  # ---- Containers ----
                   {{ include "in-cloud.web.contentCard.genericVisibilityInclude" (dict
                       "containerId" "containers-container"
                       "value" "{reqsJsonPath[0]['.items.0.spec.template.spec.containers']['-']}"
@@ -217,9 +238,16 @@ spec:
                     ) | nindent 18
                   }}
 
-                  # =========================
-                  # Conditions (only when present)
-                  # =========================
+
+                  # ---- Volumes ----
+                  {{ include "in-cloud.web.contentCard.volumes" (dict
+                      "reqIndex" 0
+                      "jsonPathToSpec" ".items.0.spec.template.spec"
+                      "errorText" "No efficient data in spec"
+                    ) | nindent 18
+                  }}
+
+                  # ---- Conditions ----
                   {{ include "in-cloud.web.contentCard.conditionsVisibility" (dict
                       "k8sResourceToFetch" $deploymentApiResource
                       "fieldSelector" (dict
@@ -285,6 +313,7 @@ spec:
           # =========================
           # AQUA SECURITY TAB (optional)
           # =========================
+          # When customWebResources.factory["node-details"].enableConfigReportsAquaTab is true
           {{- if (index .Values.customWebResources.factory "node-details").enableConfigReportsAquaTab }}
           - key: reports
             label: Reports

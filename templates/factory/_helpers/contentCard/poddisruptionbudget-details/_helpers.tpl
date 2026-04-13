@@ -1,3 +1,4 @@
+{{/* PodDisruptionBudget-specific detail cards: min/max disruption and status counters. */}}
 {{- define "in-cloud.web.contentCard.poddisruptionbudgetRuntimeFacts" -}}
 # Content card with PodDisruptionBudget runtime facts (two columns)
 - type: ContentCard

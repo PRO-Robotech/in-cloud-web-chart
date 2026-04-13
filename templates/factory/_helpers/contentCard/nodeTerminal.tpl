@@ -1,5 +1,5 @@
 {{- define "in-cloud.web.contentCard.nodeTerminal" -}}
-# Content card with Node terminal session
+# Node terminal: shell session on a Node via openapi-ui (cluster + node context).
 - type: ContentCard
   data:
     id: node-terminal-card

@@ -1,3 +1,4 @@
+{{/* ConfigMap-specific detail card: plain key/value preview. */}}
 {{- define "in-cloud.web.configmapCard" -}}
 # Content card with Secret data preview
 - type: ContentCard
@@ -14,6 +15,7 @@
       data:
         id: example-configmap-plain
         type: plain
+        {{/* Which parallel fetch result (reqsJsonPath index) to read */}}
         reqIndex: "0"
         jsonPathToSecrets: .items.0.data
         multiline: true
@@ -31,6 +33,8 @@
           whiteSpace: "pre-wrap"
           wordBreak: "break-word"
         notificationWidth: "420px"
-        notificationText: "Secret value copied to clipboard."
+        notificationText: "Config value copied to clipboard."
         niceLooking: true
+        hideEye: true
+        shownByDefault: true
 {{- end -}}

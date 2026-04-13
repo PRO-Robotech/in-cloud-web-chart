@@ -7,6 +7,12 @@
 {{- $cronjobApiResource := $cronjobCtx.resource -}}
 {{- $cronjobPermissionContext := $cronjobCtx.permissionContext -}}
 {{- $cronjobEndpoint := $cronjobCtx.endpoint -}}
+# ============================================================================
+# Factory: cronjob-details
+# ----------------------------------------------------------------------------
+# Detail page for CronJobs.
+# Toggled via: customWebResources.factory["cronjob-details"].enabled (default: true)
+# ============================================================================
 apiVersion: front.in-cloud.io/v1alpha1
 kind: Factory
 metadata:
@@ -14,6 +20,10 @@ metadata:
 
 spec:
   key: cronjob-details
+
+  # Indexes into urlsToFetch whose responses are available via reqsJsonPath[N] in the component tree
+  effectiveReqIndexes:
+    - 0
 
   # =========================
   # Data sources
@@ -106,6 +116,54 @@ spec:
                 ) | nindent 14
               }}
 
+              # ---- Suspend CronJob ----
+              {{- include "in-cloud.web.action.suspend" (dict
+                  "endpoint" $cronjobEndpoint
+                  "pathToValue" "/spec/suspend"
+                  "permissionContext" $cronjobPermissionContext
+                ) | nindent 14
+              }}
+
+              # ---- Resume CronJob ----
+              {{- include "in-cloud.web.action.resume" (dict
+                  "endpoint" $cronjobEndpoint
+                  "pathToValue" "/spec/suspend"
+                  "permissionContext" $cronjobPermissionContext
+                ) | nindent 14
+              }}
+
+              # ---- Trigger manual run ----
+              {{ include "in-cloud.web.action.triggerRun" (dict
+                  "createEndpoint" "/api/clusters/{2}/k8s/apis/{6}/{7}/namespaces/{3}/jobs"
+                  "permissionContext" (dict
+                    "cluster" "{2}"
+                    "namespace" "{3}"
+                    "apiGroup" "{6}"
+                    "apiVersion" "{7}"
+                    "plural" "jobs"
+                  )
+                ) | nindent 14
+              }}
+
+              # ---- Delete active jobs ----
+              {{ include "in-cloud.web.action.deleteChildren" (dict
+                  "text" "Delete Active Jobs"
+                  "childResourceName" "Jobs"
+                  "children" "[{\"name\":\"{reqs[0]['items','0','status','active','0','name']['-']}\",\"endpoint\":\"/api/clusters/{2}/k8s/apis/{6}/{7}/namespaces/{3}/jobs/{reqs[0]['items','0','status','active','0','name']['-']}\"}]"
+                  "visibleWhen" (dict
+                    "criteria" "notEquals"
+                    "value" "{reqsJsonPath[0]['.items.0.status.active.0.name']['-']}"
+                    "valueToCompare" "-"
+                  )
+                  "permissionContext" (dict
+                    "cluster" "{2}"
+                    "namespace" "{3}"
+                    "apiGroup" "{6}"
+                    "apiVersion" "{7}"
+                    "plural" "jobs"
+                  )
+                ) | nindent 14
+              }}
 
               # ---- Delete resource ----
               {{ include "in-cloud.web.action.delete" (dict
@@ -121,7 +179,12 @@ spec:
     - type: antdTabs
       data:
         id: tabs-root
+        # Tab selected by default when the page loads
         defaultActiveKey: details
+        # Persist the active tab key in the URL hash for bookmarking and refresh
+        syncActiveKeyWithHash: true
+        # Show "Open in new tab" context action on each tab header
+        allowOpenInNewBrowserTab: true
         items:
 
           # =========================
@@ -159,6 +222,7 @@ spec:
                   }}
 
 
+                  # ---- Init containers ----
                   {{ include "in-cloud.web.contentCard.genericVisibilityInclude" (dict
                       "containerId" "init-containers-container"
                       "value" "{reqsJsonPath[0]['.items.0.spec.jobTemplate.spec.template.spec.initContainers']['-']}"
@@ -168,6 +232,7 @@ spec:
                     ) | nindent 18
                   }}
 
+                  # ---- Containers ----
                   {{ include "in-cloud.web.contentCard.genericVisibilityInclude" (dict
                       "containerId" "containers-container"
                       "value" "{reqsJsonPath[0]['.items.0.spec.jobTemplate.spec.template.spec.containers']['-']}"
@@ -177,10 +242,15 @@ spec:
                     ) | nindent 18
                   }}
 
+                  # ---- Volumes ----
+                  {{ include "in-cloud.web.contentCard.volumes" (dict
+                      "reqIndex" 0
+                      "jsonPathToSpec" ".items.0.spec.jobTemplate.spec.template.spec"
+                      "errorText" "No efficient data in spec"
+                    ) | nindent 18
+                  }}
 
-                  # =========================
-                  # Conditions (only when present)
-                  # =========================
+                  # ---- Conditions ----
                   {{ include "in-cloud.web.contentCard.conditionsVisibility" (dict
                       "k8sResourceToFetch" $cronjobApiResource
                       "fieldSelector" (dict
@@ -246,6 +316,7 @@ spec:
           # =========================
           # AQUA SECURITY TAB (optional)
           # =========================
+          # When customWebResources.factory["node-details"].enableConfigReportsAquaTab is true
           {{- if (index .Values.customWebResources.factory "node-details").enableConfigReportsAquaTab }}
           - key: reports
             label: Reports

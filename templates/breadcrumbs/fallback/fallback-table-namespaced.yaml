@@ -1,3 +1,9 @@
+# ============================================================================
+# Breadcrumb: fallback-table-namespaced-api, fallback-table-namespaced-builtin
+# ----------------------------------------------------------------------------
+# Table (list) in a namespace: api label {5}/{6}/{7}; builtin label v1/{5} for the built-in key.
+# Swap ids by shipping alternate Breadcrumb CRs when you customize list URLs.
+# ============================================================================
 ---
 apiVersion: front.in-cloud.io/v1alpha1
 kind: Breadcrumb
@@ -5,7 +11,9 @@ metadata:
   name: fallback-table-namespaced-api
 spec:
   id: "fallback-table-namespaced-api"
+  # Single crumb naming the namespaced collection (GVR path segments).
   breadcrumbItems:
+    # api: group/version/resource placeholders from the URL.
     - key: api
       label: "{5}/{6}/{7}"
 ---
@@ -16,8 +24,8 @@ metadata:
 spec:
   id: "fallback-table-namespaced-builtin"
   breadcrumbItems:
+    # api: built-in resource key ({5}) with v1 display prefix.
     - key: api
       label: "v1/{5}"
-
 
 

@@ -1,3 +1,7 @@
+{{/*
+  CronJob-specific detail cards: schedule, job template, and container lists (via shared table
+  helper).
+*/}}
 {{- define "in-cloud.web.contentCard.cronjobRuntimeFacts" -}}
 # Content card with CronJob runtime facts (two columns)
 - type: ContentCard
@@ -316,6 +320,10 @@
 
 {{- define "in-cloud.web.contentCard.cronjob.template.initContainersList" -}}
 # Content card with CronJob JobTemplate init containers spec
+{{/*
+  customizationId: UI table override; k8sResourceToFetch: list API for parent CronJob;
+  nameFieldSelector: current resource name token
+*/}}
 {{ include "in-cloud.web.contentCard.genericContainersTableCard" (dict
     "cardId" "init-containers-card"
     "title" "Init Containers"
@@ -338,6 +346,10 @@
 
 {{- define "in-cloud.web.contentCard.cronjob.template.containersList" -}}
 # Content card with CronJob JobTemplate containers spec
+{{/*
+  customizationId: UI table override; k8sResourceToFetch: list API for parent CronJob;
+  nameFieldSelector: current resource name token
+*/}}
 {{ include "in-cloud.web.contentCard.genericContainersTableCard" (dict
     "cardId" "containers-card"
     "title" "Containers"

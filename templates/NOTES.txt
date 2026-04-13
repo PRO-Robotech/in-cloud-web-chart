@@ -1,0 +1,45 @@
+in-Cloud Web UI has been deployed successfully!
+
+Release name: {{ .Release.Name }}
+Namespace:    {{ .Release.Namespace }}
+
+Components:
+{{- if .Values.bff.enabled }}
+  - BFF (backend-for-frontend): {{ .Values.bff.image.repository }}:{{ .Values.bff.image.tag }}
+{{- end }}
+{{- if .Values.web.enabled }}
+  - Web (frontend UI):          {{ .Values.web.image.repository }}:{{ .Values.web.image.tag }}
+{{- end }}
+{{- if .Values.nginx.enabled }}
+  - Nginx (reverse proxy):      {{ .Values.nginx.image.repository }}:{{ .Values.nginx.image.tag }}
+{{- end }}
+
+Service ports:
+{{- range .Values.service.ports }}
+  - {{ .name }}: {{ .port }}
+{{- end }}
+
+{{- if .Values.expose.enabled }}
+
+External access:
+  Type: {{ .Values.expose.resourceType }}
+  Domain: {{ .Values.externalDomain }}
+  TLS: {{ .Values.expose.tls.certSource }}
+{{- else }}
+
+To access in-Cloud Web UI locally, run:
+
+  kubectl port-forward -n {{ .Release.Namespace }} svc/{{ include "incloud-web.fullname" . }} 8081:8081
+
+Then open: http://localhost:8081
+
+{{- end }}
+
+{{- $oauth := index .Values "oauth2-proxy" }}
+{{- if $oauth.enabled }}
+
+Authentication: oauth2-proxy + {{ if .Values.dex.enabled }}Dex{{ else }}external OIDC provider{{ end }}
+{{- else }}
+
+Authentication: disabled (oauth2-proxy.enabled=false)
+{{- end }}

@@ -1,4 +1,8 @@
+{{- if .Values.rbac.create }}
 ---
+# ClusterRole granting read-write access to all front.in-cloud.io resources.
+# Aggregated into the built-in "edit" ClusterRole via the aggregate-to-edit label,
+# so any user with the "edit" role can manage UI CRDs (create/update Sidebar, Factory, etc.).
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
@@ -9,3 +13,4 @@ rules:
   - apiGroups: ["front.in-cloud.io"]
     resources: ["*"]
     verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
+{{- end }}

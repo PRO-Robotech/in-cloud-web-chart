@@ -7,6 +7,12 @@
 {{- $clusterroleApiResource := $clusterroleCtx.resource -}}
 {{- $clusterrolePermissionContext := $clusterroleCtx.permissionContext -}}
 {{- $clusterroleEndpoint := $clusterroleCtx.endpoint -}}
+# ============================================================================
+# Factory: clusterrole-details
+# ----------------------------------------------------------------------------
+# Detail page for ClusterRoles.
+# Toggled via: customWebResources.factory["clusterrole-details"].enabled (default: true)
+# ============================================================================
 apiVersion: front.in-cloud.io/v1alpha1
 kind: Factory
 metadata:
@@ -14,6 +20,10 @@ metadata:
 
 spec:
   key: clusterrole-details
+
+  # Indexes into urlsToFetch whose responses are available via reqsJsonPath[N] in the component tree
+  effectiveReqIndexes:
+    - 0
 
   # =========================
   # Data sources
@@ -113,7 +123,12 @@ spec:
     - type: antdTabs
       data:
         id: tabs-root
+        # Tab selected by default when the page loads
         defaultActiveKey: details
+        # Persist the active tab key in the URL hash for bookmarking and refresh
+        syncActiveKeyWithHash: true
+        # Show "Open in new tab" context action on each tab header
+        allowOpenInNewBrowserTab: true
         items:
 
           # =========================

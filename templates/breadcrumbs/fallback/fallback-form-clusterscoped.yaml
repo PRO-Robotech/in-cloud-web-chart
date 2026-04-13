@@ -1,3 +1,10 @@
+# ============================================================================
+# Breadcrumb: fallback-form-clusterscoped-api, -api-edit, -builtin, -builtin-edit
+# ----------------------------------------------------------------------------
+# Form (create/update) for cluster-scoped resources; paths use {cluster} only (no namespace).
+# Api: table crumb {5}/{6}/{7}, edit name {8}; builtin: key {6}, edit name {7}; labels use v1/{6}
+# for builtin.
+# ============================================================================
 ---
 apiVersion: front.in-cloud.io/v1alpha1
 kind: Breadcrumb
@@ -5,7 +12,10 @@ metadata:
   name: fallback-form-clusterscoped-api
 spec:
   id: "fallback-form-clusterscoped-api"
+  # Create flow: link back to the api collection, then a static "Create" action crumb.
   breadcrumbItems:
+    # create-api-res-clusterscoped-table: collection link; create-api-res-clusterscoped-plural: form
+    # action label.
     - key: create-api-res-clusterscoped-table
       label: "{5}/{6}/{7}"
       link: "/openapi-ui/{cluster}/api-table/{5}/{6}/{7}"
@@ -18,7 +28,9 @@ metadata:
   name: fallback-form-clusterscoped-api-edit
 spec:
   id: "fallback-form-clusterscoped-api-edit"
+  # Edit flow: list link, resource name, static "Update" crumb.
   breadcrumbItems:
+    # update-*-table: back to list; update-*-name: object being edited; update-*-plural: action.
     - key: update-api-res-clusterscoped-table
       label: "{5}/{6}/{7}"
       link: "/openapi-ui/{cluster}/api-table/{5}/{6}/{7}"
@@ -33,7 +45,9 @@ metadata:
   name: fallback-form-clusterscoped-builtin
 spec:
   id: "fallback-form-clusterscoped-builtin"
+  # Create flow for built-in tables: collection link + "Create".
   breadcrumbItems:
+    # create-builtin-*-table: built-in collection; create-builtin-*-plural: create action.
     - key: create-builtin-res-clusterscoped-table
       label: "v1/{6}"
       link: "/openapi-ui/{cluster}/builtin-table/{6}"
@@ -46,7 +60,9 @@ metadata:
   name: fallback-form-clusterscoped-builtin-edit
 spec:
   id: "fallback-form-clusterscoped-builtin-edit"
+  # Edit flow for built-in tables: list, instance name, "Update".
   breadcrumbItems:
+    # update-builtin-*-table: list; update-builtin-*-name: object; update-builtin-*-plural: save.
     - key: update-builtin-res-clusterscoped-table
       label: "v1/{6}"
       link: "/openapi-ui/{cluster}/builtin-table/{6}"
@@ -54,4 +70,3 @@ spec:
       label: "{7}"
     - key: update-builtin-res-clusterscoped-plural
       label: Update
-

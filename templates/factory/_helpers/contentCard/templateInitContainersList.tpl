@@ -1,3 +1,8 @@
+{{/*
+  Wraps genericContainersTableCard: init container specs from Pod template
+  (.spec.template.spec.initContainers); same apiGroup-aware k8sResourceToFetch as template
+  containers.
+*/}}
 {{- define "in-cloud.web.contentCard.template.initContainersList" -}}
 # Content card with PodTemplate init containers spec
 {{ include "in-cloud.web.contentCard.genericContainersTableCard" (dict

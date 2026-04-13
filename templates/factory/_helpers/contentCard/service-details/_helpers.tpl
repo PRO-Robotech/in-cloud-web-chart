@@ -1,3 +1,4 @@
+{{/* Service-specific detail cards: ClusterIP/session policy and routing/ports/endpoints. */}}
 {{- define "in-cloud.web.contentCard.serviceRuntimeFacts" -}}
 # Content card with Service runtime policy facts
 - type: ContentCard
@@ -272,12 +273,14 @@
                     - type: LabelsToSearchParams
                       data:
                         id: service-pod-selector
+                        {{/* Which parallel fetch result (reqsJsonPath index) to read */}}
                         reqIndex: 0
                         jsonPathToLabels: ".items.0.spec.selector"
                         linkPrefix: "/openapi-ui/{2}/{3}/search?kinds=~v1~pods"
                         errorText: "No selector"
                         textLink: Search
                         renderLabelsAsRows: true
+                        errorMode: 'default'
 
     - type: antdFlex
       data:
@@ -292,12 +295,15 @@
           data:
             id: service-port-mapping-table
             cluster: "{2}"
+            {{/* UI table column/layout override id */}}
             customizationId: "factory-service-details-port-mapping"
             baseprefix: /openapi-ui
             withoutControls: true
             pathToItems: ".items.0.spec.ports"
+            {{/* K8s list API + namespace for the Service row */}}
             k8sResourceToFetch:
               {{- toYaml .k8sResourceToFetch | nindent 14 }}
+            {{/* server-side filter to the current Service object */}}
             fieldSelector:
               {{- toYaml .fieldSelector | nindent 14 }}
 
@@ -323,12 +329,14 @@
               data:
                 id: service-endpoints-table
                 cluster: "{2}"
+                {{/* UI table column/layout override id */}}
                 customizationId: "factory-service-details-endpointslice"
                 baseprefix: /openapi-ui
                 withoutControls: true
                 labelSelector:
                   kubernetes.io/service-name: "{reqsJsonPath[0]['.items.0.metadata.name']['-']}"
                 pathToItems: ".items[*].endpoints"
+                {{/* EndpointSlice list API for this namespace */}}
                 k8sResourceToFetch:
                   apiGroup: "discovery.k8s.io"
                   apiVersion: "v1"

@@ -1,3 +1,7 @@
+{{/*
+  Custom column: creation time. `parsedText` uses formatter `timestamp` on JSONPath to
+  `.metadata.creationTimestamp`.
+*/}}
 {{- define "in-cloud.web.columns.factory.created" -}}
 customProps:
   disableEventBubbling: true
@@ -15,6 +19,7 @@ customProps:
         - type: parsedText
           data:
             id: time-value
+            # ISO time → localized display
             formatter: timestamp
             text: "{reqsJsonPath[0]['.metadata.creationTimestamp']['-']}"
 {{- end -}}
