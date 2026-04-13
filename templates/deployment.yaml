@@ -383,6 +383,61 @@ spec:
           terminationMessagePolicy: {{ .Values.moduleExample.terminationMessagePolicy | quote }}
         {{- end }}
 
+        # -------------------- Module RBAC Container --------------------
+        {{- if .Values.moduleRbac.enabled }}
+        - name: {{ .Values.moduleRbac.name }}
+          image: "{{ .Values.moduleRbac.image.repository }}:{{ .Values.moduleRbac.image.tag }}"
+          imagePullPolicy: {{ .Values.moduleRbac.image.pullPolicy }}
+
+          # Ports
+          ports:
+            - name: http
+              containerPort: {{ .Values.moduleRbac.containerPort }}
+              protocol: TCP
+            {{- with .Values.moduleRbac.extraContainerPorts }}
+            {{- toYaml . | nindent 12 }}
+            {{- end }}
+
+          # Env
+          {{- with .Values.moduleRbac.env }}
+          env:
+            {{- include "incloud-web.env" . | nindent 12 }}
+          {{- end }}
+          {{- with .Values.moduleRbac.envFrom }}
+          envFrom:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+
+          # Probes (enabled-gated, 'enabled' key stripped)
+          {{- if .Values.moduleRbac.livenessProbe.enabled }}
+          livenessProbe:
+            {{- omit .Values.moduleRbac.livenessProbe "enabled" | toYaml | nindent 12 }}
+          {{- end }}
+          {{- if .Values.moduleRbac.readinessProbe.enabled }}
+          readinessProbe:
+            {{- omit .Values.moduleRbac.readinessProbe "enabled" | toYaml | nindent 12 }}
+          {{- end }}
+
+          # Security context (enabled-gated, 'enabled' key stripped)
+          {{- if .Values.moduleRbac.securityContext.enabled }}
+          securityContext:
+            {{- omit .Values.moduleRbac.securityContext "enabled" | toYaml | nindent 12 }}
+          {{- end }}
+
+          # Resources / mounts
+          {{- with .Values.moduleRbac.resources }}
+          resources:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- with .Values.moduleRbac.volumeMounts }}
+          volumeMounts:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+
+          terminationMessagePath: {{ .Values.moduleRbac.terminationMessagePath | quote }}
+          terminationMessagePolicy: {{ .Values.moduleRbac.terminationMessagePolicy | quote }}
+        {{- end }}
+
       # Extra raw PodSpec fields (if provided)
       {{- with .Values.extraPodSpec }}
       {{- toYaml . | nindent 6 }}
