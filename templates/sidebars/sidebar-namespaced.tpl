@@ -193,6 +193,11 @@ Named templates below return [] when the generated menu would be empty.
       link: /{{ $.Values.basePrefix }}/{cluster}/plugins/plugin-rbac/table
 
     {{- end }}
+    {{- if .items.rolesDiscoveryGraph }}
+    - key: rolesdiscoverygraph
+      label: RolesDiscoveryGraph
+      link: /{{ $.Values.basePrefix }}/{cluster}/plugins/plugin-rbac/rbac
+    {{- end }}
     {{- if .items.serviceaccounts }}
     - key: serviceaccounts
       label: ServiceAccounts

@@ -46,7 +46,7 @@ spec:
   # =========================
   # Tags matched against Sidebar.keysAndTags to highlight active sidebar item
   sidebarTags:
-    - '{5}/{6}'
+    - '{6}'
 
   # =========================
   # Page layout
