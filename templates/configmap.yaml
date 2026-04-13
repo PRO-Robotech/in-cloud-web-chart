@@ -92,6 +92,13 @@ data:
       }
       {{ end }}
 
+      {{ if $.Values.moduleRbac.enabled }}
+      # Proxy /openapi-ui-plugin-rbac to backend (RBAC module container)
+      location /openapi-ui-plugin-rbac {
+          proxy_pass http://127.0.0.1:{{ $.Values.moduleRbac.containerPort }};
+      }
+      {{ end }}
+
       # WebSocket proxy for BFF (e.g., event streams)
       location /openapi-bff-ws/ {
       {{ if $oauth.enabled }}

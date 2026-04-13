@@ -75,6 +75,8 @@ spec:
                 baseFactoriesMapping:
                   type: object
                   x-kubernetes-preserve-unknown-fields: true
+                pathToNavigateFromClusterList:
+                  type: string
       subresources:
         status: {}
       additionalPrinterColumns:

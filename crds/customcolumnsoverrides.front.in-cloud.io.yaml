@@ -56,6 +56,17 @@ spec:
                       value:
                         type: integer
                     additionalProperties: true
+              additionalPrinterColumnsTooltips:
+                items:
+                  type: object
+                  required: [key, value]
+                  properties:
+                    key:
+                      type: string
+                    value:
+                      type: integer
+                  additionalProperties: true
+                type: array
                 additionalPrinterColumnsUndefinedValues:
                   type: array
                   items:
