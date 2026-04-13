@@ -1,3 +1,7 @@
+{{/*
+  Wraps genericContainersTableCard: table of .status.containerStatuses for the current Pod; passes
+  pathToItems, k8sResourceToFetch (v1 + plural), nameFieldSelector.
+*/}}
 {{- define "in-cloud.web.contentCard.containersList" -}}
 # Content card with Pod containers status
 {{ include "in-cloud.web.contentCard.genericContainersTableCard" (dict

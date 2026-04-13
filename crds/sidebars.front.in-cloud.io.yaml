@@ -25,6 +25,12 @@ spec:
       schema:
         openAPIV3Schema:
           type: object
+          description: >-
+            Sidebar defines the left-hand navigation menu structure for the openapi-ui application.
+            The UI resolves a Sidebar CR by matching spec.id against the value of the
+            CUSTOMIZATION_SIDEBAR_FALLBACK_ID environment variable. Two Sidebar CRs are
+            typically created: one for cluster-scoped views ("fallback") and one for
+            namespaced views ("fallback-namespaced").
           required:
             - spec
           properties:
@@ -36,6 +42,7 @@ spec:
               type: object
             spec:
               type: object
+              description: Desired sidebar menu structure, resource bindings, and tags.
               additionalProperties: true
               required:
                 - id
@@ -43,19 +50,40 @@ spec:
               properties:
                 id:
                   type: string
+                  description: >-
+                    Unique identifier used by the UI to find the correct Sidebar CR.
+                    Must match CUSTOMIZATION_SIDEBAR_FALLBACK_ID (or its "-namespaced" variant)
+                    set in the web container environment. Typical values: "fallback", "fallback-namespaced".
                 keysAndTags:
                   type: object
-                  description: Arbitrary section tags like namespaces, projects, etc.
+                  description: >-
+                    Maps sidebar resource keys to arrays of tags. Each key corresponds to a
+                    sidebar menu item (e.g., "pods", "deployments"). The array of tags typically
+                    contains: [0] the K8s API path for the table view (e.g., "v1/pods"),
+                    [1] the Factory CR name for the detail page (e.g., "pod-details"),
+                    and optionally [2+] plugin route identifiers (e.g., "plugin-rbac/clusterroles").
+                    The UI uses these tags to highlight the active sidebar item based on the current
+                    route and to resolve navigation between table and detail views.
                   additionalProperties:
                     type: array
                     items:
                       type: string
                 externalKeys:
                   type: array
+                  description: >-
+                    List of external sidebar keys injected by plugins or external modules.
+                    These keys are not rendered by the Sidebar CR itself but are reserved
+                    so the UI can match plugin-provided menu items against the sidebar context.
                   items:
                     type: string
                 menuItems:
                   type: array
+                  description: >-
+                    Hierarchical list of sidebar menu sections and items. Each top-level entry
+                    represents a collapsible section (e.g., "Workloads", "Networking").
+                    Items can contain nested "children" for sub-navigation. Links support
+                    URL template placeholders: {cluster}, {namespace}, and positional {n}
+                    segments from the current URL path.
                   items:
                     type: object
                     additionalProperties: true
@@ -65,13 +93,28 @@ spec:
                     properties:
                       key:
                         type: string
+                        description: >-
+                          Unique identifier for this menu item. Used by the UI for active-state
+                          matching and keysAndTags lookups.
                       label:
                         type: string
+                        description: >-
+                          Display text shown in the sidebar. Supports URL template placeholders
+                          like {cluster} or positional {n} for dynamic labels.
                       link:
                         type: string
+                        description: >-
+                          URL to navigate to when the item is clicked. Supports template
+                          placeholders: {cluster}, {namespace}, and positional {n} segments.
+                          For sections with children, this is usually omitted.
 
                       resourcesList:
                         type: object
+                        description: >-
+                          When set, the sidebar item dynamically fetches a list of K8s resources
+                          and renders each as a sub-item. Useful for showing live resource lists
+                          (e.g., all namespaces or all custom resources of a given type) directly
+                          in the sidebar.
                         additionalProperties: true
                         required:
                           - cluster
@@ -82,23 +125,42 @@ spec:
                         properties:
                           cluster:
                             type: string
+                            description: Cluster name from which to fetch the resource list.
                           apiGroup:
                             type: string
+                            description: >-
+                              API group of the resource (e.g., "apps", "networking.k8s.io").
+                              Omit for core/v1 resources.
                           apiVersion:
                             type: string
+                            description: API version of the resource (e.g., "v1", "v1beta1").
                           plural:
                             type: string
+                            description: Plural resource name (e.g., "deployments", "pods").
                           namespace:
                             type: string
+                            description: >-
+                              Namespace scope for the resource list. Omit for cluster-scoped
+                              resources. Supports template placeholders.
                           linkToResource:
                             type: string
+                            description: >-
+                              URL template for each fetched resource item. Typically includes
+                              the resource name placeholder resolved via jsonPathToName.
                           jsonPathToName:
                             type: string
+                            description: >-
+                              JSONPath expression to extract the display name from each resource
+                              object (e.g., ".metadata.name").
                           linkToResourceList:
                             type: string
+                            description: >-
+                              Optional URL linking to the full resource list page. Displayed
+                              as a "View all" link in the sidebar.
 
                       children:
                         type: array
+                        description: Nested menu items within this section. Same schema as top-level menuItems.
                         items:
                           type: object
                           additionalProperties: true
@@ -108,13 +170,17 @@ spec:
                           properties:
                             key:
                               type: string
+                              description: Unique identifier for this child menu item.
                             label:
                               type: string
+                              description: Display text for this child menu item.
                             link:
                               type: string
+                              description: URL to navigate to when clicked. Supports template placeholders.
 
                             resourcesList:
                               type: object
+                              description: Dynamic resource list for this child item (same schema as parent resourcesList).
                               additionalProperties: true
                               required:
                                 - cluster
@@ -125,20 +191,28 @@ spec:
                               properties:
                                 cluster:
                                   type: string
+                                  description: Cluster name from which to fetch the resource list.
                                 apiGroup:
                                   type: string
+                                  description: API group of the resource. Omit for core/v1.
                                 apiVersion:
                                   type: string
+                                  description: API version of the resource.
                                 plural:
                                   type: string
+                                  description: Plural resource name.
                                 namespace:
                                   type: string
+                                  description: Namespace scope. Omit for cluster-scoped resources.
                                 linkToResource:
                                   type: string
+                                  description: URL template for each resource item.
                                 jsonPathToName:
                                   type: string
+                                  description: JSONPath to extract the display name from each resource.
                                 linkToResourceList:
                                   type: string
+                                  description: Optional URL to the full resource list page.
 
       subresources:
         status: {}

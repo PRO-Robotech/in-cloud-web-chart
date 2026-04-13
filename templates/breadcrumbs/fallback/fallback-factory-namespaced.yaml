@@ -1,3 +1,9 @@
+# ============================================================================
+# Breadcrumb: fallback-factory-namespaced-api, fallback-factory-namespaced-builtin
+# ----------------------------------------------------------------------------
+# Factory (detail) in a namespace: api {6}/{7}/{8} + object {9}; builtin {7} + object {8}.
+# Replace these fallbacks with custom Breadcrumb CRs if your factory URLs differ.
+# ============================================================================
 ---
 apiVersion: front.in-cloud.io/v1alpha1
 kind: Breadcrumb
@@ -5,7 +11,10 @@ metadata:
   name: fallback-factory-namespaced-api
 spec:
   id: "fallback-factory-namespaced-api"
+  # Trail: list link → selected object → static "Details" tail.
   breadcrumbItems:
+    # group-version: GVR list/table segment and back link; resource-name: instance; details: tail
+    # label.
     - key: group-version
       label: "{6}/{7}/{8}"
       link: "/openapi-ui/{cluster}/{namespace}/api-table/{6}/{7}/{8}"
@@ -22,6 +31,7 @@ metadata:
 spec:
   id: "fallback-factory-namespaced-builtin"
   breadcrumbItems:
+    # group-version: built-in table segment + link; resource-name: instance; details: tail label.
     - key: group-version
       label: "{6}/{7}"
       link: "/openapi-ui/{cluster}/{namespace}/builtin-table/{7}"

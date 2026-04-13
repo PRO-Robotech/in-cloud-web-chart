@@ -17,6 +17,25 @@ spec:
     - name: v1alpha1
       schema:
         openAPIV3Schema:
+          description: >-
+            CustomFormsPrefill (CFP) pre-populates fields in a create form for a specific
+            Kubernetes resource type. When a user opens a "Create" form, the UI looks up
+            a matching CFP by spec.customizationId and applies the predefined values to
+            the form before the user starts editing.
+
+            The spec is free-form (x-kubernetes-preserve-unknown-fields). Commonly used
+            spec fields (defined in Helm templates, not enforced by schema):
+
+              customizationId (string) — Identifier that ties this prefill to a resource form.
+                Convention: "default-namespace-/<apiGroup>/<apiVersion>/<plural>"
+                (e.g., "default-namespace-/v1/services").
+
+              values ([]object) — List of prefill entries. Each entry contains:
+                path ([]string): field path segments (e.g., ["metadata"]).
+                value (any): the default value to set (e.g., { generateName: "dynamic-" }).
+          required:
+          - spec
+          type: object
           properties:
             apiVersion:
               type: string
@@ -26,10 +45,10 @@ spec:
               type: object
             spec:
               type: object
+              description: >-
+                Free-form form prefill configuration. See top-level description for
+                commonly used fields: customizationId, values.
               x-kubernetes-preserve-unknown-fields: true
-          required:
-          - spec
-          type: object
       served: true
       storage: true
       subresources:

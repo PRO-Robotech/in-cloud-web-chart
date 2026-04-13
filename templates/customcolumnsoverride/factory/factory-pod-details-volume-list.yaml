@@ -3,9 +3,12 @@
 {{- $customCco := index $customCcoResources "factory-pod-details-volume-list" -}}
 {{- if eq (include "in-cloud.web.cco.isEnabled" (dict "config" $customCco)) "true" }}
 ---
-# =================================================
-# CustomColumnsOverride definition
-# =================================================
+# ============================================================================
+# CustomColumnsOverride: factory-pod-details-volume-list
+# ----------------------------------------------------------------------------
+# Embedded table columns for volume list (Pod details) within Factory detail pages.
+# Toggled via: customWebResources.customcolumnsoverride["factory-pod-details-volume-list"]
+# ============================================================================
 apiVersion: front.in-cloud.io/v1alpha1
 kind: CustomColumnsOverride
 metadata:
@@ -20,6 +23,11 @@ spec:
     - name: Name
       type: string
       jsonPath: .name
+
+  # Tooltips for standard columns
+  additionalPrinterColumnsTooltips:
+    {{ include "incloud-web-resources.cco.columns-tooltips.name" . | nindent 4 }}
+    {{ include "incloud-web-resources.cco.columns-tooltips.created" . | nindent 4 }}
 
   # Stable identifier used by frontend mapping
   id: factory-pod-details-volume-list

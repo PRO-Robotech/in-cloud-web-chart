@@ -3,15 +3,20 @@
 {{- $customCco := index $customCcoResources "factory-apps.v1.replicasets" -}}
 {{- if eq (include "in-cloud.web.cco.isEnabled" (dict "config" $customCco)) "true" }}
 ---
-# =================================================
-# CustomColumnsOverride definition
-# =================================================
+# ============================================================================
+# CustomColumnsOverride: factory-apps.v1.replicasets
+# ----------------------------------------------------------------------------
+# Embedded table columns for ReplicaSets within Factory detail pages.
+# Toggled via: customWebResources.customcolumnsoverride["factory-apps.v1.replicasets"]
+# ============================================================================
 apiVersion: front.in-cloud.io/v1alpha1
 kind: CustomColumnsOverride
 metadata:
   # Name of this CustomColumnsOverride resource
   name: factory-apps.v1.replicasets
 spec:
+  # No additionalReqsData or urlsToFetch: column values come from each list row only (no extra
+  # metrics/API fetches).
   # Table columns rendered in the resource list
   additionalPrinterColumns:
     # =================================================
@@ -19,6 +24,7 @@ spec:
     # =================================================
     - name: Name
       type: factory
+      # badgeLink: primary name cell - badge linking to this ReplicaSet Factory detail page
       {{ include "in-cloud.web.cco.props.badgeLink" (list $
           "/openapi-ui/{2}/{reqsJsonPath[0]['.metadata.namespace']['-']}/factory/replicaset-details/apps/v1/replicasets/{reqsJsonPath[0]['.metadata.name']['-']}"
         ) | nindent 6
@@ -28,9 +34,10 @@ spec:
     # =================================================
     - name: Labels
       type: factory
+      # labelsEditor: label chips with in-place edit and "search by labels" navigation
       {{ include "in-cloud.web.cco.props.labelsEditor" (dict
           "endpoint" "/api/clusters/{2}/k8s/apis/apps/v1/namespaces/{3}/replicasets/{6}"
-          "linkPrefix" "/openapi-ui/{2}/{3}/search?kinds=apps~v1~replicasets"
+          "linkPrefix" "/openapi-ui/{2}/{3}/search?kinds=apps~v1~replicasets&labels="
         ) | nindent 6
       }}
     # =================================================
@@ -38,6 +45,7 @@ spec:
     # =================================================
     - name: Pod Selector
       type: factory
+      # podSelector: template pod labels with link to matching Pods search
       {{ include "in-cloud.web.cco.props.podSelector" (dict
           "jsonPath" ".spec.template.metadata.labels"
           "linkPrefix" "/openapi-ui/{2}/{3}/search?kinds=~v1~pods"
@@ -48,6 +56,7 @@ spec:
     # =================================================
     - name: ownerRef
       type: factory
+      # ownerRefs: owning resources (e.g. Deployment) with navigation to their detail pages
       {{ include "in-cloud.web.cco.props.ownerRefs" (dict
           "jsonPath" ".metadata.ownerReferences"
           "jsonPathToArrayOfRefs" ".metadata.ownerReferences"
@@ -58,16 +67,32 @@ spec:
     # =================================================
     - name: Created
       type: factory
+      # created: relative creation time from metadata.creationTimestamp
       {{ include "in-cloud.web.cco.props.created" . | nindent 6 }}
+    # =================================================
+    # Column: Actions
+    # =================================================
+    - name: Actions
+      type: factory
+      # actions.replicaset: row action menu (e.g. delete, scale-related actions)
+      {{ include "in-cloud.web.cco.props.actions.replicaset" . | nindent 6 }}
 
   # Trim long values for selected columns
   additionalPrinterColumnsTrimLengths:
+    # Shared max string lengths for Name and Labels columns
     {{ include "incloud-web-resources.cco.columns-trim-lengths.name" . | nindent 4 }}
     {{ include "incloud-web-resources.cco.columns-trim-lengths.labels" . | nindent 4 }}
 
   # Fallback values for empty or missing fields
   additionalPrinterColumnsUndefinedValues:
+    # Placeholder when Labels (and other configured fields) are empty
     {{ include "incloud-web-resources.cco.columns-undefined-values.labels" . | nindent 4 }}
+
+  # Tooltips for standard columns
+  additionalPrinterColumnsTooltips:
+    # Shared i18n tooltip strings for standard column headers
+    {{ include "incloud-web-resources.cco.columns-tooltips.name" . | nindent 4 }}
+    {{ include "incloud-web-resources.cco.columns-tooltips.created" . | nindent 4 }}
 
   # Stable identifier used by frontend mapping
   id: factory-/apps/v1/replicasets

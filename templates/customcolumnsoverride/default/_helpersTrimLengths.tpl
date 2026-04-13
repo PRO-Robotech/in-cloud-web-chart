@@ -1,3 +1,4 @@
+{{/* CCO max cell text length before truncation: key = column id, value = max character count. */}}
 {{- define "incloud-web-resources.cco.columns-trim-lengths.name" -}}
 - key: Name
   value: 64

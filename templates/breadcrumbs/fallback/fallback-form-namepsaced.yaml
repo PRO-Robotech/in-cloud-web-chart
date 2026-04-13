@@ -1,3 +1,10 @@
+# ============================================================================
+# Breadcrumb: fallback-form-namespaced-api, -api-edit, -builtin, -builtin-edit
+# ----------------------------------------------------------------------------
+# Form (create/update) for namespaced resources; URLs include {cluster} and {namespace}.
+# Api: {6}/{7}/{8} (+ {9} on edit); builtin: {7} (+ {8} on edit); builtin table crumb labeled
+# v1/{7}.
+# ============================================================================
 ---
 apiVersion: front.in-cloud.io/v1alpha1
 kind: Breadcrumb
@@ -5,7 +12,10 @@ metadata:
   name: fallback-form-namespaced-api
 spec:
   id: "fallback-form-namespaced-api"
+  # Create: link to namespaced api collection, then "Create".
   breadcrumbItems:
+    # create-api-res-namespaced-table: namespaced collection; create-api-res-namespaced-plural:
+    # create.
     - key: create-api-res-namespaced-table
       label: "{6}/{7}/{8}"
       link: "/openapi-ui/{cluster}/{namespace}/api-table/{6}/{7}/{8}"
@@ -18,7 +28,9 @@ metadata:
   name: fallback-form-namespaced-api-edit
 spec:
   id: "fallback-form-namespaced-api-edit"
+  # Edit: collection link, resource name, "Update".
   breadcrumbItems:
+    # update-*-table: list in namespace; update-*-name: object; update-*-plural: update action.
     - key: update-api-res-namespaced-table
       label: "{6}/{7}/{8}"
       link: "/openapi-ui/{cluster}/{namespace}/api-table/{6}/{7}/{8}"
@@ -33,7 +45,9 @@ metadata:
   name: fallback-form-namespaced-builtin
 spec:
   id: "fallback-form-namespaced-builtin"
+  # Create for built-in namespaced tables.
   breadcrumbItems:
+    # create-builtin-*-table: built-in namespaced list; create-builtin-*-plural: create.
     - key: create-builtin-res-namespaced-table
       label: "v1/{7}"
       link: "/openapi-ui/{cluster}/{namespace}/builtin-table/{7}"
@@ -46,7 +60,9 @@ metadata:
   name: fallback-form-namespaced-builtin-edit
 spec:
   id: "fallback-form-namespaced-builtin-edit"
+  # Edit for built-in namespaced tables.
   breadcrumbItems:
+    # update-builtin-*-table: list; update-builtin-*-name: object; update-builtin-*-plural: save.
     - key: update-builtin-res-namespaced-table
       label: "v1/{7}"
       link: "/openapi-ui/{cluster}/{namespace}/builtin-table/{7}"

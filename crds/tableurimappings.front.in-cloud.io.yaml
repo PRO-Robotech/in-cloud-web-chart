@@ -18,6 +18,13 @@ spec:
       schema:
         openAPIV3Schema:
           type: object
+          description: >-
+            TableUriMapping defines a custom navigation rule for table row clicks in the
+            openapi-ui application. When a user clicks a row in a resource list table, the
+            UI checks for a matching TableUriMapping by spec.id and uses spec.pathToNavigate
+            as the target URL template. This allows overriding the default navigation
+            behavior (which goes to the Factory detail page via baseFactoriesMapping).
+            keysToParse fields provide additional context for URL template resolution.
           required:
             - spec
           properties:
@@ -29,20 +36,37 @@ spec:
               type: object
             spec:
               type: object
+              description: Custom table row navigation configuration.
               required:
                 - id
                 - pathToNavigate
               properties:
                 id:
                   type: string
+                  description: >-
+                    Unique identifier matched by the UI against the current table context
+                    to determine if this mapping applies.
                 pathToNavigate:
                   type: string
+                  description: >-
+                    URL template to navigate to when a table row is clicked.
+                    Supports the same placeholders as other URL templates in the system
+                    ({cluster}, {namespace}, positional {n}, reqsJsonPath expressions).
                 keysToParse:
                   x-kubernetes-preserve-unknown-fields: true
+                  description: >-
+                    Primary set of key-value pairs used to resolve URL template placeholders.
+                    Free-form object — keys and their interpretation depend on the UI logic.
                 keysToParseSecond:
                   x-kubernetes-preserve-unknown-fields: true
+                  description: >-
+                    Secondary set of key-value pairs for URL resolution. Applied after
+                    keysToParse, allowing multi-level template substitution.
                 keysToParseThird:
                   x-kubernetes-preserve-unknown-fields: true
+                  description: >-
+                    Tertiary set of key-value pairs for URL resolution. Applied after
+                    keysToParseSecond for complex multi-step navigation rules.
       subresources:
         status: {}
       additionalPrinterColumns:

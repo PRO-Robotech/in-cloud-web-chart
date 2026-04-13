@@ -2,9 +2,12 @@
 {{- $customCcoResources := default (dict) $customWebResources.customcolumnsoverride -}}
 {{- $nodeDetailsCco := index $customCcoResources "node-details" -}}
 {{- if eq (include "in-cloud.web.cco.isEnabled" (dict "config" $nodeDetailsCco)) "true" }}
-# =================================================
-# Cluster-scoped Node list columns override
-# =================================================
+# ============================================================================
+# CustomColumnsOverride: stock-cluster-v1.nodes
+# ----------------------------------------------------------------------------
+# Table columns for Node (cluster-scoped).
+# Toggled via: customWebResources.customcolumnsoverride["node-details"]
+# ============================================================================
 apiVersion: front.in-cloud.io/v1alpha1
 kind: CustomColumnsOverride
 metadata:
@@ -14,6 +17,8 @@ spec:
   # Unique identifier of this CustomColumnsOverride
   id: stock-cluster-/v1/nodes
 
+  # additionalReqsData: Node metrics (usage.cpu / usage.memory from Metrics API) for Memory and CPU
+  # columns.
   # =================================================
   # Table columns rendered in the Nodes list
   # =================================================
@@ -136,6 +141,17 @@ spec:
       type: factory
       jsonPath: .metadata.creationTimestamp
       {{ include "in-cloud.web.columns.factory.created" . | nindent 6 }}
+    # =================================================
+    # Column: Actions
+    # =================================================
+    - name: Actions
+      type: factory
+      {{ include "in-cloud.web.cco.props.actions.node" . | nindent 6 }}
+
+  # Tooltips for standard columns
+  additionalPrinterColumnsTooltips:
+    {{ include "incloud-web-resources.cco.columns-tooltips.name" . | nindent 4 }}
+    {{ include "incloud-web-resources.cco.columns-tooltips.created" . | nindent 4 }}
 
   # Trim long values for selected columns in tables
   additionalPrinterColumnsTrimLengths:

@@ -18,6 +18,12 @@ spec:
       schema:
         openAPIV3Schema:
           type: object
+          description: >-
+            Navigation configures context-switching behavior in the UI header selectors
+            (cluster, namespace, project, instance) and maps base factory identifiers
+            to detail-page factory names. The openapi-ui app reads this resource
+            to determine where to navigate when a user changes context or clicks a
+            cluster in the cluster list.
           required:
             - spec
           properties:
@@ -29,54 +35,106 @@ spec:
               type: object
             spec:
               type: object
-              # required:
-                # - instances
-                # - namespaces
-                # - projects
+              description: Desired navigation behavior for context selectors and factory routing.
               properties:
                 instances:
                   type: object
+                  description: >-
+                    Controls the "Instance" selector in the UI header.
+                    Defines URL templates for navigating when an instance is selected or cleared.
+                    Supports placeholder variables: {selectedCluster}, {value} (selected instance name),
+                    and reqsJsonPath expressions like {reqsJsonPath[0]['.metadata.name']}.
                   required:
                     - change
                     - clear
                   properties:
                     change:
                       type: string
+                      description: >-
+                        URL template the UI navigates to when a user selects an instance.
+                        Example: "/openapi-ui/{selectedCluster}/{value}/builtin-table/pods".
+                        {value} is replaced with the selected instance name.
                     clear:
                       type: string
+                      description: >-
+                        URL template the UI navigates to when a user clears the instance selector.
+                        Example: "/openapi-ui/{selectedCluster}/builtin-table/pods".
                     mapOptionsPattern:
                       type: string
+                      description: >-
+                        JSONPath expression used to extract display values for dropdown options
+                        from the fetched instance list.
+                        Example: "{reqsJsonPath[0]['.metadata.name']}".
                     aliasPath:
                       type: string
+                      description: >-
+                        JSONPath expression used to resolve the display alias for the currently
+                        selected instance. Example: "{reqsJsonPath[0]['.metadata.name']}".
                 namespaces:
                   type: object
+                  description: >-
+                    Controls the "Namespace" selector in the UI header.
+                    Defines URL templates for navigating when a namespace is selected or cleared.
+                    Supports the same placeholder variables as "instances".
                   required:
                     - change
                     - clear
                   properties:
                     change:
                       type: string
+                      description: >-
+                        URL template the UI navigates to when a user selects a namespace.
+                        {value} is replaced with the selected namespace name.
                     clear:
                       type: string
+                      description: >-
+                        URL template the UI navigates to when a user clears the namespace selector.
                     aliasPath:
                       type: string
+                      description: >-
+                        JSONPath expression used to resolve the display alias for the currently
+                        selected namespace.
                 projects:
                   type: object
+                  description: >-
+                    Controls the "Project" selector in the UI header.
+                    Defines URL templates for navigating when a project is selected or cleared.
+                    Supports the same placeholder variables as "instances".
                   required:
                     - change
                     - clear
                   properties:
                     change:
                       type: string
+                      description: >-
+                        URL template the UI navigates to when a user selects a project.
+                        {value} is replaced with the selected project name.
                     clear:
                       type: string
+                      description: >-
+                        URL template the UI navigates to when a user clears the project selector.
                     aliasPath:
                       type: string
+                      description: >-
+                        JSONPath expression used to resolve the display alias for the currently
+                        selected project.
                 baseFactoriesMapping:
                   type: object
                   x-kubernetes-preserve-unknown-fields: true
+                  description: >-
+                    Maps base factory identifiers to detail-page factory names.
+                    Keys follow the pattern:
+                    "<base-factory-key>-<apiGroup>-<apiVersion>-<plural>"
+                    (e.g., "base-factory-clusterscoped-api-apps-v1-deployments").
+                    Values are the Factory CR names that render the detail page
+                    (e.g., "deployment-details"). The UI resolves which Factory to load
+                    when navigating from a table row to a resource detail page.
                 pathToNavigateFromClusterList:
                   type: string
+                  description: >-
+                    URL template used when a user clicks on a cluster in the cluster list page.
+                    ~recordValue~ is replaced with the cluster name at runtime.
+                    Example: "/openapi-ui/~recordValue~/builtin-table/pods".
       subresources:
         status: {}
       additionalPrinterColumns:

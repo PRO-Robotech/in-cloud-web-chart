@@ -1,3 +1,10 @@
+# ============================================================================
+# Breadcrumb: fallback-factory-clusterscoped-api, fallback-factory-clusterscoped-builtin
+# ----------------------------------------------------------------------------
+# Factory (detail), cluster scope: api uses {5}/{6}/{7} + object {8}; builtin uses {6} + {7};
+# {cluster} is the route context.
+# {cluster} aligns with URL index {2} after /openapi-ui/; replace ids if your detail paths change.
+# ============================================================================
 ---
 apiVersion: front.in-cloud.io/v1alpha1
 kind: Breadcrumb
@@ -5,7 +12,10 @@ metadata:
   name: fallback-factory-clusterscoped-api
 spec:
   id: "fallback-factory-clusterscoped-api"
+  # Detail trail: collection (with link) → resource name → static "Details".
   breadcrumbItems:
+    # group-version: list/table crumb with link to the collection; resource-name: selected object;
+    # details: static tail label.
     - key: group-version
       label: "{5}/{6}/{7}"
       link: "/openapi-ui/{cluster}/api-table/{5}/{6}/{7}"
@@ -21,7 +31,9 @@ metadata:
   name: fallback-factory-clusterscoped-builtin
 spec:
   id: "fallback-factory-clusterscoped-builtin"
+  # Same trail shape as api: built-in list link → instance → "Details".
   breadcrumbItems:
+    # group-version: link to built-in table; resource-name: instance; details: detail view label.
     - key: group-version
       label: "{5}/{6}"
       link: "/openapi-ui/{cluster}/builtin-table/{6}"

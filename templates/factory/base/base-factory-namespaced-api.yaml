@@ -1,3 +1,7 @@
+{{/*
+  Base detail-page Factory for namespaced API extension (CRD) resources.
+  Enabled via defaultWebResources.factory.default "base-factory-namespaced-api".
+*/}}
 {{ if (index .Values.defaultWebResources.factory.default "base-factory-namespaced-api") }}
 {{/* Shared factory context (resource, permission context, endpoint) */}}
 {{- $namespacedApiCtx := fromYaml (include "in-cloud.web.factoryContext.namespacedApi" .) -}}
@@ -5,29 +9,43 @@
 {{- $namespacedApiPermissionContext := $namespacedApiCtx.permissionContext -}}
 {{- $namespacedApiEndpoint := $namespacedApiCtx.endpoint -}}
 ---
+# ============================================================================
+# Factory: base-factory-namespaced-api
+# ----------------------------------------------------------------------------
+# Generic detail page for any namespaced API extension resource (apps, batch, networking, CRDs,
+# etc.).
+# Enabled via: defaultWebResources.factory.default["base-factory-namespaced-api"]
+# ============================================================================
 apiVersion: front.in-cloud.io/v1alpha1
 kind: Factory
 metadata:
   name: base-factory-namespaced-api
 
 spec:
+  # Unique factory identifier — matched by Navigation.baseFactoriesMapping
   key: base-factory-namespaced-api
+
+  # Indexes into urlsToFetch whose responses are available via reqsJsonPath[N] in the component tree
+  effectiveReqIndexes:
+    - 0
 
   # =========================
   # Data sources
   # =========================
   urlsToFetch:
-    # Primary resource request (from shared factory context)
+    # Slot 0: primary resource list/get (from shared factory context)
     {{- include "in-cloud.web.factoryContext.primaryUrlToFetchList" (dict
         "resource" $namespacedApiResource
         "fieldSelector" "metadata.name={9}"
       ) | trim | nindent 4 }}
 
+  # false = full-page layout without extra scroll wrapper
   withScrollableMainContentCard: false
 
   # =========================
   # Sidebar tags for navigation
   # =========================
+  # Tags matched against Sidebar.keysAndTags to highlight active sidebar item
   sidebarTags:
     - '{6}/{7}/{8}'
 
@@ -105,9 +123,15 @@ spec:
     # =========================
     # Main content tabs
     # =========================
+    # antdTabs — tabbed main section (Details, YAML, Events)
     - type: antdTabs
       data:
+        # Tab selected by default when the page loads
         defaultActiveKey: details
+        # Persist the active tab key in the URL hash for bookmarking and refresh
+        syncActiveKeyWithHash: true
+        # Show "Open in new tab" context action on each tab header
+        allowOpenInNewBrowserTab: true
         id: tabs-root
         items:
 
@@ -117,6 +141,7 @@ spec:
           - key: details
             label: Details
             children:
+              # antdFlex — Details tab content stack
               - type: antdFlex
                 data:
                   id: details-stack
@@ -130,9 +155,7 @@ spec:
                     ) | nindent 18 
                   }}
 
-                  # =========================
-                  # Conditions (only when present)
-                  # =========================
+                  # ---- Conditions ----
                   {{ include "in-cloud.web.contentCard.conditionsVisibility" (dict
                       "k8sResourceToFetch" $namespacedApiResource
                       "fieldSelector" (dict

@@ -1,0 +1,25 @@
+# ============================================================================
+# CustomFormsPrefill: example
+# ----------------------------------------------------------------------------
+# Example CustomFormsPrefill (CFP) manifest: pre-fills form field values when
+# creating/editing a resource. Copy, uncomment, and set your metadata.name / spec;
+# requires an existing CFO with the same customizationId.
+# ============================================================================
+# ---
+# apiVersion: front.in-cloud.io/v1alpha1
+# kind: CustomFormsPrefill
+# metadata:
+#   name: v1.service
+# spec:
+#   # CFO identifier this prefill belongs to (must match the target
+#   # CustomFormsOverride's customizationId).
+#   customizationId: default-namespace-/v1/services
+#   # values: list of prefills; each entry sets path + value.
+#   values:
+# # path — segment chain to a field in the manifest (JSONPath-like over fields: spec.*, metadata.*,
+# …).
+#     - path:
+#         - metadata
+#       # value — default value to pre-fill for this field when the form opens.
+#       value:
+#         generateName: dynamic-

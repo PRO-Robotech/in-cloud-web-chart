@@ -1,3 +1,31 @@
+{{/* ======================================================================
+ URL / JSONPath placeholder reference (used across all templates)
+ ======================================================================
+ Positional URL path segments (1-based):
+   {1}..{N}          — segments of the current browser URL path
+   {cluster}         — current cluster name (= {2} in most routes)
+   {namespace}       — current namespace   (= {3} in namespaced routes)
+   {selectedCluster} — cluster chosen in the header selector dropdown
+   {value}           — value the user just selected (instance/namespace/project)
+   ~recordValue~     — replaced at runtime with the clicked table row value
+
+ reqsJsonPath expressions (data from Factory.spec.urlsToFetch):
+   {reqsJsonPath[<reqIdx>]['<jsonPath>']['<fallback>']}
+     reqIdx   — 0-based index into urlsToFetch array
+     jsonPath — JSONPath inside the fetched K8s object (e.g. '.metadata.name')
+     fallback — text shown when the value is missing (e.g. '-')
+
+ Example: /openapi-ui/mycluster/myns/api-table/apps/v1/deployments
+   {1}=openapi-ui  {2}=mycluster  {3}=myns  {4}=api-table
+   {5}=apps  {6}=v1  {7}=deployments
+
+ Route types used in sidebar links:
+   builtin-table — core/v1 resources (pods, services, configmaps, ...)
+   api-table     — API extension resources (apps/v1, batch/v1, networking.k8s.io/v1, ...)
+   factory       — detail page rendered by a Factory CR
+   plugins       — page provided by a microfrontend plugin
+ ====================================================================== */}}
+
 {{/* ----------------------------------------------------------------------
  Name helpers
 ---------------------------------------------------------------------- */}}

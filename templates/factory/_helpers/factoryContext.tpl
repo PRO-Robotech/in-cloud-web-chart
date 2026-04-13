@@ -1,5 +1,27 @@
 {{- define "in-cloud.web.factoryContext.namespacedApi" -}}
-{{/* Shared context for namespaced custom resources (apis/<group>/<version>) */}}
+{{/*
+  factoryContext.tpl — shared YAML fragments for Factory detail pages in openapi-ui.
+
+  Defines: namespacedApi / namespacedBuiltin (namespaced), clusterScopedApi / clusterScopedBuiltin
+  (cluster-scoped), primaryUrlToFetchList (resource + fieldSelector), metricsPodsUrlToFetchList
+  (optional metrics.k8s.io pods). Placeholders {2}, {3}, … come from the UI route.
+
+  Note: *Context* YAML is consumed by fromYaml() elsewhere — no inline “#” in emitted YAML.
+  primaryUrlToFetchList output must not start with a stray “#” line under urlsToFetch (Helm validation).
+
+  --- namespacedApi ---
+  Context for namespaced custom resources: apis/<apiGroup>/<apiVersion>/namespaces/<ns>/<plural>/...
+
+  resource.* (and permissionContext.*, same values):
+  - cluster: {2}, namespace: {3} — URL segments.
+  - apiGroup: {6}, apiVersion: {7}, plural: {8} — group, version, plural from the API path.
+
+  permissionContext duplicates resource: the UI uses it for RBAC permission checks (same fields).
+
+  endpoint: BFF proxy URL to the Kubernetes API. Pattern:
+  /api/clusters/{cluster}/k8s/apis/{group}/{version}/namespaces/{namespace}/{plural}/{name}
+  The name segment uses reqsJsonPath (current object in the request chain).
+*/}}
 resource:
   cluster: "{2}"
   namespace: "{3}"
@@ -16,7 +38,16 @@ endpoint: "/api/clusters/{2}/k8s/apis/{6}/{7}/namespaces/{3}/{8}/{reqsJsonPath[0
 {{- end -}}
 
 {{- define "in-cloud.web.factoryContext.namespacedBuiltin" -}}
-{{/* Shared context for namespaced builtin resources (api/<version>) */}}
+{{/*
+  Context for namespaced core/v1-style resources: api/<apiVersion>/namespaces/<ns>/<plural>/...
+  Builtin paths have no separate apiGroup — only apiVersion and plural in the URL.
+
+  resource / permissionContext:
+  - cluster: {2}, namespace: {3}
+  - apiVersion: {6}, plural: {7}
+
+  permissionContext duplicates resource for RBAC. endpoint targets /api/clusters/{2}/k8s/api/...
+*/}}
 resource:
   cluster: "{2}"
   namespace: "{3}"
@@ -31,7 +62,15 @@ endpoint: "/api/clusters/{2}/k8s/api/{6}/namespaces/{3}/{7}/{reqsJsonPath[0]['.i
 {{- end -}}
 
 {{- define "in-cloud.web.factoryContext.clusterScopedApi" -}}
-{{/* Shared context for cluster-scoped custom resources (apis/<group>/<version>) */}}
+{{/*
+  Cluster-scoped custom resource: apis/<apiGroup>/<apiVersion>/<plural>/...
+
+  resource / permissionContext:
+  - cluster: {2}
+  - apiGroup: {5}, apiVersion: {6}, plural: {7}
+
+  permissionContext duplicates resource for RBAC. endpoint has no namespace segment.
+*/}}
 resource:
   cluster: "{2}"
   apiGroup: "{5}"
@@ -46,7 +85,14 @@ endpoint: "/api/clusters/{2}/k8s/apis/{5}/{6}/{7}/{reqsJsonPath[0]['.items.0.met
 {{- end -}}
 
 {{- define "in-cloud.web.factoryContext.clusterScopedBuiltin" -}}
-{{/* Shared context for cluster-scoped builtin resources (api/<version>) */}}
+{{/*
+  Cluster-scoped core API: api/<apiVersion>/<plural>/...
+
+  resource / permissionContext:
+  - cluster: {2}, apiVersion: {5}, plural: {6}
+
+  permissionContext duplicates resource for RBAC. endpoint has no namespace.
+*/}}
 resource:
   cluster: "{2}"
   apiVersion: "{5}"
@@ -59,14 +105,22 @@ endpoint: "/api/clusters/{2}/k8s/api/{5}/{6}/{reqsJsonPath[0]['.items.0.metadata
 {{- end -}}
 
 {{- define "in-cloud.web.factoryContext.primaryUrlToFetchList" -}}
-{{/* Utility: build the primary urlsToFetch item from resource + name selector */}}
+{{/*
+  Builds one urlsToFetch list element: merge(.resource) with fieldSelector.
+
+  fieldSelector is the Kubernetes list query parameter: server-side filtering (e.g. metadata.name=)
+  so the list returns only matching objects.
+*/}}
 {{- toYaml (list (merge (dict
   "fieldSelector" .fieldSelector
 ) .resource)) -}}
 {{- end -}}
 
 {{- define "in-cloud.web.factoryContext.metricsPodsUrlToFetchList" -}}
-{{/* Utility: optional extra urlsToFetch item for pods metrics (metrics.k8s.io/v1beta1) */}}
+{{/*
+  Optional urlsToFetch entry: metrics.k8s.io/v1beta1, plural pods — pod resource metrics for the UI.
+  If withNamespace is true, namespace {3} is set on the request (namespaced pod metrics).
+*/}}
 {{- $metricsPodsUrlToFetch := dict
   "cluster" "{2}"
   "apiGroup" "metrics.k8s.io"

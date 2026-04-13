@@ -1,8 +1,13 @@
+{{/*
+  StatusText for Node row: Ready vs pressure/unavailable reasons from conditions with status=True.
+*/}}
 {{- define "in-cloud.web.statusText.nodeAvailability" -}}
 - type: StatusText
   data:
     id: node-status
 
+    # criteria* / valueToCompare* / strategy*: rules that classify node condition reasons into
+    # Available, Unavailable, or fallback.
     # Match strategy for success conditions
     criteriaSuccess: equals
     strategySuccess: every
@@ -24,7 +29,8 @@
     # Fallback text when neither success nor error matched
     fallbackText: Progressing
 
-    # Values extracted from Node conditions with status=True
+    # values: JSONPath expressions feeding the matcher (here: `reason` from conditions where status
+    # is True).
     values:
       - >-
         {reqsJsonPath[0]['{{ .itemPath }}.status.conditions[?(@.status==''True'')].reason']['-']}

@@ -1,7 +1,10 @@
 {{- define "in-cloud.web.contentCard.yamlEditor" -}}
+# YamlEditor card: edit resource YAML with API/builtin resolution, prefetched data, and RBAC for
+# saves.
 - type: ContentCard
   data:
     id: yaml-editor-card
+    # AntD: card spacing
     style:
       marginBottom: 24px
   children:
@@ -13,13 +16,13 @@
         # Base editor configuration
         # =========================
 
-        # Request index used to prefill editor with fetched resource
+        # Request index in factory context (reqIndex) for prefill data
         prefillValuesRequestIndex: 0
 
         # Height subtracted from viewport to fit layout
         substractHeight: 350
 
-        # JSONPath to resource root in API response
+        # JSONPath to resource root in API response (openapi-ui resource shape)
         pathToData: .items.0
 
         # Indicates whether resource is namespaced or cluster-scoped

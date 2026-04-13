@@ -1,3 +1,8 @@
+{{/* CCO column options: custom sorters/filters and empty-cell placeholder text. */}}
+{{/*
+  key = column id; value = placeholder (undefined-value entries); type = sort kind on sorter entries
+  (e.g. memory, cpu).
+*/}}
 {{- define "incloud-web-resources.cco.columns-custom-sorters-and-filters.memory" -}}
 - key: Memory
   type: memory

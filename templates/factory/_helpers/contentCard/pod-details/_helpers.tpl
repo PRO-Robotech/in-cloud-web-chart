@@ -1,3 +1,4 @@
+{{/* Pod-specific detail cards: node link, networking, and QoS/runtime fields. */}}
 {{- define "in-cloud.web.contentCard.podRuntimeFacts" -}}
 # Content card with Pod runtime facts (structure copied from Factory -> Details -> right column)
 - type: ContentCard

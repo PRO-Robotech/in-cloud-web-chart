@@ -1,3 +1,7 @@
+{{/*
+  Wraps genericContainersTableCard: container specs from Pod template
+  (.spec.template.spec.containers); k8sResourceToFetch includes apiGroup for workload objects.
+*/}}
 {{- define "in-cloud.web.contentCard.template.containersList" -}}
 # Content card with PodTemplate containers spec
 {{ include "in-cloud.web.contentCard.genericContainersTableCard" (dict

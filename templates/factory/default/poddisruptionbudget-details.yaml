@@ -15,6 +15,9 @@ metadata:
 spec:
   key: poddisruptionbudget-details
 
+  effectiveReqIndexes:
+    - 0
+
   # =========================
   # Data sources
   # =========================
@@ -119,7 +122,12 @@ spec:
     - type: antdTabs
       data:
         id: tabs-root
+        # Tab selected by default when the page loads
         defaultActiveKey: details
+        # Persist the active tab key in the URL hash for bookmarking and refresh
+        syncActiveKeyWithHash: true
+        # Show "Open in new tab" context action on each tab header
+        allowOpenInNewBrowserTab: true
         items:
 
           # =========================
@@ -156,9 +164,7 @@ spec:
                         children:
                           {{ include "in-cloud.web.contentCard.poddisruptionbudgetRuntimeFacts" . | nindent 26 }}
 
-                  # =========================
-                  # Conditions (only when present)
-                  # =========================
+                  # ---- Conditions ----
                   {{ include "in-cloud.web.contentCard.conditionsVisibility" (dict
                       "k8sResourceToFetch" $poddisruptionbudgetApiResource
                       "fieldSelector" (dict

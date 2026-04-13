@@ -3,9 +3,12 @@
 {{- $customCco := index $customCcoResources "stock-cluster-batch.v1.cronjobs" -}}
 {{- if eq (include "in-cloud.web.cco.isEnabled" (dict "config" $customCco)) "true" }}
 ---
-# =================================================
-# CustomColumnsOverride definition
-# =================================================
+# ============================================================================
+# CustomColumnsOverride: stock-cluster-batch.v1.cronjobs
+# ----------------------------------------------------------------------------
+# Table columns for CronJob (cluster-scoped).
+# Toggled via: customWebResources.customcolumnsoverride["stock-cluster-batch.v1.cronjobs"]
+# ============================================================================
 apiVersion: front.in-cloud.io/v1alpha1
 kind: CustomColumnsOverride
 metadata:
@@ -36,7 +39,7 @@ spec:
       type: factory
       {{ include "in-cloud.web.cco.props.labelsEditor" (dict
           "endpoint" "/api/clusters/{2}/k8s/apis/batch/v1/cronjobs/{6}"
-          "linkPrefix" "/openapi-ui/{2}/search?kinds=batch~v1~cronjobs"
+          "linkPrefix" "/openapi-ui/{2}/search?kinds=batch~v1~cronjobs&labels="
         ) | nindent 6
       }}
     # =================================================
@@ -69,6 +72,12 @@ spec:
     - name: Created
       type: factory
       {{ include "in-cloud.web.cco.props.created" . | nindent 6 }}
+    # =================================================
+    # Column: Actions
+    # =================================================
+    - name: Actions
+      type: factory
+      {{ include "in-cloud.web.cco.props.actions.cronjob" . | nindent 6 }}
 
   # Trim long values for selected columns
   additionalPrinterColumnsTrimLengths:
@@ -78,6 +87,11 @@ spec:
   additionalPrinterColumnsUndefinedValues:
     {{ include "incloud-web-resources.cco.columns-undefined-values.namespace" . | nindent 4 }}
     {{ include "incloud-web-resources.cco.columns-undefined-values.starting-deadline-seconds" . | nindent 4 }}
+
+  # Tooltips for standard columns
+  additionalPrinterColumnsTooltips:
+    {{ include "incloud-web-resources.cco.columns-tooltips.name" . | nindent 4 }}
+    {{ include "incloud-web-resources.cco.columns-tooltips.created" . | nindent 4 }}
 
   # Stable identifier used by frontend mapping
   id: stock-cluster-/batch/v1/cronjobs

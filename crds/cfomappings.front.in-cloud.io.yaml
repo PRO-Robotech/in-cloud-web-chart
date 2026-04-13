@@ -22,6 +22,12 @@ spec:
       schema:
         openAPIV3Schema:
           type: object
+          description: >-
+            CFOMapping is a routing table that tells the openapi-ui application which
+            CustomFormsOverride (CFO) to apply when a user opens a create/edit form
+            for a specific resource type. The UI reads this CR (matched by
+            CUSTOMIZATION_CFOMAPPING_RESOURCE_NAME, typically "default") and looks up
+            the API path in spec.mappings to find the corresponding CFO customizationId.
           required:
             - spec
           properties:
@@ -31,9 +37,16 @@ spec:
               type: string
             spec:
               type: object
+              description: Mapping configuration from API paths to CFO identifiers.
               additionalProperties: true
               properties:
                 mappings:
                   type: object
+                  description: >-
+                    Dictionary of API path → CustomFormsOverride customizationId.
+                    Key format: "default-/<apiGroup>/<apiVersion>/<plural>"
+                    (e.g., "default-/apps/v1/deployments", "default-/v1/secrets").
+                    Value: the spec.customizationId of the CFO to apply.
+                    Typically key and value are identical (the CFO name matches the path).
                   additionalProperties:
                     type: string

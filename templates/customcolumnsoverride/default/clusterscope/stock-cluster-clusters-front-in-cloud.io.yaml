@@ -1,0 +1,42 @@
+# ============================================================================
+# CustomColumnsOverride: stock-cluster-clusters-front-in-cloud.io
+# ----------------------------------------------------------------------------
+# Table columns for Cluster (front.in-cloud.io) (cluster-scoped).
+# Toggled via: customWebResources.customcolumnsoverride["stock-cluster-clusters-front-in-cloud.io"]
+# ============================================================================
+apiVersion: front.in-cloud.io/v1alpha1
+kind: CustomColumnsOverride
+metadata:
+  name: stock-cluster-clusters-front-in-cloud.io
+spec:
+  additionalPrinterColumns:
+    # =================================================
+    # Column: Name
+    # =================================================
+    - name: Name
+      type: factory
+      {{ include "in-cloud.web.cco.props.badgeLink" (list $
+          (.Values.navigation.pathToNavigateFromClusterListResource | default "/openapi-ui/{reqsJsonPath[0]['.metadata.name']['-']}/builtin-table/pods?resources=metrics.k8s.io/v1beta1/pods")
+          (dict
+          "name" "Name"
+          "jsonPath" ".spec.displayName"
+          "badge" "Cluster"
+          "text" "{reqsJsonPath[0]['.spec.displayName']['-']}"
+          )
+        ) | nindent 6
+      }}
+
+    # =================================================
+    # Column: Version
+    # =================================================
+    - name: Version
+      type: string
+      jsonPath: .spec.version
+    # =================================================
+    # Column: Created
+    # =================================================
+    - name: Created
+      type: factory
+      {{ include "in-cloud.web.cco.props.created" . | nindent 6 }}
+
+  id: stock-cluster-/front.in-cloud.io/v1alpha1/clusters

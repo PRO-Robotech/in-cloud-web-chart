@@ -1,3 +1,7 @@
+{{/*
+  Wraps genericContainersTableCard: table of .status.initContainerStatuses; same k8sResourceToFetch
+  wiring as containers list.
+*/}}
 {{- define "in-cloud.web.contentCard.initContainersList" -}}
 # Content card with Pod init containers status
 {{ include "in-cloud.web.contentCard.genericContainersTableCard" (dict

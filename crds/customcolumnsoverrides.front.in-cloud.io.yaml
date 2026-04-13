@@ -18,6 +18,15 @@ spec:
       schema:
         openAPIV3Schema:
           type: object
+          description: >-
+            CustomColumnsOverride (CCO) customizes the columns displayed in a resource
+            list table within the openapi-ui application. The UI matches a CCO by spec.id
+            against the current resource type being listed. CCOs define which columns to
+            show, their rendering type (plain text, badge link, labels editor, status, etc.),
+            text trimming rules, tooltips, fallback values for empty fields, and custom
+            sorting/filtering behavior.
+            Resource naming convention: "stock-<scope>-<apiGroup>.<apiVersion>.<plural>"
+            (e.g., "stock-cluster-apps.v1.deployments", "stock-namespace-v1.pods").
           required: [spec]
           properties:
             apiVersion:
@@ -28,68 +37,115 @@ spec:
               type: object
             spec:
               type: object
+              description: Column definitions and display options for a resource list table.
               required: [id]
               properties:
                 id:
                   type: string
+                  description: >-
+                    Identifier used by the UI to match this CCO to a resource list.
+                    Typically matches the resource metadata.name. The UI resolves CCOs
+                    using the SEARCH_TABLE_CUSTOMIZATION_PREFIX ("stock-") + scope + resource path.
                 additionalPrinterColumns:
                   type: array
+                  description: >-
+                    Ordered list of columns to render in the table. Each column specifies
+                    a name, a rendering type, a jsonPath for data extraction, and optional
+                    customProps for advanced rendering (badge links, labels editors, status
+                    indicators, action menus, etc.).
                   items:
                     type: object
                     required: [name]
                     properties:
                       jsonPath:
                         type: string
+                        description: >-
+                          JSONPath expression to extract column value from the resource object
+                          (e.g., ".metadata.name", ".spec.replicas", ".status.phase").
                       name:
                         type: string
+                        description: >-
+                          Column header text displayed in the table (e.g., "Name", "Namespace",
+                          "Labels", "Status", "Created", "Actions").
                       customProps:
                         x-kubernetes-preserve-unknown-fields: true
+                        description: >-
+                          Free-form component props passed to the column renderer. The structure
+                          depends on the column type. Common patterns include:
+                            badgeLink — renders a clickable badge with link (Name, Namespace columns)
+                            Labels — inline labels editor with edit modal
+                            podSelector — clickable label set linking to search
+                            statusDeployment / statusPod / nodeStatus — status indicators
+                            created — relative time display
+                            actions — dropdown with Edit/Delete/Scale/Restart actions
                     additionalProperties: true
                 additionalPrinterColumnsTrimLengths:
                   type: array
+                  description: >-
+                    Limits the visible text length for specified columns. Values exceeding
+                    the limit are truncated with an ellipsis. Key matches the column "name" field.
                   items:
                     type: object
                     required: [key, value]
                     properties:
                       key:
                         type: string
+                        description: Column name to apply trimming to (e.g., "Name", "Labels").
                       value:
                         type: integer
+                        description: Maximum character count before truncation.
                     additionalProperties: true
-              additionalPrinterColumnsTooltips:
-                items:
-                  type: object
-                  required: [key, value]
-                  properties:
-                    key:
-                      type: string
-                    value:
-                      type: integer
-                  additionalProperties: true
-                type: array
-                additionalPrinterColumnsUndefinedValues:
+                additionalPrinterColumnsTooltips:
                   type: array
+                  description: >-
+                    Tooltip text shown on hover for specified columns. Key matches
+                    the column "name" field.
                   items:
                     type: object
                     required: [key, value]
                     properties:
                       key:
                         type: string
+                        description: Column name to attach the tooltip to.
                       value:
                         type: string
+                        description: Tooltip text content.
                     additionalProperties: true
-                additionalPrinterColumnsCustomSortersAndFilters:
+                additionalPrinterColumnsUndefinedValues:
+                  type: array
+                  description: >-
+                    Fallback display values for columns when the resource field is null,
+                    undefined, or empty. Key matches the column "name" field.
                   items:
                     type: object
+                    required: [key, value]
                     properties:
                       key:
                         type: string
-                      type:
+                        description: Column name to set fallback for.
+                      value:
                         type: string
+                        description: Text displayed when the field value is missing (e.g., "-", "N/A").
+                    additionalProperties: true
+                additionalPrinterColumnsCustomSortersAndFilters:
+                  type: array
+                  description: >-
+                    Custom sorting and filtering behavior for specified columns.
+                    Overrides the default string-based sort with type-aware logic.
+                  items:
+                    type: object
                     required:
                       - key
                       - type
-                  type: array
+                    properties:
+                      key:
+                        type: string
+                        description: Column name to apply custom sorting/filtering to.
+                      type:
+                        type: string
+                        description: >-
+                          Sort/filter type hint (e.g., "number", "date", "status").
+                          The UI uses this to apply appropriate comparison logic.
 
       subresources:
         status: {}

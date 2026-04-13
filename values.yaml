@@ -161,69 +161,99 @@ dex:
     #   name: internal-cert
 
 # --- Cluster ---------------------------------------------------------------
+# Static cluster list served as JSON by the nginx sidecar at /clusterlist and /api/clusters.
+# Each entry generates a proxy location in the nginx config: /api/clusters/<name> → <scheme>://<api>.
+# The UI reads this list on startup to populate the cluster selector dropdown.
 clusters:
-  - name: default
-    description: default
-    tenant: dev
-    scheme: http
-    api: 127.0.0.1
+  - name: default          # Unique cluster identifier (used in URLs and proxy routing)
+    description: default   # Human-readable description shown in the cluster list UI
+    tenant: dev            # Tenant label associated with this cluster
+    scheme: http           # Protocol for proxying to the cluster API (http or https)
+    api: 127.0.0.1         # Kubernetes API server address for this cluster
 
 # --- Default Web Resources ---------------------------------------------------------------
-# This parameter group allows you to disable the default resources. 
-# This is necessary if you plan to define your own resources 
-# (e.g., via the incloud-web-chart chart) or manage them by another means.
+# Toggle the built-in Breadcrumb, CCO (CustomColumnsOverride), and Factory CRs
+# that ship with this chart. Set a key to "false" to skip rendering that resource.
+# Useful when you define your own CRs or manage them externally.
 defaultWebResources:
+
+  # Breadcrumb CRs rendered by templates/breadcrumbs/.
+  # Key pattern: "stock-<scope>-factory-<factory-name>"
+  #   scope: "cluster" (cluster-scoped view) or "project" (namespaced view)
+  #   factory-name: corresponds to the Factory CR name these breadcrumbs belong to.
   breadcrumbs:
     default:
-      stock-cluster-factory-namespace-details: true
-      stock-cluster-factory-base-factory-clusterscoped-api: true
-      stock-cluster-factory-base-factory-clusterscoped-builtin: true
-      stock-project-factory-base-factory-namespaced-api: true
-      stock-project-factory-base-factory-namespaced-builtin: true
+      stock-cluster-factory-namespace-details: true                    # breadcrumbs for the namespace detail page (cluster scope)
+      stock-cluster-factory-base-factory-clusterscoped-api: true       # breadcrumbs for cluster-scoped API resource detail pages
+      stock-cluster-factory-base-factory-clusterscoped-builtin: true   # breadcrumbs for cluster-scoped builtin (core/v1) detail pages
+      stock-project-factory-base-factory-namespaced-api: true          # breadcrumbs for namespaced API resource detail pages
+      stock-project-factory-base-factory-namespaced-builtin: true      # breadcrumbs for namespaced builtin (core/v1) detail pages
+
+  # CustomColumnsOverride CRs for namespace list tables.
+  # Key: CCO resource name (matches spec.id and metadata.name).
   customcolumnsoverride:
-    stock-cluster-v1_namespaces: true
-    stock-namespace-v1_namespaces: true
+    stock-cluster-v1_namespaces: true     # columns for namespace list in cluster-scoped view
+    stock-namespace-v1_namespaces: true   # columns for namespace list in namespaced view
+
+  # Factory CRs — base detail pages for resources.
+  # Key: Factory CR name (matches spec.key and metadata.name).
   factory:
     default:
-      base-factory-clusterscoped-api: true
-      base-factory-clusterscoped-builtin: true
-      base-factory-namespaced-api: true
-      base-factory-namespaced-builtin: true
-      namespace-details: true
+      base-factory-clusterscoped-api: true       # generic detail page for any cluster-scoped API resource
+      base-factory-clusterscoped-builtin: true   # generic detail page for any cluster-scoped core/v1 resource
+      base-factory-namespaced-api: true          # generic detail page for any namespaced API resource
+      base-factory-namespaced-builtin: true      # generic detail page for any namespaced core/v1 resource
+      namespace-details: true                    # detail page for Namespace resources
 
 customWebResources:
-  # All CCO resources are enabled by default when key is absent.
-  # Add only explicit overrides here, for example:
+  # Per-resource overrides for built-in CRs. When a key is absent the resource is
+  # enabled by default. Add a key with "enabled: false" to disable a specific CR,
+  # or add feature flags consumed by the corresponding template.
+
+  # CustomColumnsOverride overrides. Key = CCO resource name (e.g., "stock-cluster-v1.services").
   # customcolumnsoverride:
   #   stock-cluster-v1.services:
-  #     enabled: false
+  #     enabled: false         # disables the built-in CCO for cluster-scoped Services table
   customcolumnsoverride: {}
 
-  # All Navigation resources are enabled by default when key is absent.
-  # Keep only explicit overrides or feature flags.
+  # Navigation CR overrides. Key = Navigation resource name.
   # navigation:
   #   navigation:
-  #     enabled: false
+  #     enabled: false         # disables the primary Navigation CR
   navigation: {}
 
-  # All Factory resources are enabled by default when key is absent.
-  # Keep only explicit overrides or feature flags.
+  # Factory CR overrides. Key = Factory resource name (spec.key / metadata.name).
+  # Besides "enabled", templates may read additional flags from this config block.
   factory:
     pod-details:
       enabled: true
-      enableMonitoringTab: true
+      enableMonitoringTab: true            # renders the Monitoring tab with Grafana iframe on the Pod detail page
     node-details:
       enabled: true
-      enableConfigReportsAquaTab: true
+      enableConfigReportsAquaTab: true     # renders the Aqua Security config audit reports tab on the Node detail page
 
 
-# --- Navigation ------------------------------------------------------------
+# --- Navigation (Navigation CR: front.in-cloud.io/v1alpha1) ----------------
+# Configures context-switching behavior in the UI header selectors
+# (cluster, instance, namespace, project) and maps base factory identifiers
+# to detail-page Factory CR names. The openapi-ui app reads this CR to know
+# where to navigate when a user changes context or opens a resource detail page.
 navigation:
-  # Name of Navigation custom resource.
+  # Name of the Navigation custom resource to create.
   name: navigation
 
-  # Enable or disable rendering of the baseFactoriesMapping block.
+  # Enable or disable rendering of the baseFactoriesMapping block in the CR.
   baseFactoriesMappingEnabled: true
+
+  # Maps base factory identifiers → detail-page Factory CR names.
+  # Key pattern: "<base-factory-key>-<apiGroup>-<apiVersion>-<plural>"
+  #   where <base-factory-key> is one of:
+  #     base-factory-clusterscoped-api    — cluster-scoped API resources (apps, batch, networking, etc.)
+  #     base-factory-clusterscoped-builtin — cluster-scoped core/v1 resources (pods, services, etc.)
+  #     base-factory-namespaced-api       — same as above but within namespace context
+  #     base-factory-namespaced-builtin   — same as above but within namespace context
+  # Value: Factory CR name that renders the detail page (e.g., "deployment-details").
+  # The UI resolves which Factory to load when navigating from a table row to a detail view.
   baseFactoriesMapping:
     base-factory-clusterscoped-api-apiextensions.k8s.io-v1-customresourcedefinitions: crd-details
     base-factory-clusterscoped-api-apps-v1-daemonsets: daemonset-details
@@ -301,28 +331,47 @@ navigation:
     base-factory-namespaced-builtin-v1-serviceaccounts: serviceaccount-details
     base-factory-namespaced-builtin-v1-services: service-details
 
-  # Cluster "instances" selector behavior.
+  # --- Context selectors ---
+  # Each selector block configures a dropdown in the UI header.
+  # Supported URL placeholders:
+  #   {selectedCluster} — currently selected cluster name
+  #   {value}           — the value the user just selected (instance/namespace/project name)
+  # JSONPath expressions for aliasPath / mapOptionsPattern:
+  #   {reqsJsonPath[0]['.metadata.name']} — extract .metadata.name from the first fetched list
+
+  # "Instance" selector — switches between instances (custom resource of the platform).
   instances:
     enabled: true
+    # JSONPath to resolve the display name for the selected instance
     aliasPath: "{reqsJsonPath[0]['.metadata.name']}"
+    # URL to navigate when an instance is selected
     change: "/openapi-ui/{selectedCluster}/{value}/builtin-table/pods?resources=metrics.k8s.io/v1beta1/pods"
+    # URL to navigate when the instance selector is cleared
     clear: "/openapi-ui/{selectedCluster}/builtin-table/pods?resources=metrics.k8s.io/v1beta1/pods"
+    # JSONPath to extract dropdown option labels from the fetched instance list
     mapOptionsPattern: "{reqsJsonPath[0]['.metadata.name']}"
 
-  # Namespace selector behavior.
+  # "Namespace" selector — switches between Kubernetes namespaces.
   namespaces:
     enabled: true
     aliasPath: "{reqsJsonPath[0]['.metadata.name']}"
+    # URL to navigate when a namespace is selected
     change: "/openapi-ui/{selectedCluster}/{value}/builtin-table/pods"
+    # URL to navigate when the namespace selector is cleared (falls back to namespace list)
     clear: "/openapi-ui/{selectedCluster}/builtin-table/namespaces"
 
-  # Project selector behavior.
+  # "Project" selector — switches between projects (custom resource of the platform).
   projects:
     enabled: true
     aliasPath: "{reqsJsonPath[0]['.metadata.name']}"
     change: "/openapi-ui/{selectedCluster}/{value}/builtin-table/pods?resources=metrics.k8s.io/v1beta1/pods"
     clear: "/openapi-ui/{selectedCluster}/builtin-table/pods?resources=metrics.k8s.io/v1beta1/pods"
 
+  # URL template used when a cluster row is clicked in the Cluster CR list (uses reqsJsonPath).
+  pathToNavigateFromClusterListResource: "/openapi-ui/{reqsJsonPath[0]['.metadata.name']['-']}/builtin-table/pods?resources=metrics.k8s.io/v1beta1/pods"
+  # URL template used when a cluster row is clicked in the static cluster list.
+  # ~recordValue~ is replaced with the cluster name at runtime.
+  pathToNavigateFromClusterList: "/openapi-ui/~recordValue~/builtin-table/pods?resources=metrics.k8s.io/v1beta1/pods"
 
 # --- Global ----------------------------------------------------------------
 nameOverride: ""                  # Overrides chart name; leave empty to use default
@@ -342,6 +391,10 @@ serviceAccount:
   create: true
   name: ""                         # Defaults to <release>-<chart>
   annotations: {}
+
+# --- RBAC ------------------------------------------------------------------
+rbac:
+  create: true
 
 # --- Pod-level settings ----------------------------------------------------
 podAnnotations: {}
@@ -506,7 +559,7 @@ bff:
     BASE_NAVIGATION_RESOURCE_PLURAL: "navigations"
     BASE_NAVIGATION_RESOURCE_NAME: "fallback"
     WS_LOG_BLACKLIST_PATHS: '["error.config.headers.authorization","headers.authorization","headers.cookie"]'
-    MF_PLUGINS_JSON: '{"plugin-rbac":{"name":"plugin-rbac","entry":"http://127.0.0.1:8081/openapi-ui-plugin-rbac/assets/remoteEntry.js","exposedModule":"./App"}}'
+    MF_PLUGINS_JSON: '{"plugin-rbac":{"name":"plugin-rbac","entry":"/openapi-ui-plugin-rbac/assets/remoteEntry.js","exposedModule":"./App"}}'
     # MF_PLUGINS_JSON: '{"plugin-example":{"name":"plugin-example","entry":"http://127.0.0.1:8081/openapi-ui-plugin/assets/remoteEntry.js","exposedModule":"./App"}}'
 
   envFrom: []
@@ -609,6 +662,10 @@ web:
     CUSTOMIZATION_NAVIGATION_RESOURCE_NAME: "fallback"
     CUSTOMIZATION_CFOMAPPING_RESOURCE_PLURAL: "cfomappings"
     CUSTOMIZATION_CFOMAPPING_RESOURCE_NAME: "default"
+    CURRENT_CLUSTER: default
+    CLUSTERLIST_API_RESOURCE_API_GROUP: front.in-cloud.io
+    CLUSTERLIST_API_RESOURCE_API_VERSION: v1alpha1
+    CLUSTERLIST_API_RESOURCE_PLURAL: clusters
     INSTANCES_API_GROUP: "in-cloud.io"
     INSTANCES_PLURAL: "instances"
     INSTANCES_API_VERSION: "v1alpha1"
@@ -743,6 +800,7 @@ nginx:
 
   # Security context for the container runtime
   securityContext:
+    enabled: true
     allowPrivilegeEscalation: false
     capabilities:
       drop:
@@ -892,7 +950,7 @@ moduleRbac:
   # Environment variables that configure moduleRbac behavior and integration with Kubernetes API
   env:
     PORT: "8084"
-    CORS_ALLOWED_ORIGINS: "http://127.0.0.1:8081"
+    CORS_ALLOWED_ORIGINS: "https://demo.in-cloud.io"
     BASEPREFIX: /openapi-ui-plugin-rbac
 
   envFrom: []
@@ -1056,6 +1114,7 @@ sidebars:
     usermanagement:
       enabled: true
       items:
+        rolesDiscovery: true  # Show available roles and bindings
         serviceaccounts: true  # Namespace-scoped service accounts
         roles: true  # Namespace-scoped roles
         rolebindings: true  # Namespace-scoped role bindings
@@ -1151,6 +1210,7 @@ sidebars:
     usermanagement:
       enabled: true
       items:
+        rolesDiscovery: true  # Show available roles and bindings
         serviceaccounts: true  # Namespace-scoped service accounts
         roles: true  # Namespace-scoped roles
         rolebindings: true  # Namespace-scoped role bindings
@@ -1168,17 +1228,30 @@ sidebars:
         customresourcedefinitions: true  # CRDs (cluster-wide but visible)
       extraItems: []
 
-  # Mapping of resource keys to API endpoints and detail views
+  # Additional keysAndTags entries merged into the Sidebar CR alongside keysAndTags.
+  # Use this to add bindings for custom or third-party resources without overriding
+  # the default set. Same format as keysAndTags below.
   extrakeysAndTags: {}
-  
-  # Mapping of resource keys to API endpoints and detail views
+
+  # Maps sidebar menu item keys → arrays of route tags used by the UI to:
+  #   1. Highlight the active sidebar item based on the current URL
+  #   2. Resolve navigation between table views and detail pages
+  #
+  # Array format for each key:
+  #   [0] — K8s API path for the table view (e.g., "apps/v1/deployments")
+  #          Used to match the current URL against sidebar items.
+  #   [1] — Factory CR name for the detail page (e.g., "deployment-details")
+  #          Used to highlight the sidebar item when viewing resource details.
+  #   [2+] — Optional plugin route identifiers (e.g., "plugin-rbac/clusterroles")
+  #          Used when a plugin provides additional views for this resource type.
   keysAndTags:
     clusterrolebindings:
-      - rbac.authorization.k8s.io/v1/clusterrolebindings
-      - clusterrolebinding-details
+      - rbac.authorization.k8s.io/v1/clusterrolebindings   # table route
+      - clusterrolebinding-details                          # detail factory
     clusterroles:
       - rbac.authorization.k8s.io/v1/clusterroles
       - clusterrole-details
+      - plugin-rbac/clusterroles                            # RBAC plugin view
     configmaps:
       - v1/configmaps
       - configmap-details
@@ -1239,6 +1312,10 @@ sidebars:
     roles:
       - rbac.authorization.k8s.io/v1/roles
       - role-details
+      - plugin-rbac/roles                                   # RBAC plugin view
+    rolesdiscovery:
+      - plugin-rbac/table                                   # plugin-only (no K8s resource)
+
     secrets:
       - v1/secrets
       - secret-details
@@ -1255,10 +1332,18 @@ sidebars:
       - storage.k8s.io/v1/storageclasses
       - storageclass-details
 
+# --- Monitoring ------------------------------------------------------------
+# Configuration for the monitoring tab rendered on Factory detail pages
+# (e.g., Pod details, Node details) when enableMonitoringTab is true.
+# The UI embeds Grafana dashboards via iframe using these settings.
 monitoring:
+  # PromQL API base URL used for metric queries in UI components
   promqlUrl: https://demo.in-cloud.io/monitoring/api/v1/
+  # Grafana datasource UID passed as a query parameter to embedded dashboards
   grafanaDatasource: P4169E866C3094E38
+  # Base URL of the Grafana instance for iframe embedding
   grafanaBaseUrl: https://grafana.in-cloud.io
+  # Dashboard paths (uid/slug) appended to grafanaBaseUrl for specific detail pages
   grafanaDashboardPaths:
-    podDetails: k8s_views_pods/kubernetes-views-pods
-    nodeDetails: k8s_views_nodes/kubernetes-views-nodes
+    podDetails: k8s_views_pods/kubernetes-views-pods      # dashboard for Pod detail monitoring tab
+    nodeDetails: k8s_views_nodes/kubernetes-views-nodes    # dashboard for Node detail monitoring tab

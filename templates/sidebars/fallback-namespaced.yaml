@@ -1,9 +1,18 @@
+# ============================================================================
+# Sidebar: fallback-namespaced
+# ----------------------------------------------------------------------------
+# Default namespace-scoped sidebar: same keysAndTags sources as fallback-clusterscoped,
+# but menuItems come from sidebar-namespaced.tpl ({cluster}, {namespace} in links).
+# Use a custom Sidebar CR to override spec.id or the generated menu tree.
+# ============================================================================
 apiVersion: front.in-cloud.io/v1alpha1
 kind: Sidebar
 metadata:
   name: fallback-namespaced
 spec:
+  # Distinct id from cluster fallback so the UI can swap sidebars by scope.
   id: fallback-namespaced
+  # Same Helm merge as cluster fallback: .Values.sidebars.keysAndTags and extrakeysAndTags.
   keysAndTags:
     {{- with .Values.sidebars.keysAndTags }}
     {{- toYaml . | nindent 4 }}
@@ -11,5 +20,6 @@ spec:
     {{- with .Values.sidebars.extrakeysAndTags }}
     {{- toYaml . | nindent 4 }}
     {{- end }}
+  # key/label/link tree; links omit or include {namespace} per resource scope (see tpl).
   menuItems:
     {{- include "incloud-web-chart.sidebar.menu.items.namespaced" . | nindent 4 }}

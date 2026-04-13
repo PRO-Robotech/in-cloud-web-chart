@@ -1,3 +1,4 @@
+{{/* Role-specific detail card: RBAC rules table (namespaced). */}}
 {{- define "in-cloud.web.contentCard.roleRules" -}}
 # Content card with Role rules table
 - type: ContentCard
@@ -34,14 +35,17 @@
       data:
         id: role-rules-table
         cluster: "{2}"
+        {{/* UI table column/layout override id */}}
         customizationId: factory-k8s-rbac-rules
         baseprefix: /openapi-ui
         pathToItems: ".items.0.rules"
+        {{/* K8s list API for this Role */}}
         k8sResourceToFetch:
           namespace: "{3}"
           apiGroup: "{6}"
           apiVersion: "{7}"
           plural: "{8}"
+        {{/* server-side filter to the current Role */}}
         fieldSelector:
           metadata.name: "{9}"
 {{- end -}}

@@ -65,6 +65,12 @@ spec:
     {{ include "incloud-web-resources.cco.columns-undefined-values.resource-names" . | nindent 4 }}
     {{ include "incloud-web-resources.cco.columns-undefined-values.non-resource-urls" . | nindent 4 }}
     {{ include "incloud-web-resources.cco.columns-undefined-values.verbs-dash" . | nindent 4 }}
+
+  # Tooltips for standard columns
+  additionalPrinterColumnsTooltips:
+    {{ include "incloud-web-resources.cco.columns-tooltips.name" . | nindent 4 }}
+    {{ include "incloud-web-resources.cco.columns-tooltips.created" . | nindent 4 }}
+
   # Stable identifier used by frontend mapping
   id: factory-k8s-rbac-rules
 {{- end -}}

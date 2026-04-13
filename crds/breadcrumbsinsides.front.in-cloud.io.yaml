@@ -18,6 +18,11 @@ spec:
       schema:
         openAPIV3Schema:
           type: object
+          description: >-
+            BreadcrumbInside defines a secondary (nested) breadcrumb trail that appears
+            within an inner content area — for example inside a tab or a nested detail view.
+            It uses the same schema as Breadcrumb, but the UI renders it independently
+            when a sub-context is active (e.g., viewing a container inside a Pod detail page).
           properties:
             apiVersion:
               type: string
@@ -27,14 +32,21 @@ spec:
               type: object
             spec:
               type: object
+              description: Desired inner breadcrumb trail configuration.
               required:
                 - id
                 - breadcrumbItems
               properties:
                 id:
                   type: string
+                  description: >-
+                    Unique identifier matched by the UI for nested breadcrumb contexts.
+                    Same naming convention as Breadcrumb spec.id.
                 breadcrumbItems:
                   type: array
+                  description: >-
+                    Ordered list of inner breadcrumb segments. Same format and placeholder
+                    support as Breadcrumb spec.breadcrumbItems ({n}, {cluster}, {namespace}).
                   items:
                     type: object
                     required:
@@ -43,10 +55,13 @@ spec:
                     properties:
                       key:
                         type: string
+                        description: Unique key for this inner breadcrumb segment.
                       label:
                         type: string
+                        description: Display text. Supports URL template placeholders.
                       link:
                         type: string
+                        description: Optional navigation URL. Supports template placeholders.
                     additionalProperties: true
               additionalProperties: true
       subresources:

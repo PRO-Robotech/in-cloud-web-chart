@@ -1,3 +1,12 @@
+{{/*
+  CCO factory column helpers: YAML fragments (props) and full factory columns for CustomColumnsOverride tables.
+*/}}
+{{/*
+  badgeLink: resource badge with a clickable link to the resource detail page.
+  root — Helm root / factory context (badge mapping, Navigation); href — detail URL template with placeholders;
+  badge — badge label; jsonPath — JSONPath into the row payload for the cell; text — link label override.
+  href+root → resolveFromLegacy; root only (no href) → factoryDetails (mappingKey + baseFactoriesMapping).
+*/}}
 {{- define "in-cloud.web.cco.props.badgeLink" -}}
 {{- $ctx := . -}}
 {{- if kindIs "slice" . -}}
@@ -28,6 +37,7 @@
 {{- else if and (not $href) $ctx.root -}}
 {{- $href = (include "in-cloud.web.cco.href.factoryDetails" $ctx | trim) -}}
 {{- end -}}
+# JSONPath into row/API payload for this column
 jsonPath: {{ default ".metadata.name" $ctx.jsonPath }}
 {{ include "in-cloud.web.columns.factory.badgeLink" (dict
     "badge" $badge
@@ -37,6 +47,10 @@ jsonPath: {{ default ".metadata.name" $ctx.jsonPath }}
 }}
 {{- end -}}
 
+{{/*
+  namespaceBadgeLink: same as badgeLink, fixed for the Namespace column.
+  href — /openapi-ui/{2}/factory/namespace-details/v1/namespaces/{namespace}; {2} is the cluster segment in the UI path.
+*/}}
 {{- define "in-cloud.web.cco.props.namespaceBadgeLink" -}}
 {{ include "in-cloud.web.cco.props.badgeLink" (dict
     "root" $
@@ -49,6 +63,11 @@ jsonPath: {{ default ".metadata.name" $ctx.jsonPath }}
 }}
 {{- end -}}
 
+{{/*
+  labelsEditor: editable labels column.
+  endpoint — PATCH target; linkPrefix — base path for label navigation; reqIndex — index in parallel fetch responses;
+  jsonPathToLabels — path to the labels map; pathToValue — JSON patch path for persisted updates.
+*/}}
 {{- define "in-cloud.web.cco.props.labelsEditor" -}}
 jsonPath: .metadata.labels
 customProps:
@@ -57,10 +76,15 @@ customProps:
     - type: Labels
       data:
         id: labels-editor
+        # index into parallel fetch responses (row is reqsJsonPath[0])
         reqIndex: 0
+        # JSONPath to labels object for display/edit
         jsonPathToLabels: .metadata.labels
+        # PATCH URL for label updates
         endpoint: {{ .endpoint | quote }}
+        # JSON patch path sent with the request body
         pathToValue: /metadata/labels
+        # navigation prefix when following a label
         linkPrefix: {{ .linkPrefix | quote }}
         inputLabel: "false"
         modalTitle: Edit labels
@@ -76,6 +100,10 @@ customProps:
         verticalViewList: true
 {{- end -}}
 
+{{/*
+  podSelector: pod selector as chips with search navigation.
+  jsonPath — field path to the selector on the row; linkPrefix — base path for “search by label” navigation.
+*/}}
 {{- define "in-cloud.web.cco.props.podSelector" -}}
 jsonPath: {{ .jsonPath }}
 customProps:
@@ -85,30 +113,40 @@ customProps:
       data:
         id: pod-to-search-params
         reqIndex: 0
+        # same path: selector labels → query params
         jsonPathToLabels: {{ .jsonPath }}
         linkPrefix: {{ .linkPrefix | quote }}
         errorText: No selector
         maxTextLength: 11
         # textLink: Search
         renderLabelsAsRows: true
+        errorMode: 'default'
 {{- end -}}
 
+{{/*
+  created: creation timestamp column; implementation uses factory.created (parsedText formatter: timestamp on creationTimestamp).
+*/}}
 {{- define "in-cloud.web.cco.props.created" -}}
 jsonPath: .metadata.creationTimestamp
 {{ include "in-cloud.web.columns.factory.created" . }}
 {{- end -}}
 
+{{/*
+  timestamp: generic timestamp cell; formatter — timestamp on parsedText; .jsonPath / .value — source path or literal.
+*/}}
 {{- define "in-cloud.web.cco.props.timestamp" -}}
 jsonPath: {{ .jsonPath }}
 customProps:
   disableEventBubbling: true
   items:
+    {{- /* antdFlex: horizontal row for icon + time */}}
     - type: antdFlex
       data:
         id: time-block
         align: center
         gap: 6
       children:
+        {{- /* antdText: leading icon */}}
         - type: antdText
           data:
             id: time-icon
@@ -116,10 +154,14 @@ customProps:
         - type: parsedText
           data:
             id: time-value
+            # platform format for RFC3339-style instants
             formatter: timestamp
             text: {{ .value | quote }}
 {{- end -}}
 
+{{/*
+  text: plain parsedText column; jsonPath — row field; value — default text or placeholder.
+*/}}
 {{- define "in-cloud.web.cco.props.text" -}}
 jsonPath: {{ .jsonPath }}
 {{ include "in-cloud.web.columns.factory.text" (dict
@@ -128,6 +170,9 @@ jsonPath: {{ .jsonPath }}
 }}
 {{- end -}}
 
+{{/*
+  link: simple hyperlink column; jsonPath — cell value path; link — href; text — anchor label.
+*/}}
 {{- define "in-cloud.web.cco.props.link" -}}
 jsonPath: {{ default ".metadata.name" .jsonPath }}
 {{ include "in-cloud.web.columns.factory.link" (dict
@@ -137,6 +182,7 @@ jsonPath: {{ default ".metadata.name" .jsonPath }}
 }}
 {{- end -}}
 
+{{/* memory: numeric/memory column via factory.memory helper. */}}
 {{- define "in-cloud.web.cco.props.memory" -}}
 {{ include "in-cloud.web.columns.factory.memory" (dict
     "value" .value
@@ -144,6 +190,7 @@ jsonPath: {{ default ".metadata.name" .jsonPath }}
 }}
 {{- end -}}
 
+{{/* cpu: CPU usage column via factory.cpu helper. */}}
 {{- define "in-cloud.web.cco.props.cpu" -}}
 {{ include "in-cloud.web.columns.factory.cpu" (dict
     "value" .value
@@ -151,6 +198,11 @@ jsonPath: {{ default ".metadata.name" .jsonPath }}
 }}
 {{- end -}}
 
+{{/*
+  ownerRefs: owner reference links with factory resolution.
+  jsonPathToArrayOfRefs — JSONPath to the ownerReferences array; forcedNamespace — override namespace for link targets;
+  forcedApiVersion — map of group/version hints when resolving refs to detail pages.
+*/}}
 {{- define "in-cloud.web.cco.props.ownerRefs" -}}
 jsonPath: {{ default .jsonPathToArrayOfRefs .jsonPath }}
 customProps:
@@ -160,9 +212,11 @@ customProps:
       data:
         id: refs
         reqIndex: 0
+        # cluster segment in UI paths (same as {2} elsewhere)
         cluster: {{ default "{2}" .cluster | quote }}
         baseprefix: {{ default "/openapi-ui" .baseprefix }}
         {{- if not .skipForcedNamespace }}
+        # default: row namespace
         forcedNamespace: {{ default "{reqsJsonPath[0]['.metadata.namespace']['-']}" .forcedNamespace | quote }}
         {{- end }}
         {{- with .forcedApiVersion }}
@@ -183,6 +237,10 @@ customProps:
         baseNavigationName: navigation
 {{- end -}}
 
+{{/*
+  statusDeployment: deployment status column; delegates to
+  in-cloud.web.statusText.deploymentAvailability.
+*/}}
 {{- define "in-cloud.web.cco.props.statusDeployment" -}}
 customProps:
   disableEventBubbling: true
@@ -193,6 +251,7 @@ customProps:
     }}
 {{- end -}}
 
+{{/* statusJob: job status column; delegates to in-cloud.web.statusText.jobAvailability. */}}
 {{- define "in-cloud.web.cco.props.statusJob" -}}
 customProps:
   disableEventBubbling: true
@@ -203,6 +262,7 @@ customProps:
     }}
 {{- end -}}
 
+{{/* statusPod: pod status column; delegates to in-cloud.web.statusText.podAvailability. */}}
 {{- define "in-cloud.web.cco.props.statusPod" -}}
 customProps:
   disableEventBubbling: true
@@ -277,21 +337,21 @@ customProps:
 {{- end -}}
 
 {{- define "in-cloud.web.cco.column.statusDeployment" -}}
-# Standard Deployment status column
+# Standard Deployment status column (statusText.deploymentAvailability)
 - name: Status
   type: factory
   {{ include "in-cloud.web.cco.props.statusDeployment" . | nindent 2 }}
 {{- end -}}
 
 {{- define "in-cloud.web.cco.column.statusJob" -}}
-# Standard Job status column
+# Standard Job status column (statusText.jobAvailability)
 - name: Status
   type: factory
   {{ include "in-cloud.web.cco.props.statusJob" . | nindent 2 }}
 {{- end -}}
 
 {{- define "in-cloud.web.cco.column.statusPod" -}}
-# Standard Pod status column
+# Standard Pod status column (statusText.podAvailability)
 - name: Status
   type: factory
   {{ include "in-cloud.web.cco.props.statusPod" . | nindent 2 }}

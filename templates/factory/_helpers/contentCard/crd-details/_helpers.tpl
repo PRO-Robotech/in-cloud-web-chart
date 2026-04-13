@@ -1,3 +1,4 @@
+{{/* CRD-specific detail cards: spec facts, versions table, and instances list. */}}
 {{- define "in-cloud.web.contentCard.crdRuntimeFacts" -}}
 # Content card with CRD runtime facts
 - type: ContentCard
@@ -160,12 +161,15 @@
       data:
         id: crd-versions-table
         cluster: "{2}"
+        {{/* UI table column/layout override id */}}
         customizationId: versions-apiextensions.k8s.io.v1.customresourcedefinitions
         baseprefix: /openapi-ui
         withoutControls: true
         pathToItems: ".items.0.spec.versions"
+        {{/* K8s list API for the CRD definition */}}
         k8sResourceToFetch:
           {{- toYaml .k8sResourceToFetch | nindent 10 }}
+        {{/* server-side filter to the current CRD */}}
         fieldSelector:
           {{- toYaml .fieldSelector | nindent 10 }}
 {{- end -}}
@@ -181,6 +185,7 @@
       data:
         id: instances-table
         cluster: "{2}"
+        {{/* UI table column/layout override id */}}
         customizationId: instances-crd
         baseprefix: /openapi-ui
         pathToItems: ".items"
@@ -192,6 +197,7 @@
           plural: "{reqsJsonPath[0]['.items.0.spec.names.plural']['-']}"
           apiVersion: "{reqsJsonPath[0]['.items.0.status.storedVersions[0]']['-']}"
           apiGroup: "{reqsJsonPath[0]['.items.0.spec.group']['-']}"
+        {{/* Dynamic list API for CR instances of this CRD */}}
         k8sResourceToFetch:
           plural: "{reqsJsonPath[0]['.items.0.spec.names.plural']['-']}"
           apiVersion: "{reqsJsonPath[0]['.items.0.status.storedVersions[0]']['-']}"

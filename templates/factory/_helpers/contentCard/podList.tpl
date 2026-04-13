@@ -1,3 +1,7 @@
+{{/*
+  ContentCard with EnrichedTable listing Pods: k8sResourceToFetch for v1/pods, optional
+  labelSelectorFull/fieldSelector, pathToItems .items.
+*/}}
 {{- define "in-cloud.web.contentCard.podList" -}}
 - type: ContentCard
   data:
@@ -12,6 +16,7 @@
         cluster: "{2}"
         customizationId: "factory-/v1/pods"
 
+        # k8sResourceToFetch: API coordinates used to load and refresh the Pod list.
         k8sResourceToFetch:
           apiVersion: "v1"
           plural: "pods"

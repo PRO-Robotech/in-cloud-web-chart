@@ -1,4 +1,7 @@
-
+{{/*
+  StatusText for Pod row: maps phases, container/init reasons, and condition reasons to phase-based
+  labels.
+*/}}
 {{- define "in-cloud.web.statusText.podAvailability" -}}
 {{- $itemPath := ".items.0" -}}
 {{- if hasKey . "itemPath" -}}
@@ -8,6 +11,8 @@
   data:
     id: pod-status
 
+    # values: JSONPath expressions whose results are matched by criteria* / valueToCompare* (phases,
+    # reasons, conditions).
     # --- Collected values from Pod status -----------------------------------
     values:
       # Init containers
@@ -27,6 +32,8 @@
       # Condition reasons (PodScheduled / Initialized / ContainersReady / Ready)
       - "{reqsJsonPath[0]['{{ $itemPath }}.status.conditions[*].reason']}"
 
+    # criteria* / valueToCompare* / strategy*: rules that map collected reasons/phases to success,
+    # error, or phase text outputs.
     # --- Success criteria ---------------------------------------------------
     criteriaSuccess: notEquals
     strategySuccess: every

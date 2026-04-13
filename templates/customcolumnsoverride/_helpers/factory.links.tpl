@@ -1,3 +1,7 @@
+{{/*
+  Factory detail URL resolution for CCO: mappingKey identifies a factory template; Navigation CR baseFactoriesMapping
+  maps keys to factoryDetails names; resolveFromLegacy rewrites legacy hrefs; factoryDetails builds canonical paths.
+*/}}
 {{- define "in-cloud.web.cco.factory.mappingKey" -}}
 {{- $scope := default "namespaced" .scope -}}
 {{- $source := default "api" .source -}}
@@ -6,6 +10,10 @@
 {{- printf "base-factory-%s-%s-%s-%s" $scope $source (replace "/" "-" $apiVersion) $plural -}}
 {{- end -}}
 
+{{/*
+  Resolves factoryDetails (detail page factory name) from
+  .root.Values.navigation.baseFactoriesMapping[mappingKey].
+*/}}
 {{- define "in-cloud.web.cco.factory.detailsName" -}}
 {{- $root := .root -}}
 {{- $mappingKey := .mappingKey -}}
@@ -21,6 +29,10 @@
 {{- $detailsName -}}
 {{- end -}}
 
+{{/*
+  Builds /openapi-ui/.../factory/{factoryDetails}/{apiVersion}/{plural}/{name} from mappingKey +
+  path placeholders.
+*/}}
 {{- define "in-cloud.web.cco.href.factoryDetails" -}}
 {{- $detailsName := include "in-cloud.web.cco.factory.detailsName" . | trim -}}
 {{- $basePrefix := default "/openapi-ui" .basePrefix -}}
@@ -40,6 +52,10 @@
 {{- end -}}
 {{- end -}}
 
+{{/*
+  Parses a legacy /openapi-ui/.../factory/{oldName}/... href, derives mappingKey from scope/api/plural,
+  then rebuilds the URL via factoryDetails so links follow Navigation baseFactoriesMapping.
+*/}}
 {{- define "in-cloud.web.cco.href.resolveFromLegacy" -}}
 {{- $root := .root -}}
 {{- $href := .href -}}
@@ -100,10 +116,12 @@
 {{- end -}}
 {{- end -}}
 
+{{/* props.link: antdLink cell; disableEventBubbling avoids triggering the table row click. */}}
 {{- define "in-cloud.web.columns.factory.link" -}}
 customProps:
   disableEventBubbling: true
   items:
+    {{- /* antdLink: external or in-app href */}}
     - type: antdLink
       data:
         id: "value-link"

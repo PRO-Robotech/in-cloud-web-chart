@@ -18,6 +18,13 @@ spec:
       schema:
         openAPIV3Schema:
           type: object
+          description: >-
+            Breadcrumb defines the breadcrumb navigation trail displayed above the main
+            content area in the openapi-ui application. The UI matches the current page
+            context (table, factory detail, form, search) against spec.id using the prefix
+            from CUSTOMIZATION_BREADCRUMBS_FALLBACK_ID. Each Breadcrumb CR corresponds to
+            a specific page type and scope (cluster-scoped vs namespaced, API vs builtin,
+            create vs edit).
           properties:
             apiVersion:
               type: string
@@ -27,14 +34,29 @@ spec:
               type: object
             spec:
               type: object
+              description: Desired breadcrumb trail configuration.
               required:
                 - id
                 - breadcrumbItems
               properties:
                 id:
                   type: string
+                  description: >-
+                    Unique breadcrumb identifier matched by the UI against the current route.
+                    Naming convention: "<fallbackPrefix>-<pageType>-<scope>-<resourceType>[-edit]".
+                    Examples: "fallback-factory-clusterscoped-api", "fallback-form-namespaced-builtin-edit",
+                    "fallback-table-clusterscoped-builtin", "fallback-search-page".
                 breadcrumbItems:
                   type: array
+                  description: >-
+                    Ordered list of breadcrumb segments displayed left-to-right.
+                    Supports URL template placeholders for dynamic segments:
+                      Positional: {1}, {2}, ... — 1-based URL path segments
+                        (e.g., /openapi-ui/cluster-name/ns/api-table/apps/v1/deployments
+                         → {1}="openapi-ui", {2}="cluster-name", {3}="ns", {4}="api-table",
+                           {5}="apps", {6}="v1", {7}="deployments")
+                      Named: {cluster}, {namespace} — resolved from routing context.
+                    Multiple segments can be concatenated in labels: "{5}/{6}/{7}".
                   items:
                     type: object
                     required:
@@ -43,10 +65,23 @@ spec:
                     properties:
                       key:
                         type: string
+                        description: >-
+                          Unique key for this breadcrumb segment. Used internally for
+                          rendering; not displayed to the user.
                       label:
                         type: string
+                        description: >-
+                          Display text for this breadcrumb segment. Supports URL template
+                          placeholders: {n} (positional), {cluster}, {namespace}.
+                          Examples: "{5}/{6}/{7}" renders as "apps/v1/deployments",
+                          "Create" or "Update" for form pages.
                       link:
                         type: string
+                        description: >-
+                          Optional navigation URL when the segment is clicked. Supports
+                          the same template placeholders as label. Omit for the last
+                          (current page) segment. Example:
+                          "/openapi-ui/{cluster}/api-table/{5}/{6}/{7}".
                     additionalProperties: true
               additionalProperties: true
       subresources:

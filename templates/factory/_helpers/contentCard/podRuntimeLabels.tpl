@@ -1,5 +1,5 @@
 {{- define "in-cloud.web.contentCard.podRuntimeLabels" -}}
-# Content card with Pod runtime labels (two columns)
+# Pod runtime selectors: nodeSelector vs pod labels as searchable label rows (two columns).
 - type: ContentCard
   data:
     id: pod-runtime-labels-card
@@ -8,6 +8,7 @@
     - type: DefaultDiv
       data:
         id: pod-runtime-labels-card-title
+        # AntD: flex row (icon + title)
         style:
           display: flex
           gap: 12px
@@ -31,6 +32,7 @@
               fontSize: 16px
               lineHeight: 24px
 
+    # AntD grid layout
     - type: antdRow
       data:
         gutter: [24, 12]
@@ -64,13 +66,16 @@
                     - type: LabelsToSearchParams
                       data:
                         id: node-labels-to-search-params
+                        # Request index in factory context for label source data
                         reqIndex: 0
+                        # JSONPath to node selector key/value map in the fetched resource
                         jsonPathToLabels: {{ .nodJsonPathToLabels | default ".items.0.spec.nodeSelector" | quote }}
                         linkPrefix: "/openapi-ui/{2}/search?kinds=~v1~nodes"
                         errorText: "No selector"
                         # maxTextLength: 11
                         textLink: Search
                         renderLabelsAsRows: true
+                        errorMode: 'default'
 
         # RIGHT COLUMN — Pod labels
         - type: antdCol
@@ -100,7 +105,9 @@
                     - type: LabelsToSearchParams
                       data:
                         id: pod-labels-to-search-params
+                        # Request index in factory context for label source data
                         reqIndex: 0
+                        # JSONPath to pod labels map in the fetched resource
                         jsonPathToLabels: {{ .podJsonPathToLabels | default ".items.0.metadata.labels" | quote }}
                         linkPrefix: "/openapi-ui/{2}/{3}/search?kinds=~v1~pods"
                         errorText: "No labels"
@@ -108,4 +115,5 @@
                         textLink: Search
                         renderLabelsAsRows: false
                         # maxTextLength: ""
+                        errorMode: 'default'
 {{- end -}}

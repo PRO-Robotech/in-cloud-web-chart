@@ -1,3 +1,9 @@
+# ============================================================================
+# Breadcrumb: fallback-search-page
+# ----------------------------------------------------------------------------
+# Search flow (not table/factory form): static crumbs only, no {N} path indexes.
+# Point the UI to a different Breadcrumb id if you replace this search trail.
+# ============================================================================
 ---
 apiVersion: front.in-cloud.io/v1alpha1
 kind: Breadcrumb
@@ -5,7 +11,9 @@ metadata:
   name: fallback-search-page
 spec:
   id: fallback-search-page
+  # Fixed two-step trail for the search experience (entry + resources).
   breadcrumbItems:
+    # search: first crumb (search entry); resources: second step (results/scope).
     - key: search
       label: "search"
     - key: resources
