@@ -48,4 +48,6 @@
         baseFactoryNamespacedBuiltinKey: base-factory-namespaced-builtin
         baseFactoryClusterSceopedBuiltinKey: base-factory-clusterscoped-builtin
         baseNamespaceFactoryKey: namespace-details
+        baseNavigationPlural: navigations
+        baseNavigationName: navigation
 {{- end -}}

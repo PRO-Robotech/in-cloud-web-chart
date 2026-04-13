@@ -1,0 +1,12 @@
+# ---
+# apiVersion: front.in-cloud.io/v1alpha1
+# kind: CustomFormsPrefill
+# metadata:
+#   name: v1.service
+# spec:
+#   customizationId: default-namespace-/v1/services
+#   values:
+#     - path:
+#         - metadata
+#       value: 
+#         generateName: dynamic-

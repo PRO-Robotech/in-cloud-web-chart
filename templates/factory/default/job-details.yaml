@@ -15,6 +15,9 @@ metadata:
 spec:
   key: job-details
 
+  effectiveReqIndexes:
+    - 0
+
   # =========================
   # Data sources
   # =========================
@@ -106,6 +109,28 @@ spec:
                 ) | nindent 14
               }}
 
+              # ---- Suspend Job ----
+              {{- include "in-cloud.web.action.suspend" (dict
+                  "endpoint" $jobEndpoint
+                  "pathToValue" "/spec/suspend"
+                  "permissionContext" $jobPermissionContext
+                ) | nindent 14
+              }}
+
+              # ---- Resume Job ----
+              {{- include "in-cloud.web.action.resume" (dict
+                  "endpoint" $jobEndpoint
+                  "pathToValue" "/spec/suspend"
+                  "permissionContext" $jobPermissionContext
+                ) | nindent 14
+              }}
+
+              # ---- Rerun last job ----
+              {{- include "in-cloud.web.action.rerunLast" (dict
+                  "createEndpoint" "/api/clusters/{2}/k8s/apis/{6}/{7}/namespaces/{3}/{8}"
+                  "permissionContext" $jobPermissionContext
+                ) | nindent 14
+              }}
 
               # ---- Delete resource ----
               {{ include "in-cloud.web.action.delete" (dict
@@ -122,6 +147,8 @@ spec:
       data:
         id: tabs-root
         defaultActiveKey: details
+        syncActiveKeyWithHash: true
+        allowOpenInNewBrowserTab: true
         items:
 
           # =========================
@@ -159,6 +186,7 @@ spec:
                   }}
 
 
+                  # ---- Init containers ----
                   {{ include "in-cloud.web.contentCard.genericVisibilityInclude" (dict
                       "containerId" "init-containers-container"
                       "value" "{reqsJsonPath[0]['.items.0.spec.template.spec.initContainers']['-']}"
@@ -168,6 +196,7 @@ spec:
                     ) | nindent 18
                   }}
 
+                  # ---- Containers ----
                   {{ include "in-cloud.web.contentCard.genericVisibilityInclude" (dict
                       "containerId" "containers-container"
                       "value" "{reqsJsonPath[0]['.items.0.spec.template.spec.containers']['-']}"
@@ -177,9 +206,15 @@ spec:
                     ) | nindent 18
                   }}
 
-                  # =========================
-                  # Conditions (only when present)
-                  # =========================
+                  # ---- Volumes ----
+                  {{ include "in-cloud.web.contentCard.volumes" (dict
+                      "reqIndex" 0
+                      "jsonPathToSpec" ".items.0.spec.template.spec"
+                      "errorText" "No efficient data in spec"
+                    ) | nindent 18
+                  }}
+
+                  # ---- Conditions ----
                   {{ include "in-cloud.web.contentCard.conditionsVisibility" (dict
                       "k8sResourceToFetch" $jobApiResource
                       "fieldSelector" (dict

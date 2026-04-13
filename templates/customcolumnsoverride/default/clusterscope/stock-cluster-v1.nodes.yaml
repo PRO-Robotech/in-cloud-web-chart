@@ -136,6 +136,17 @@ spec:
       type: factory
       jsonPath: .metadata.creationTimestamp
       {{ include "in-cloud.web.columns.factory.created" . | nindent 6 }}
+    # =================================================
+    # Column: Actions
+    # =================================================
+    - name: Actions
+      type: factory
+      {{ include "in-cloud.web.cco.props.actions.node" . | nindent 6 }}
+
+  # Tooltips for standard columns
+  additionalPrinterColumnsTooltips:
+    {{ include "incloud-web-resources.cco.columns-tooltips.name" . | nindent 4 }}
+    {{ include "incloud-web-resources.cco.columns-tooltips.created" . | nindent 4 }}
 
   # Trim long values for selected columns in tables
   additionalPrinterColumnsTrimLengths:

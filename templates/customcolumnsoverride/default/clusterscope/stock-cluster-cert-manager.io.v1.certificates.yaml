@@ -50,12 +50,23 @@ spec:
     - name: Created
       type: factory
       {{ include "in-cloud.web.cco.props.created" . | nindent 6 }}
+    # =================================================
+    # Column: Actions
+    # =================================================
+    - name: Actions
+      type: factory
+      {{ include "in-cloud.web.cco.props.actions.namespacedApi" (dict "apiGroup" "cert-manager.io" "apiVersion" "v1" "plural" "certificates") | nindent 6 }}
 
   # Trim long values for selected columns
   additionalPrinterColumnsTrimLengths:
     {{ include "incloud-web-resources.cco.columns-trim-lengths.name" . | nindent 4 }}
 
   additionalPrinterColumnsUndefinedValues: []
+
+  # Tooltips for standard columns
+  additionalPrinterColumnsTooltips:
+    {{ include "incloud-web-resources.cco.columns-tooltips.name" . | nindent 4 }}
+    {{ include "incloud-web-resources.cco.columns-tooltips.created" . | nindent 4 }}
 
   # Stable identifier used by frontend mapping
   id: stock-cluster-/cert-manager.io/v1/certificates

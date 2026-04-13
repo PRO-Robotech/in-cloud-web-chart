@@ -15,6 +15,9 @@ metadata:
 spec:
   key: node-details
 
+  effectiveReqIndexes:
+    - 0
+
   # =========================
   # Data sources
   # =========================
@@ -167,6 +170,8 @@ spec:
       data:
         id: tabs-root
         defaultActiveKey: details
+        syncActiveKeyWithHash: true
+        allowOpenInNewBrowserTab: true
         items:
 
           # =========================

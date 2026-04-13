@@ -18,8 +18,26 @@ spec:
     # Column: Name
     # =================================================
     - name: Name
-      type: string
+      type: factory
       jsonPath: .name
+      customProps:
+        disableEventBubbling: true
+        items:
+          - type: antdFlex
+            data:
+              id: container-name-with-badge
+              align: center
+              direction: row
+              gap: 6
+            children:
+              - type: ResourceBadge
+                data:
+                  id: container-name-badge
+                  value: "Container"
+              - type: parsedText
+                data:
+                  id: container-name-text
+                  text: "{reqsJsonPath[0]['.name']['-']}"
     # =================================================
     # Column: Image
     # =================================================
@@ -91,6 +109,11 @@ spec:
       value: "-"
     - key: WaitingdReason
       value: "-"
+
+  # Tooltips for standard columns
+  additionalPrinterColumnsTooltips:
+    {{ include "incloud-web-resources.cco.columns-tooltips.name" . | nindent 4 }}
+    {{ include "incloud-web-resources.cco.columns-tooltips.created" . | nindent 4 }}
 
   # Stable identifier used by frontend mapping
   id: container-status-containers-list

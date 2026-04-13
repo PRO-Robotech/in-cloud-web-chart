@@ -43,4 +43,6 @@ spec:
     change: {{ default "/openapi-ui/{selectedCluster}/{value}/builtin-table/pods?resources=metrics.k8s.io/v1beta1/pods" $projects.change | quote }}
     clear: {{ default "/openapi-ui/{selectedCluster}/builtin-table/pods?resources=metrics.k8s.io/v1beta1/pods" $projects.clear | quote }}
   {{- end }}
+
+  pathToNavigateFromClusterList: {{ $navigation.pathToNavigateFromClusterList | default "/openapi-ui/~recordValue~/builtin-table/pods?resources=metrics.k8s.io/v1beta1/pods" | quote }}
 {{- end -}}

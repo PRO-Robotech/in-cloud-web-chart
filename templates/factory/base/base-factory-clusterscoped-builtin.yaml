@@ -1,3 +1,7 @@
+{{/*
+  Base detail-page Factory for cluster-scoped built-in API resources (e.g. Node, Namespace).
+  Enabled via defaultWebResources.factory.default "base-factory-clusterscoped-builtin".
+*/}}
 {{ if (index .Values.defaultWebResources.factory.default "base-factory-clusterscoped-builtin") }}
 {{/* Shared factory context (resource, permission context, endpoint) */}}
 {{- $clusterScopedBuiltinCtx := fromYaml (include "in-cloud.web.factoryContext.clusterScopedBuiltin" .) -}}
@@ -13,6 +17,10 @@ metadata:
 spec:
   key: base-factory-clusterscoped-builtin
 
+  # Declares which urlsToFetch slots (0-based) supply data for reqIndex / reqsJsonPath in this tree.
+  effectiveReqIndexes:
+    - 0
+
   # =========================
   # Data sources
   # =========================
@@ -23,6 +31,7 @@ spec:
         "fieldSelector" "metadata.name={7}"
       ) | trim | nindent 4 }}
 
+  # When false, main card body is not wrapped in an extra scroll container (full-page layout).
   withScrollableMainContentCard: false
 
   # =========================
@@ -108,6 +117,9 @@ spec:
     - type: antdTabs
       data:
         defaultActiveKey: details
+        # Sync selected tab with location hash; allow middle-click / open tab in a new browser tab.
+        syncActiveKeyWithHash: true
+        allowOpenInNewBrowserTab: true
         id: tabs-root
         items:
 
@@ -133,9 +145,7 @@ spec:
 
 
 
-                  # =========================
-                  # Conditions (only when present)
-                  # =========================
+                  # ---- Conditions ----
                   {{ include "in-cloud.web.contentCard.conditionsVisibility" (dict
                       "k8sResourceToFetch" $clusterScopedBuiltinResource
                       "fieldSelector" (dict

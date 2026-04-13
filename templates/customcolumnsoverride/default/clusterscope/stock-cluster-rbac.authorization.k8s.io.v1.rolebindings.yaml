@@ -74,6 +74,12 @@ spec:
     - name: Created
       type: factory
       {{ include "in-cloud.web.cco.props.created" . | nindent 6 }}
+    # =================================================
+    # Column: Actions
+    # =================================================
+    - name: Actions
+      type: factory
+      {{ include "in-cloud.web.cco.props.actions.namespacedApi" (dict "apiGroup" "rbac.authorization.k8s.io" "apiVersion" "v1" "plural" "rolebindings") | nindent 6 }}
 
   # Trim long values for selected columns
   additionalPrinterColumnsTrimLengths:
@@ -87,6 +93,11 @@ spec:
     {{ include "incloud-web-resources.cco.columns-undefined-values.groups" . | nindent 4 }}
     {{ include "incloud-web-resources.cco.columns-undefined-values.service-accounts" . | nindent 4 }}
     {{ include "incloud-web-resources.cco.columns-undefined-values.namespace" . | nindent 4 }}
+
+  # Tooltips for standard columns
+  additionalPrinterColumnsTooltips:
+    {{ include "incloud-web-resources.cco.columns-tooltips.name" . | nindent 4 }}
+    {{ include "incloud-web-resources.cco.columns-tooltips.created" . | nindent 4 }}
 
   # Stable identifier used by frontend mapping
   id: stock-cluster-/rbac.authorization.k8s.io/v1/rolebindings

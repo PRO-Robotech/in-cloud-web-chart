@@ -15,6 +15,9 @@ metadata:
 spec:
   key: poddisruptionbudget-details
 
+  effectiveReqIndexes:
+    - 0
+
   # =========================
   # Data sources
   # =========================
@@ -120,6 +123,8 @@ spec:
       data:
         id: tabs-root
         defaultActiveKey: details
+        syncActiveKeyWithHash: true
+        allowOpenInNewBrowserTab: true
         items:
 
           # =========================
@@ -156,9 +161,7 @@ spec:
                         children:
                           {{ include "in-cloud.web.contentCard.poddisruptionbudgetRuntimeFacts" . | nindent 26 }}
 
-                  # =========================
-                  # Conditions (only when present)
-                  # =========================
+                  # ---- Conditions ----
                   {{ include "in-cloud.web.contentCard.conditionsVisibility" (dict
                       "k8sResourceToFetch" $poddisruptionbudgetApiResource
                       "fieldSelector" (dict

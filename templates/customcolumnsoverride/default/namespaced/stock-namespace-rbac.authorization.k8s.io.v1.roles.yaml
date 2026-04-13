@@ -20,7 +20,11 @@ spec:
     - name: Name
       type: factory
       {{ include "in-cloud.web.cco.props.badgeLink" (list $
-          "/openapi-ui/{2}/{reqsJsonPath[0]['.metadata.namespace']['-']}/factory/role-details/rbac.authorization.k8s.io/v1/roles/{reqsJsonPath[0]['.metadata.name']['-']}"
+          (ternary
+            "/openapi-ui/default/plugins/plugin-rbac/roles/{reqsJsonPath[0]['.metadata.namespace']['-']}/{reqsJsonPath[0]['.metadata.name']['-']}#details"
+            "/openapi-ui/{2}/{reqsJsonPath[0]['.metadata.namespace']['-']}/factory/role-details/rbac.authorization.k8s.io/v1/roles/{reqsJsonPath[0]['.metadata.name']['-']}"
+            $.Values.moduleRbac.enabled
+          )
         ) | nindent 6
       }}
     # =================================================
@@ -29,10 +33,21 @@ spec:
     - name: Created
       type: factory
       {{ include "in-cloud.web.cco.props.created" . | nindent 6 }}
+    # =================================================
+    # Column: Actions
+    # =================================================
+    - name: Actions
+      type: factory
+      {{ include "in-cloud.web.cco.props.actions.namespacedApi" (dict "apiGroup" "rbac.authorization.k8s.io" "apiVersion" "v1" "plural" "roles") | nindent 6 }}
 
   # Trim long values for selected columns
   additionalPrinterColumnsTrimLengths:
     {{ include "incloud-web-resources.cco.columns-trim-lengths.name" . | nindent 4 }}
+
+  # Tooltips for standard columns
+  additionalPrinterColumnsTooltips:
+    {{ include "incloud-web-resources.cco.columns-tooltips.name" . | nindent 4 }}
+    {{ include "incloud-web-resources.cco.columns-tooltips.created" . | nindent 4 }}
 
   # Stable identifier used by frontend mapping
   id: stock-namespace-/rbac.authorization.k8s.io/v1/roles

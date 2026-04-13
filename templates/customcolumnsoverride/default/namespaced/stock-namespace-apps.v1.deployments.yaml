@@ -30,7 +30,7 @@ spec:
       type: factory
       {{ include "in-cloud.web.cco.props.labelsEditor" (dict
           "endpoint" "/api/clusters/{2}/k8s/apis/apps/v1/namespaces/{3}/deployments/{6}"
-          "linkPrefix" "/openapi-ui/{2}/{3}/search?kinds=apps~v1~deployments"
+          "linkPrefix" "/openapi-ui/{2}/{3}/search?kinds=apps~v1~deployments&labels="
         ) | nindent 6
       }}
     # =================================================
@@ -55,6 +55,12 @@ spec:
     - name: Created
       type: factory
       {{ include "in-cloud.web.cco.props.created" . | nindent 6 }}
+    # =================================================
+    # Column: Actions
+    # =================================================
+    - name: Actions
+      type: factory
+      {{ include "in-cloud.web.cco.props.actions.deployment" . | nindent 6 }}
 
   # Trim long values for selected columns
   additionalPrinterColumnsTrimLengths:
@@ -66,6 +72,11 @@ spec:
   additionalPrinterColumnsUndefinedValues:
     {{ include "incloud-web-resources.cco.columns-undefined-values.labels" . | nindent 4 }}
     {{ include "incloud-web-resources.cco.columns-undefined-values.pod-selector" . | nindent 4 }}
+
+  # Tooltips for standard columns
+  additionalPrinterColumnsTooltips:
+    {{ include "incloud-web-resources.cco.columns-tooltips.name" . | nindent 4 }}
+    {{ include "incloud-web-resources.cco.columns-tooltips.created" . | nindent 4 }}
 
   # Stable identifier used by frontend mapping
   id: stock-namespace-/apps/v1/deployments

@@ -278,6 +278,7 @@
                         errorText: "No selector"
                         textLink: Search
                         renderLabelsAsRows: true
+                        errorMode: 'default'
 
     - type: antdFlex
       data:

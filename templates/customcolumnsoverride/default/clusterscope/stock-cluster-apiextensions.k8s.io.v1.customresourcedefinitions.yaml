@@ -47,10 +47,21 @@ spec:
     - name: Established
       type: string
       jsonPath: .status.conditions[?(@.type=='Established')].status
+    # =================================================
+    # Column: Actions
+    # =================================================
+    - name: Actions
+      type: factory
+      {{ include "in-cloud.web.cco.props.actions.clusterScopedApi" (dict "apiGroup" "apiextensions.k8s.io" "apiVersion" "v1" "plural" "customresourcedefinitions") | nindent 6 }}
 
   # Trim long values for selected columns
   additionalPrinterColumnsTrimLengths:
     {{ include "incloud-web-resources.cco.columns-trim-lengths.name" . | nindent 4 }}
+
+  # Tooltips for standard columns
+  additionalPrinterColumnsTooltips:
+    {{ include "incloud-web-resources.cco.columns-tooltips.name" . | nindent 4 }}
+    {{ include "incloud-web-resources.cco.columns-tooltips.created" . | nindent 4 }}
 
   # Stable identifier used by frontend mapping
   id: stock-cluster-/apiextensions.k8s.io/v1/customresourcedefinitions

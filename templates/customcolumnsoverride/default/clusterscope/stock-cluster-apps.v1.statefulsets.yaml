@@ -36,7 +36,7 @@ spec:
       type: factory
       {{ include "in-cloud.web.cco.props.labelsEditor" (dict
           "endpoint" "/api/clusters/{2}/k8s/apis/apps/v1/statefulsets/{6}"
-          "linkPrefix" "/openapi-ui/{2}/search?kinds=apps~v1~statefulsets"
+          "linkPrefix" "/openapi-ui/{2}/search?kinds=apps~v1~statefulsets&labels="
         ) | nindent 6
       }}
     # =================================================
@@ -55,12 +55,23 @@ spec:
     - name: Created
       type: factory
       {{ include "in-cloud.web.cco.props.created" . | nindent 6 }}
+    # =================================================
+    # Column: Actions
+    # =================================================
+    - name: Actions
+      type: factory
+      {{ include "in-cloud.web.cco.props.actions.statefulset" . | nindent 6 }}
 
   # Trim long values for selected columns
   additionalPrinterColumnsTrimLengths:
     {{ include "incloud-web-resources.cco.columns-trim-lengths.name" . | nindent 4 }}
     {{ include "incloud-web-resources.cco.columns-trim-lengths.labels" . | nindent 4 }}
     {{ include "incloud-web-resources.cco.columns-trim-lengths.pod-selector" . | nindent 4 }}
+
+  # Tooltips for standard columns
+  additionalPrinterColumnsTooltips:
+    {{ include "incloud-web-resources.cco.columns-tooltips.name" . | nindent 4 }}
+    {{ include "incloud-web-resources.cco.columns-tooltips.created" . | nindent 4 }}
 
   # Stable identifier used by frontend mapping
   id: stock-cluster-/apps/v1/statefulsets

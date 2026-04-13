@@ -21,6 +21,11 @@ spec:
       type: string
       jsonPath: .name
 
+  # Tooltips for standard columns
+  additionalPrinterColumnsTooltips:
+    {{ include "incloud-web-resources.cco.columns-tooltips.name" . | nindent 4 }}
+    {{ include "incloud-web-resources.cco.columns-tooltips.created" . | nindent 4 }}
+
   # Stable identifier used by frontend mapping
   id: factory-replicationcontroller-details-volume-list
 {{- end -}}

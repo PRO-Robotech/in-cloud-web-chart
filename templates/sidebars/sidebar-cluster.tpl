@@ -20,6 +20,9 @@
     - key: search
       label: Search
       link: /openapi-ui/{cluster}/search
+    - key: clusters
+      label: Clusters
+      link: /openapi-ui/clusters
     {{- end }}
     {{- with .extraItems }}
       {{ . | toYaml | nindent 4 }}
@@ -173,6 +176,11 @@
 {{- with $sidebars.usermanagement }}
   {{- if .enabled }}
 - children:
+    {{- if .items.rolesDiscovery }}
+    - key: rolesdiscovery
+      label: RolesDiscovery
+      link: /{{ $.Values.basePrefix }}/{cluster}/plugins/plugin-rbac/table
+    {{- end }}
     {{- if .items.serviceaccounts }}
     - key: serviceaccounts
       label: ServiceAccounts

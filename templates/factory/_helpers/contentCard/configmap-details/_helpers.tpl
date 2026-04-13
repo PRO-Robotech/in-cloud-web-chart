@@ -31,6 +31,8 @@
           whiteSpace: "pre-wrap"
           wordBreak: "break-word"
         notificationWidth: "420px"
-        notificationText: "Secret value copied to clipboard."
+        notificationText: "Config value copied to clipboard."
         niceLooking: true
+        hideEye: true
+        shownByDefault: true
 {{- end -}}

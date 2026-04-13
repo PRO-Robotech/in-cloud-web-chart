@@ -64,6 +64,7 @@
                         errorText: "Selects all pods in namespace"
                         textLink: Search
                         renderLabelsAsRows: true
+                        errorMode: 'default'
 
                 - type: antdFlex
                   data:

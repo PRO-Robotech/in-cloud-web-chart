@@ -1,0 +1,7 @@
+apiVersion: front.in-cloud.io/v1alpha1
+kind: Cluster
+metadata:
+  name: default
+spec:
+  displayName: infra
+  version: "{{ .Chart.Version }}"

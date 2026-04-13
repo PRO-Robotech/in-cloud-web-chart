@@ -17,6 +17,9 @@ metadata:
 spec:
   key: crd-details
 
+  effectiveReqIndexes:
+    - 0
+
   # =========================
   # Data sources
   # =========================
@@ -115,6 +118,8 @@ spec:
     - type: antdTabs
       data:
         defaultActiveKey: details
+        syncActiveKeyWithHash: true
+        allowOpenInNewBrowserTab: true
         id: tabs-root
         items:
 
@@ -165,9 +170,7 @@ spec:
                             ) | nindent 26
                           }}
 
-                  # =========================
-                  # Conditions (only when present)
-                  # =========================
+                  # ---- Conditions ----
                   {{ include "in-cloud.web.contentCard.conditionsVisibility" (dict
                       "k8sResourceToFetch" $crdApiResource
                       "fieldSelector" (dict

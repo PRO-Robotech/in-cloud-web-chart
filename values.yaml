@@ -323,6 +323,8 @@ navigation:
     change: "/openapi-ui/{selectedCluster}/{value}/builtin-table/pods?resources=metrics.k8s.io/v1beta1/pods"
     clear: "/openapi-ui/{selectedCluster}/builtin-table/pods?resources=metrics.k8s.io/v1beta1/pods"
 
+  pathToNavigateFromClusterListResource: "/openapi-ui/{reqsJsonPath[0]['.metadata.name']['-']}/builtin-table/pods?resources=metrics.k8s.io/v1beta1/pods"
+  pathToNavigateFromClusterList: "/openapi-ui/~recordValue~/builtin-table/pods?resources=metrics.k8s.io/v1beta1/pods"
 
 # --- Global ----------------------------------------------------------------
 nameOverride: ""                  # Overrides chart name; leave empty to use default
@@ -342,6 +344,10 @@ serviceAccount:
   create: true
   name: ""                         # Defaults to <release>-<chart>
   annotations: {}
+
+# --- RBAC ------------------------------------------------------------------
+rbac:
+  create: true
 
 # --- Pod-level settings ----------------------------------------------------
 podAnnotations: {}
@@ -506,7 +512,7 @@ bff:
     BASE_NAVIGATION_RESOURCE_PLURAL: "navigations"
     BASE_NAVIGATION_RESOURCE_NAME: "fallback"
     WS_LOG_BLACKLIST_PATHS: '["error.config.headers.authorization","headers.authorization","headers.cookie"]'
-    MF_PLUGINS_JSON: '{"plugin-rbac":{"name":"plugin-rbac","entry":"http://127.0.0.1:8081/openapi-ui-plugin-rbac/assets/remoteEntry.js","exposedModule":"./App"}}'
+    MF_PLUGINS_JSON: '{"plugin-rbac":{"name":"plugin-rbac","entry":"/openapi-ui-plugin-rbac/assets/remoteEntry.js","exposedModule":"./App"}}'
     # MF_PLUGINS_JSON: '{"plugin-example":{"name":"plugin-example","entry":"http://127.0.0.1:8081/openapi-ui-plugin/assets/remoteEntry.js","exposedModule":"./App"}}'
 
   envFrom: []
@@ -609,6 +615,10 @@ web:
     CUSTOMIZATION_NAVIGATION_RESOURCE_NAME: "fallback"
     CUSTOMIZATION_CFOMAPPING_RESOURCE_PLURAL: "cfomappings"
     CUSTOMIZATION_CFOMAPPING_RESOURCE_NAME: "default"
+    CURRENT_CLUSTER: default
+    CLUSTERLIST_API_RESOURCE_API_GROUP: front.in-cloud.io
+    CLUSTERLIST_API_RESOURCE_API_VERSION: v1alpha1
+    CLUSTERLIST_API_RESOURCE_PLURAL: clusters
     INSTANCES_API_GROUP: "in-cloud.io"
     INSTANCES_PLURAL: "instances"
     INSTANCES_API_VERSION: "v1alpha1"
@@ -743,6 +753,7 @@ nginx:
 
   # Security context for the container runtime
   securityContext:
+    enabled: true
     allowPrivilegeEscalation: false
     capabilities:
       drop:
@@ -892,7 +903,7 @@ moduleRbac:
   # Environment variables that configure moduleRbac behavior and integration with Kubernetes API
   env:
     PORT: "8084"
-    CORS_ALLOWED_ORIGINS: "http://127.0.0.1:8081"
+    CORS_ALLOWED_ORIGINS: "https://demo.in-cloud.io"
     BASEPREFIX: /openapi-ui-plugin-rbac
 
   envFrom: []
@@ -1056,6 +1067,7 @@ sidebars:
     usermanagement:
       enabled: true
       items:
+        rolesDiscovery: true  # Show available roles and bindings
         serviceaccounts: true  # Namespace-scoped service accounts
         roles: true  # Namespace-scoped roles
         rolebindings: true  # Namespace-scoped role bindings
@@ -1151,6 +1163,7 @@ sidebars:
     usermanagement:
       enabled: true
       items:
+        rolesDiscovery: true  # Show available roles and bindings
         serviceaccounts: true  # Namespace-scoped service accounts
         roles: true  # Namespace-scoped roles
         rolebindings: true  # Namespace-scoped role bindings
@@ -1179,6 +1192,7 @@ sidebars:
     clusterroles:
       - rbac.authorization.k8s.io/v1/clusterroles
       - clusterrole-details
+      - plugin-rbac/clusterroles
     configmaps:
       - v1/configmaps
       - configmap-details
@@ -1239,6 +1253,10 @@ sidebars:
     roles:
       - rbac.authorization.k8s.io/v1/roles
       - role-details
+      - plugin-rbac/roles
+    rolesdiscovery:
+      - plugin-rbac/table
+
     secrets:
       - v1/secrets
       - secret-details

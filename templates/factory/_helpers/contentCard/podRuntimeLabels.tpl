@@ -71,6 +71,7 @@
                         # maxTextLength: 11
                         textLink: Search
                         renderLabelsAsRows: true
+                        errorMode: 'default'
 
         # RIGHT COLUMN — Pod labels
         - type: antdCol
@@ -108,4 +109,5 @@
                         textLink: Search
                         renderLabelsAsRows: false
                         # maxTextLength: ""
+                        errorMode: 'default'
 {{- end -}}

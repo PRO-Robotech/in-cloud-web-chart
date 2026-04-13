@@ -92,6 +92,12 @@ spec:
     - name: Created
       type: factory
       {{ include "in-cloud.web.cco.props.created" . | nindent 6 }}
+    # =================================================
+    # Column: Actions
+    # =================================================
+    - name: Actions
+      type: factory
+      {{ include "in-cloud.web.cco.props.actions.pod" . | nindent 6 }}
 
   # Additional sorters and filters for selected columns
   additionalPrinterColumnsCustomSortersAndFilters:
@@ -106,6 +112,11 @@ spec:
   additionalPrinterColumnsUndefinedValues:
     {{ include "incloud-web-resources.cco.columns-undefined-values.node" . | nindent 4 }}
     {{ include "incloud-web-resources.cco.columns-undefined-values.pod-ip" . | nindent 4 }}
+
+  # Tooltips for standard columns
+  additionalPrinterColumnsTooltips:
+    {{ include "incloud-web-resources.cco.columns-tooltips.name" . | nindent 4 }}
+    {{ include "incloud-web-resources.cco.columns-tooltips.created" . | nindent 4 }}
 
   # Stable identifier used by frontend mapping
   id: stock-cluster-/v1/pods

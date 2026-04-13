@@ -16,6 +16,9 @@ metadata:
 spec:
   key: clusterrolebinding-details
 
+  effectiveReqIndexes:
+    - 0
+
   # =========================
   # Data sources
   # =========================
@@ -113,6 +116,8 @@ spec:
     - type: antdTabs
       data:
         defaultActiveKey: details
+        syncActiveKeyWithHash: true
+        allowOpenInNewBrowserTab: true
         id: tabs-root
         items:
 

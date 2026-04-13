@@ -15,6 +15,9 @@ metadata:
 spec:
   key: horizontalpodautoscaler-details
 
+  effectiveReqIndexes:
+    - 0
+
   # =========================
   # Data sources
   # =========================
@@ -115,6 +118,8 @@ spec:
       data:
         id: tabs-root
         defaultActiveKey: details
+        syncActiveKeyWithHash: true
+        allowOpenInNewBrowserTab: true
         items:
 
           # =========================
@@ -151,9 +156,7 @@ spec:
                         children:
                           {{ include "in-cloud.web.contentCard.horizontalpodautoscalerRuntimeFacts" . | nindent 26 }}
 
-                  # =========================
-                  # Conditions (only when present)
-                  # =========================
+                  # ---- Conditions ----
                   {{ include "in-cloud.web.contentCard.conditionsVisibility" (dict
                       "k8sResourceToFetch" $hpaApiResource
                       "fieldSelector" (dict

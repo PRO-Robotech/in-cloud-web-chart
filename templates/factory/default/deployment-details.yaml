@@ -15,6 +15,9 @@ metadata:
 spec:
   key: deployment-details
 
+  effectiveReqIndexes:
+    - 0
+
   # =========================
   # Data sources
   # =========================
@@ -163,6 +166,8 @@ spec:
       data:
         id: tabs-root
         defaultActiveKey: details
+        syncActiveKeyWithHash: true
+        allowOpenInNewBrowserTab: true
         items:
 
           # =========================
@@ -199,6 +204,7 @@ spec:
                     ) | nindent 18
                   }}
 
+                  # ---- Init containers ----
                   {{ include "in-cloud.web.contentCard.genericVisibilityInclude" (dict
                       "containerId" "init-containers-container"
                       "value" "{reqsJsonPath[0]['.items.0.spec.template.spec.initContainers']['-']}"
@@ -208,6 +214,7 @@ spec:
                     ) | nindent 18
                   }}
 
+                  # ---- Containers ----
                   {{ include "in-cloud.web.contentCard.genericVisibilityInclude" (dict
                       "containerId" "containers-container"
                       "value" "{reqsJsonPath[0]['.items.0.spec.template.spec.containers']['-']}"
@@ -217,9 +224,16 @@ spec:
                     ) | nindent 18
                   }}
 
-                  # =========================
-                  # Conditions (only when present)
-                  # =========================
+
+                  # ---- Volumes ----
+                  {{ include "in-cloud.web.contentCard.volumes" (dict
+                      "reqIndex" 0
+                      "jsonPathToSpec" ".items.0.spec.template.spec"
+                      "errorText" "No efficient data in spec"
+                    ) | nindent 18
+                  }}
+
+                  # ---- Conditions ----
                   {{ include "in-cloud.web.contentCard.conditionsVisibility" (dict
                       "k8sResourceToFetch" $deploymentApiResource
                       "fieldSelector" (dict

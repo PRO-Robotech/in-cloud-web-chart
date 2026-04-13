@@ -91,6 +91,7 @@ customProps:
         maxTextLength: 11
         # textLink: Search
         renderLabelsAsRows: true
+        errorMode: 'default'
 {{- end -}}
 
 {{- define "in-cloud.web.cco.props.created" -}}
