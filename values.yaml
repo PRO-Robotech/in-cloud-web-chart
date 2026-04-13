@@ -1115,6 +1115,7 @@ sidebars:
       enabled: true
       items:
         rolesDiscovery: true  # Show available roles and bindings
+        rolesDiscoveryGraph: true  # Show RBAC relationship graph
         serviceaccounts: true  # Namespace-scoped service accounts
         roles: true  # Namespace-scoped roles
         rolebindings: true  # Namespace-scoped role bindings
@@ -1211,6 +1212,7 @@ sidebars:
       enabled: true
       items:
         rolesDiscovery: true  # Show available roles and bindings
+        rolesDiscoveryGraph: true  # Show RBAC relationship graph
         serviceaccounts: true  # Namespace-scoped service accounts
         roles: true  # Namespace-scoped roles
         rolebindings: true  # Namespace-scoped role bindings
@@ -1253,7 +1255,7 @@ sidebars:
       - clusterrole-details
       - plugin-rbac/clusterroles                            # RBAC plugin view
     configmaps:
-      - v1/configmaps
+      - configmaps
       - configmap-details
     cronjobs:
       - batch/v1/cronjobs
@@ -1277,34 +1279,34 @@ sidebars:
       - batch/v1/jobs
       - job-details
     limitranges:
-      - v1/limitranges
+      - limitranges
       - limitrange-details
     namespaces:
-      - v1/namespaces
+      - namespaces
       - namespace-details
     networkpolicies:
       - networking.k8s.io/v1/networkpolicies
       - networkpolicy-details
     nodes:
-      - v1/nodes
+      - nodes
       - node-details
     persistentvolumeclaims:
-      - v1/persistentvolumeclaims
+      - persistentvolumeclaims
       - persistentvolumeclaim-details
     persistentvolumes:
-      - v1/persistentvolumes
+      - persistentvolumes
       - persistentvolume-details
     poddisruptionbudgets:
       - policy/v1/poddisruptionbudgets
       - poddisruptionbudget-details
     pods:
-      - v1/pods
+      - pods
       - pod-details
     replicasets:
       - apps/v1/replicasets
       - replicaset-details
     resourcequotas:
-      - v1/resourcequotas
+      - resourcequotas
       - resourcequota-details
     rolebindings:
       - rbac.authorization.k8s.io/v1/rolebindings
@@ -1315,15 +1317,17 @@ sidebars:
       - plugin-rbac/roles                                   # RBAC plugin view
     rolesdiscovery:
       - plugin-rbac/table                                   # plugin-only (no K8s resource)
+    rolesdiscoverygraph:
+      - plugin-rbac/rbac                                    # plugin-only RBAC graph view
 
     secrets:
-      - v1/secrets
+      - secrets
       - secret-details
     serviceaccounts:
-      - v1/serviceaccounts
+      - serviceaccounts
       - serviceaccount-details
     services:
-      - v1/services
+      - services
       - service-details
     statefulsets:
       - apps/v1/statefulsets
