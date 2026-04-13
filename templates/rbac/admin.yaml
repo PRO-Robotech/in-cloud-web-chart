@@ -1,5 +1,9 @@
 {{- if .Values.rbac.create }}
 ---
+# ClusterRole granting full access to all front.in-cloud.io resources.
+# Aggregated into the built-in "admin" ClusterRole via the aggregate-to-admin label,
+# so any user with the "admin" role automatically gets full CRUD on UI CRDs
+# (Navigation, Sidebar, Factory, Breadcrumb, CCO, CFO, CFOMapping, etc.).
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:

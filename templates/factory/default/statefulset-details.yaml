@@ -7,6 +7,12 @@
 {{- $statefulsetApiResource := $statefulsetCtx.resource -}}
 {{- $statefulsetPermissionContext := $statefulsetCtx.permissionContext -}}
 {{- $statefulsetEndpoint := $statefulsetCtx.endpoint -}}
+# ============================================================================
+# Factory: statefulset-details
+# ----------------------------------------------------------------------------
+# Detail page for StatefulSets.
+# Toggled via: customWebResources.factory["statefulset-details"].enabled (default: true)
+# ============================================================================
 apiVersion: front.in-cloud.io/v1alpha1
 kind: Factory
 metadata:
@@ -15,6 +21,7 @@ metadata:
 spec:
   key: statefulset-details
 
+  # Indexes into urlsToFetch whose responses are available via reqsJsonPath[N] in the component tree
   effectiveReqIndexes:
     - 0
 
@@ -109,6 +116,7 @@ spec:
                 ) | nindent 14
               }}
 
+              # Change desired replica count via the scale subresource
               {{- include "in-cloud.web.action.scale" (dict
                   "endpoint" (printf "%s/scale" $statefulsetEndpoint)
                   "permissionContext" (merge (dict
@@ -117,6 +125,7 @@ spec:
                 ) | nindent 14
               }}
 
+              # Rolling restart of Pods (rollout restart)
               {{- include "in-cloud.web.action.rolloutRestart" (dict
                   "endpoint" $statefulsetEndpoint
                   "permissionContext" $statefulsetPermissionContext
@@ -137,8 +146,11 @@ spec:
     - type: antdTabs
       data:
         id: tabs-root
+        # Tab selected by default when the page loads
         defaultActiveKey: details
+        # Persist the active tab key in the URL hash for bookmarking and refresh
         syncActiveKeyWithHash: true
+        # Show "Open in new tab" context action on each tab header
         allowOpenInNewBrowserTab: true
         items:
 
@@ -256,6 +268,7 @@ spec:
           # =========================
           # AQUA SECURITY TAB (optional)
           # =========================
+          # When customWebResources.factory["node-details"].enableConfigReportsAquaTab is true
           {{- if (index .Values.customWebResources.factory "node-details").enableConfigReportsAquaTab }}
           - key: reports
             label: Reports

@@ -17,6 +17,47 @@ spec:
     - name: v1alpha1
       schema:
         openAPIV3Schema:
+          description: >-
+            Factory is a declarative page descriptor that tells the openapi-ui application
+            how to render a resource detail page. The UI resolves a Factory CR by its
+            spec.key (matched via Navigation.baseFactoriesMapping or a direct route).
+            The spec is intentionally free-form (x-kubernetes-preserve-unknown-fields)
+            because Factory pages compose an arbitrary tree of UI components.
+
+            Commonly used spec fields (defined in Helm templates, not in this schema):
+
+              key (string) — Unique factory identifier, e.g., "deployment-details".
+                Matched by Navigation.baseFactoriesMapping values and used in URL routes.
+
+              effectiveReqIndexes ([]int) — 0-based indexes into urlsToFetch that provide
+                data for reqIndex / reqsJsonPath expressions inside the component tree.
+
+              urlsToFetch ([]object) — List of K8s API requests the page needs. Each entry
+                specifies cluster, apiGroup, apiVersion, plural, namespace, and an optional
+                fieldSelector (e.g., "metadata.name={9}"). The UI fetches these on page load
+                and exposes results as reqsJsonPath[<index>][<jsonPath>][<fallback>].
+
+              withScrollableMainContentCard (bool) — When false, the main content card body
+                is not wrapped in an extra scroll container (full-page layout).
+
+              sidebarTags ([]string) — Tags used to highlight the active sidebar item.
+                Typically "{apiGroup}/{apiVersion}/{plural}" matching keysAndTags values.
+
+              data ([]object) — Tree of UI component descriptors. Each node has:
+                type (string): component type, e.g., "antdFlex", "antdTabs", "ResourceBadge",
+                  "DropdownRedirect", "CopyButton", "ActionsDropdown", "EnrichedTable",
+                  "DefaultDiv", "Labels", etc.
+                data (object): props passed to the component. May include id, style,
+                  reqIndex, jsonPath, endpoint, and component-specific fields.
+                children ([]object): nested components (same structure recursively).
+
+            URL / JSONPath template placeholders used throughout data trees:
+              Positional: {2}=cluster, {3}=namespace, {5..9}=apiGroup/version/plural/name segments.
+              reqsJsonPath: {reqsJsonPath[<reqIdx>]['<jsonPath>']['<fallback>']}
+              chosenEntryValue: value selected in a DropdownRedirect.
+          required:
+          - spec
+          type: object
           properties:
             apiVersion:
               type: string
@@ -26,10 +67,10 @@ spec:
               type: object
             spec:
               type: object
+              description: >-
+                Free-form page descriptor. See the top-level description for commonly used
+                fields: key, effectiveReqIndexes, urlsToFetch, sidebarTags, data.
               x-kubernetes-preserve-unknown-fields: true
-          required:
-          - spec
-          type: object
       served: true
       storage: true
       subresources:

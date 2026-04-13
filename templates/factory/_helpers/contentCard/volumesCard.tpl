@@ -11,6 +11,7 @@
     - type: DefaultDiv
       data:
         id: volumes-card-title
+        # AntD: flex row (icon + title)
         style:
           display: flex
           gap: 12px
@@ -41,13 +42,18 @@
     # =========================
     - type: Volumes
       data:
+        # Request index in factory context for volume source data
         reqIndex: {{ .reqIndex | default 0 }}
+        # JSONPath to Pod/Workload spec containing volumes
         jsonPathToSpec: {{ .jsonPathToSpec | default ".items.0.spec" }}
         errorText: {{ .errorText | default "No efficient data in spec" | quote }}
         baseprefix: "/openapi-ui"
+        # Target cluster for volume resolution
         cluster: '{2}'
+        # Namespace scope for namespaced fetches (factory route segment)
         forcedNamespace: '{3}'
 
+        # JSONPath to Pod name in the fetched resource
         jsonPathToPodName: .items.0.metadata.name
         baseFactoryClusterSceopedAPIKey: base-factory-clusterscoped-api
         baseFactoryClusterSceopedBuiltinKey: base-factory-clusterscoped-builtin

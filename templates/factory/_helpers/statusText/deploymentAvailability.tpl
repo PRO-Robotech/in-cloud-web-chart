@@ -1,4 +1,6 @@
-
+{{/*
+  StatusText for Deployment row: derives Available / Error / Progressing from condition reasons.
+*/}}
 {{- define "in-cloud.web.statusText.deploymentAvailability" -}}
 {{- $itemPath := ".items.0" -}}
 {{- if hasKey . "itemPath" -}}
@@ -7,27 +9,38 @@
 - type: StatusText
   data:
     id: header-status
-    # 1) Collect all possible Deployment conditions
+    # values: JSONPath expressions whose results are matched by the criteria* rules (here: all
+    # condition reasons).
     values:
       - "{reqsJsonPath[0]['{{ $itemPath }}.status.conditions[*].reason']['-']}"
 
-    # 2) Criteria: positive / negative; neutral goes to fallback
+    # criteria* / valueToCompare* / strategy*: rules that classify collected values into success,
+    # error, or fallback labels.
     criteriaSuccess: equals
     valueToCompareSuccess:
       # Positive reasons
-      - "MinimumReplicasAvailable"     # Available: all replicas are healthy
-      - "NewReplicaSetAvailable"       # Progressing: new RS serves traffic
-      - "ReplicaSetUpdated"            # Progressing: RS is updated/synced
-      - "Complete"                     # Update completed successfully
+      # Available: all replicas are healthy
+      - "MinimumReplicasAvailable"
+      # Progressing: new RS serves traffic
+      - "NewReplicaSetAvailable"
+      # Progressing: RS is updated/synced
+      - "ReplicaSetUpdated"
+      # Update completed successfully
+      - "Complete"
 
     criteriaError: equals
     valueToCompareError:
       # Negative reasons
-      - "DeploymentReplicaFailure"     # General replica failure
-      - "FailedCreate"                 # Failed to create Pod/RS
-      - "FailedDelete"                 # Failed to delete resource
-      - "FailedScaleUp"                # Failed to scale up
-      - "FailedScaleDown"              # Failed to scale down
+      # General replica failure
+      - "DeploymentReplicaFailure"
+      # Failed to create Pod/RS
+      - "FailedCreate"
+      # Failed to delete resource
+      - "FailedDelete"
+      # Failed to scale up
+      - "FailedScaleUp"
+      # Failed to scale down
+      - "FailedScaleDown"
 
     # 3) Texts to display
     successText:  "Available"

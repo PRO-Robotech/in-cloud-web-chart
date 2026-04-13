@@ -12,6 +12,7 @@
     - type: DefaultDiv
       data:
         id: conditions-card-title
+        # AntD: flex row (icon + title)
         style:
           display: flex
           gap: 12px
@@ -43,7 +44,9 @@
     - type: EnrichedTable
       data:
         baseprefix: /openapi-ui
+        # Target cluster for table data fetch
         cluster: '{2}'
+        # CCO id: table columns/presentation for status conditions
         customizationId: factory-status-conditions
         id: conditions-table
         pathToItems: .items.0.status.conditions

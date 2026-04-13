@@ -3,9 +3,13 @@
 {{- $customCco := index $customCcoResources "stock-namespace-policy.v1.poddisruptionbudgets" -}}
 {{- if eq (include "in-cloud.web.cco.isEnabled" (dict "config" $customCco)) "true" }}
 ---
-# =================================================
-# CustomColumnsOverride definition
-# =================================================
+# ============================================================================
+# CustomColumnsOverride: stock-namespace-policy.v1.poddisruptionbudgets
+# ----------------------------------------------------------------------------
+# Table columns for PodDisruptionBudget (namespaced).
+# Toggled via:
+# customWebResources.customcolumnsoverride["stock-namespace-policy.v1.poddisruptionbudgets"]
+# ============================================================================
 apiVersion: front.in-cloud.io/v1alpha1
 kind: CustomColumnsOverride
 metadata:

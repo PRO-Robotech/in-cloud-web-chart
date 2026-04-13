@@ -1,7 +1,12 @@
+{{/*
+  Generic ContentCard helpers: EnrichedTable-backed lists and container tables.
+  AntD: optional card margin; list headers often use DefaultDiv flex rows (see genericContainersTableCard).
+*/}}
 {{- define "in-cloud.web.contentCard.genericResourceListCard" -}}
 - type: ContentCard
   data:
     id: {{ .cardId }}
+    # AntD: card spacing
     style:
       marginBottom: 24px
   children:
@@ -9,9 +14,12 @@
       data:
         id: {{ .tableId }}
         baseprefix: /openapi-ui
+        # Target cluster for list fetch
         cluster: "{2}"
+        # CCO id: table columns/presentation for this resource list
         customizationId: {{ .customizationId | quote }}
 
+        # Kubernetes API object to list (group/version/plural[, namespace])
         k8sResourceToFetch:
           {{- if .apiGroup }}
           apiGroup: {{ .apiGroup | quote }}
@@ -19,10 +27,12 @@
           apiVersion: {{ .apiVersion | quote }}
           plural: {{ .plural | quote }}
           {{- if .ifNamespaced }}
+          # Namespace for namespaced list API calls
           namespace: "{3}"
           {{- end }}
 
         dataForControls:
+          # Cluster for table control actions (same target as list)
           cluster: "{2}"
           {{- if .apiGroup }}
           apiGroup: {{ .apiGroup | quote }}
@@ -30,6 +40,7 @@
           apiVersion: {{ .apiVersion | quote }}
           plural: {{ .plural | quote }}
           {{- if .ifNamespaced }}
+          # Namespace for control actions on namespaced resources
           namespace: "{3}"
           {{- end }}
 
@@ -65,6 +76,7 @@
     - type: DefaultDiv
       data:
         id: {{ .titleRowId }}
+        # AntD: flex row (icon + title)
         style:
           display: flex
           gap: 12px
@@ -96,14 +108,18 @@
     - type: EnrichedTable
       data:
         id: {{ .tableId }}
+        # Target cluster for table data fetch
         cluster: "{2}"
+        # CCO id: table columns/presentation for containers
         customizationId: {{ .customizationId | quote }}
         baseprefix: "/openapi-ui"
         withoutControls: true
         pathToItems: {{ .pathToItems }}
         pathToKey: .name
+        # Kubernetes API object that holds the container list
         k8sResourceToFetch:
           {{- toYaml .k8sResourceToFetch | nindent 10 }}
+        # Field selector: pin table to a single resource (e.g. by metadata.name)
         fieldSelector:
           metadata.name: {{ .nameFieldSelector | quote }}
         additionalReqsDataToEachItem:

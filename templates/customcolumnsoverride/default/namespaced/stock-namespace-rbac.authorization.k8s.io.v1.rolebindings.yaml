@@ -3,9 +3,14 @@
 {{- $customCco := index $customCcoResources "stock-namespace-rbac.authorization.k8s.io.v1.rolebindings" -}}
 {{- if eq (include "in-cloud.web.cco.isEnabled" (dict "config" $customCco)) "true" }}
 ---
-# =================================================
-# CustomColumnsOverride definition
-# =================================================
+# ============================================================================
+# CustomColumnsOverride: stock-namespace-rbac.authorization.k8s.io.v1.rolebindings
+# ----------------------------------------------------------------------------
+# Table columns for RoleBinding (namespaced).
+# Toggled via:
+# customWebResources.customcolumnsoverride["stock-namespace-
+# rbac.authorization.k8s.io.v1.rolebindings"]
+# ============================================================================
 apiVersion: front.in-cloud.io/v1alpha1
 kind: CustomColumnsOverride
 metadata:

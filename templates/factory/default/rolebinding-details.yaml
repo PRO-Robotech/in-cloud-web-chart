@@ -8,6 +8,12 @@
 {{- $rolebindingPermissionContext := $rolebindingCtx.permissionContext -}}
 {{- $rolebindingEndpoint := $rolebindingCtx.endpoint -}}
 ---
+# ============================================================================
+# Factory: rolebinding-details
+# ----------------------------------------------------------------------------
+# Detail page for RoleBindings.
+# Toggled via: customWebResources.factory["rolebinding-details"].enabled (default: true)
+# ============================================================================
 apiVersion: front.in-cloud.io/v1alpha1
 kind: Factory
 metadata:
@@ -16,6 +22,7 @@ metadata:
 spec:
   key: rolebinding-details
 
+  # Indexes into urlsToFetch whose responses are available via reqsJsonPath[N] in the component tree
   effectiveReqIndexes:
     - 0
 
@@ -114,8 +121,11 @@ spec:
     # =========================
     - type: antdTabs
       data:
+        # Tab selected by default when the page loads
         defaultActiveKey: details
+        # Persist the active tab key in the URL hash for bookmarking and refresh
         syncActiveKeyWithHash: true
+        # Show "Open in new tab" context action on each tab header
         allowOpenInNewBrowserTab: true
         id: tabs-root
         items:

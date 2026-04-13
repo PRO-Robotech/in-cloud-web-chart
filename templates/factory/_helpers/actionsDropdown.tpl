@@ -11,6 +11,8 @@
     # PERMISSION CHECK
     # =========================
     {{- with .permissionContext }}
+    # RBAC check — the UI verifies the user has the required verb on this resource before showing
+    # the action
     permissionContext:
       {{ toYaml . | nindent 6 }}
     {{- end }}
@@ -61,6 +63,7 @@
     # =========================
     # API endpoint (parameterized)
     # =========================
+    # BFF proxy URL used for the API call (PATCH/DELETE/PUT)
     endpoint: {{ .endpoint | quote }}
 
     # =========================
@@ -231,6 +234,7 @@
     # =========================
     # Visibility rules
     # =========================
+    # Condition evaluated by the UI to show/hide this action (e.g., check a field value)
     visibleWhen:
       criteria: notEquals
       value: {{ printf "{reqsJsonPath[0]['%s.spec.unschedulable']['-']}" $itemsPath | quote }}

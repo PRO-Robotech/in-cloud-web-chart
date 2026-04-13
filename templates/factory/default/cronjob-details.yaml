@@ -7,6 +7,12 @@
 {{- $cronjobApiResource := $cronjobCtx.resource -}}
 {{- $cronjobPermissionContext := $cronjobCtx.permissionContext -}}
 {{- $cronjobEndpoint := $cronjobCtx.endpoint -}}
+# ============================================================================
+# Factory: cronjob-details
+# ----------------------------------------------------------------------------
+# Detail page for CronJobs.
+# Toggled via: customWebResources.factory["cronjob-details"].enabled (default: true)
+# ============================================================================
 apiVersion: front.in-cloud.io/v1alpha1
 kind: Factory
 metadata:
@@ -15,6 +21,7 @@ metadata:
 spec:
   key: cronjob-details
 
+  # Indexes into urlsToFetch whose responses are available via reqsJsonPath[N] in the component tree
   effectiveReqIndexes:
     - 0
 
@@ -172,8 +179,11 @@ spec:
     - type: antdTabs
       data:
         id: tabs-root
+        # Tab selected by default when the page loads
         defaultActiveKey: details
+        # Persist the active tab key in the URL hash for bookmarking and refresh
         syncActiveKeyWithHash: true
+        # Show "Open in new tab" context action on each tab header
         allowOpenInNewBrowserTab: true
         items:
 
@@ -306,6 +316,7 @@ spec:
           # =========================
           # AQUA SECURITY TAB (optional)
           # =========================
+          # When customWebResources.factory["node-details"].enableConfigReportsAquaTab is true
           {{- if (index .Values.customWebResources.factory "node-details").enableConfigReportsAquaTab }}
           - key: reports
             label: Reports

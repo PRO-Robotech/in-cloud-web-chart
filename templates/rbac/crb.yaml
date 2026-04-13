@@ -1,4 +1,7 @@
 {{- if .Values.rbac.create }}
+# Binds the front-in-cloud-view ClusterRole to all authenticated users.
+# This ensures every logged-in user can read front.in-cloud.io CRDs,
+# which is required for the UI to render navigation, sidebars, factories, etc.
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:

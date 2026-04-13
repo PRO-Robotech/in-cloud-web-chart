@@ -3,9 +3,12 @@
 {{- $customCco := index $customCcoResources "stock-namespace-batch.v1.jobs" -}}
 {{- if eq (include "in-cloud.web.cco.isEnabled" (dict "config" $customCco)) "true" }}
 ---
-# =================================================
-# CustomColumnsOverride definition
-# =================================================
+# ============================================================================
+# CustomColumnsOverride: stock-namespace-batch.v1.jobs
+# ----------------------------------------------------------------------------
+# Table columns for Job (namespaced).
+# Toggled via: customWebResources.customcolumnsoverride["stock-namespace-batch.v1.jobs"]
+# ============================================================================
 apiVersion: front.in-cloud.io/v1alpha1
 kind: CustomColumnsOverride
 metadata:

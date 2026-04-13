@@ -1,3 +1,4 @@
+{{/* HorizontalPodAutoscaler-specific detail cards: scale target ref and replica bounds/status. */}}
 {{- define "in-cloud.web.contentCard.horizontalpodautoscalerRuntimeFacts" -}}
 # Content card with HPA runtime facts (two columns)
 - type: ContentCard
@@ -68,6 +69,7 @@
                         baseprefix: /openapi-ui
                         cluster: '{2}'
                         #forcedNamespace: '{3}'
+                        {{/* Which parallel fetch result (reqsJsonPath index) to read */}}
                         reqIndex: 0
                         errorText: error getting refs
                         notArrayErrorText: refs on path are not arr

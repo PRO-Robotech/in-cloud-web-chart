@@ -1,3 +1,7 @@
+{{/*
+  Deployment-specific detail cards: rollout/runtime facts; ReplicaSet, Pod, and volume lists are
+  defined in sibling helpers.
+*/}}
 {{- define "in-cloud.web.contentCard.deploymentRuntimeFacts" -}}
 # Content card with Deployment runtime facts (two columns)
 - type: ContentCard

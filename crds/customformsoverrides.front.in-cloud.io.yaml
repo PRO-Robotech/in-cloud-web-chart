@@ -17,6 +17,39 @@ spec:
     - name: v1alpha1
       schema:
         openAPIV3Schema:
+          description: >-
+            CustomFormsOverride (CFO) customizes the create/edit form for a specific
+            Kubernetes resource type in the openapi-ui application. The UI resolves a CFO
+            via the CFOMapping CR, which maps an API path to a spec.customizationId.
+
+            The spec is free-form (x-kubernetes-preserve-unknown-fields) because form
+            customization can include arbitrary JSON Schema overrides. Commonly used
+            spec fields (defined in Helm templates, not enforced by schema):
+
+              customizationId (string) — Identifier matched by CFOMapping.spec.mappings.
+                Convention: "default-/<apiGroup>/<apiVersion>/<plural>"
+                (e.g., "default-/apps/v1/deployments") or "fallback" for the default CFO.
+
+              forceViewMode (string) — Controls the form editor mode.
+                "Manual" shows a structured form; other values may show raw YAML.
+
+              hidden ([][]string) — List of field paths to hide from the form.
+                Each entry is an array of path segments, e.g., ["metadata", "uid"].
+                Commonly used helpers in templates:
+                  hidden.metadata.system — hides system-managed fields (uid, resourceVersion, etc.)
+                  hidden.metadata.api — hides kind and apiVersion fields
+                  hidden.status — hides the entire status subtree
+                  hidden.template.metadata.system — hides system fields in spec.template.metadata
+
+              schema (object) — JSON Schema overrides merged with the resource's OpenAPI schema.
+                Can customize field types (e.g., multilineString for ConfigMap data values),
+                add descriptions, or modify validation rules. Empty {} means no overrides.
+
+              strategy (string) — How the schema override is applied: "merge" merges with
+                the base schema, "replace" replaces it entirely. Default is typically "merge".
+          required:
+          - spec
+          type: object
           properties:
             apiVersion:
               type: string
@@ -26,10 +59,10 @@ spec:
               type: object
             spec:
               type: object
+              description: >-
+                Free-form form customization. See the top-level description for commonly
+                used fields: customizationId, forceViewMode, hidden, schema, strategy.
               x-kubernetes-preserve-unknown-fields: true
-          required:
-          - spec
-          type: object
       served: true
       storage: true
       subresources:

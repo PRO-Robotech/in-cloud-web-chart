@@ -3,9 +3,13 @@
 {{- $customCco := index $customCcoResources "stock-cluster-cert-manager.io.v1.certificates" -}}
 {{- if eq (include "in-cloud.web.cco.isEnabled" (dict "config" $customCco)) "true" }}
 ---
-# =================================================
-# CustomColumnsOverride definition
-# =================================================
+# ============================================================================
+# CustomColumnsOverride: stock-cluster-cert-manager.io.v1.certificates
+# ----------------------------------------------------------------------------
+# Table columns for Certificate (cert-manager.io) (cluster-scoped).
+# Toggled via:
+# customWebResources.customcolumnsoverride["stock-cluster-cert-manager.io.v1.certificates"]
+# ============================================================================
 apiVersion: front.in-cloud.io/v1alpha1
 kind: CustomColumnsOverride
 metadata:

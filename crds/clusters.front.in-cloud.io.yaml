@@ -19,6 +19,12 @@ spec:
       schema:
         openAPIV3Schema:
           type: object
+          description: >-
+            Cluster represents a logical Kubernetes cluster registered in the openapi-ui
+            application. When CLUSTERLIST_API_RESOURCE_PLURAL is set to "clusters", the UI
+            fetches Cluster CRs instead of the static JSON cluster list served by nginx.
+            Each Cluster CR provides display metadata (name, version) used in the cluster
+            selector and cluster list page.
           required:
             - spec
           properties:
@@ -30,5 +36,8 @@ spec:
               type: object
             spec:
               type: object
-              description: Empty spec for Cluster resource
+              description: >-
+                Free-form cluster metadata. Commonly used fields (not enforced by schema):
+                  displayName (string) — human-readable cluster label shown in the UI.
+                  version (string) — cluster or chart version displayed on the cluster list page.
               x-kubernetes-preserve-unknown-fields: true

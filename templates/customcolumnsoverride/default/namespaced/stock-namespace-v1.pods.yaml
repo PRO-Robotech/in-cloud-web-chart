@@ -3,9 +3,12 @@
 {{- $customCco := index $customCcoResources "stock-namespace-v1.pods" -}}
 {{- if eq (include "in-cloud.web.cco.isEnabled" (dict "config" $customCco)) "true" }}
 ---
-# =================================================
-# CustomColumnsOverride definition
-# =================================================
+# ============================================================================
+# CustomColumnsOverride: stock-namespace-v1.pods
+# ----------------------------------------------------------------------------
+# Table columns for Pod (namespaced).
+# Toggled via: customWebResources.customcolumnsoverride["stock-namespace-v1.pods"]
+# ============================================================================
 apiVersion: front.in-cloud.io/v1alpha1
 kind: CustomColumnsOverride
 metadata:
@@ -56,6 +59,8 @@ spec:
     - name: QOS
       type: string
       jsonPath: .status.qosClass
+    # Memory/CPU columns read container usage from additionalReqsData (metrics fetch), not from the
+    # Pod object alone.
     # =================================================
     # Column: Memory
     # =================================================

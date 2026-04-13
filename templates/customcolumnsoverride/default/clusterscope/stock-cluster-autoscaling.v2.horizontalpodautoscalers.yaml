@@ -3,9 +3,13 @@
 {{- $customCco := index $customCcoResources "stock-cluster-autoscaling.v2.horizontalpodautoscalers" -}}
 {{- if eq (include "in-cloud.web.cco.isEnabled" (dict "config" $customCco)) "true" }}
 ---
-# =================================================
-# CustomColumnsOverride definition
-# =================================================
+# ============================================================================
+# CustomColumnsOverride: stock-cluster-autoscaling.v2.horizontalpodautoscalers
+# ----------------------------------------------------------------------------
+# Table columns for HorizontalPodAutoscaler (cluster-scoped).
+# Toggled via:
+# customWebResources.customcolumnsoverride["stock-cluster-autoscaling.v2.horizontalpodautoscalers"]
+# ============================================================================
 apiVersion: front.in-cloud.io/v1alpha1
 kind: CustomColumnsOverride
 metadata:

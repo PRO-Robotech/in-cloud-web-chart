@@ -31,10 +31,15 @@ spec:
   # List of exposed ports for the Service
   ports:
     {{- range .Values.service.ports }}
-    - name: {{ .name }}                              # Port name (must be DNS-compatible)
-      port: {{ .port }}                              # Port exposed by the Service
-      targetPort: {{ .targetPort | default .port }}  # Target port on the pod/container
-      protocol: {{ .protocol | default "TCP" }}      # Protocol (default is TCP)
-      nodePort: {{ .nodePort | default nil }}    # NodePort (if type is NodePort)
+    # Port name (must be DNS-compatible)
+    - name: {{ .name }}
+      # Port exposed by the Service
+      port: {{ .port }}
+      # Target port on the pod/container
+      targetPort: {{ .targetPort | default .port }}
+      # Protocol (default is TCP)
+      protocol: {{ .protocol | default "TCP" }}
+      # NodePort (if type is NodePort)
+      nodePort: {{ .nodePort | default nil }}
     {{- end }}
 {{- end }}

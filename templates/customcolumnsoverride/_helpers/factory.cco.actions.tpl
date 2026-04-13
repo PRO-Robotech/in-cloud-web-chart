@@ -12,6 +12,8 @@
   In CCO (table) context each row IS the resource object:
     name      → {reqsJsonPath[0]['.metadata.name']['-']}
     namespace → {reqsJsonPath[0]['.metadata.namespace']['-']}
+  {2} — cluster id segment in UI paths (e.g. /openapi-ui/{2}/... and /api/clusters/{2}/k8s/...).
+  reqsJsonPath[0] — first parallel fetch result = the row resource (placeholders in jsonPath/actions resolve against it).
   ============================================================
 */}}
 

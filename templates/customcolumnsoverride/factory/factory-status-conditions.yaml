@@ -3,9 +3,12 @@
 {{- $customCco := index $customCcoResources "factory-status-conditions" -}}
 {{- if eq (include "in-cloud.web.cco.isEnabled" (dict "config" $customCco)) "true" }}
 ---
-# =================================================
-# CustomColumnsOverride definition
-# =================================================
+# ============================================================================
+# CustomColumnsOverride: factory-status-conditions
+# ----------------------------------------------------------------------------
+# Embedded table columns for status conditions within Factory detail pages.
+# Toggled via: customWebResources.customcolumnsoverride["factory-status-conditions"]
+# ============================================================================
 apiVersion: front.in-cloud.io/v1alpha1
 kind: CustomColumnsOverride
 metadata:

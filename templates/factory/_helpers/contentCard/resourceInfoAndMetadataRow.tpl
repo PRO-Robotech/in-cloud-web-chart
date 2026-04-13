@@ -12,6 +12,7 @@
 {{- if hasKey . "withResponsive" }}
 {{- $withResponsive = .withResponsive }}
 {{- end }}
+# AntD grid layout: resource info and metadata counters side by side (responsive columns).
 - type: antdRow
   data:
     # Keep vertical gap when columns collapse to stacked layout on smaller widths/zoom.
@@ -38,6 +39,10 @@
         xl: 12
         {{- end }}
       children:
+        {{/*
+          endpoint: BFF proxy URL for PATCH on metadata; permissionContext: RBAC;
+          fieldSelector/k8sResourceToFetch: optional fetch scope
+        */}}
         {{ include $metadataTemplate (dict
             "endpoint" .endpoint
             "permissionContext" .permissionContext

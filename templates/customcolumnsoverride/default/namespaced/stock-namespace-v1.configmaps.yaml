@@ -3,9 +3,12 @@
 {{- $customCco := index $customCcoResources "stock-namespace-v1.configmaps" -}}
 {{- if eq (include "in-cloud.web.cco.isEnabled" (dict "config" $customCco)) "true" }}
 ---
-# =================================================
-# CustomColumnsOverride definition
-# =================================================
+# ============================================================================
+# CustomColumnsOverride: stock-namespace-v1.configmaps
+# ----------------------------------------------------------------------------
+# Table columns for ConfigMap (namespaced).
+# Toggled via: customWebResources.customcolumnsoverride["stock-namespace-v1.configmaps"]
+# ============================================================================
 apiVersion: front.in-cloud.io/v1alpha1
 kind: CustomColumnsOverride
 metadata:

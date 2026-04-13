@@ -9,15 +9,22 @@
 {{- $namespacePermissionContext := $namespaceCtx.permissionContext -}}
 {{- $namespaceEndpoint := $namespaceCtx.endpoint -}}
 ---
+# ============================================================================
+# Factory: namespace-details
+# ----------------------------------------------------------------------------
+# Detail page for Namespace resources (cluster-scoped built-in).
+# Enabled via: defaultWebResources.factory.default["namespace-details"]
+# ============================================================================
 apiVersion: front.in-cloud.io/v1alpha1
 kind: Factory
 metadata:
   name: namespace-details
 
 spec:
+  # Unique factory identifier — matched by Navigation.baseFactoriesMapping
   key: namespace-details
 
-  # Declares which urlsToFetch slots (0-based) supply data for reqIndex / reqsJsonPath in this tree.
+  # Indexes into urlsToFetch whose responses are available via reqsJsonPath[N] in the component tree
   effectiveReqIndexes:
     - 0
 
@@ -25,18 +32,19 @@ spec:
   # Data sources
   # =========================
   urlsToFetch:
-    # Primary resource request (from shared factory context)
+    # Slot 0: primary resource list/get (from shared factory context)
     {{- include "in-cloud.web.factoryContext.primaryUrlToFetchList" (dict
         "resource" $namespaceBuiltinResource
         "fieldSelector" "metadata.name={7}"
       ) | trim | nindent 4 }}
 
-  # When false, main card body is not wrapped in an extra scroll container (full-page layout).
+  # false = full-page layout without extra scroll wrapper
   withScrollableMainContentCard: false
 
   # =========================
   # Sidebar tags for navigation
   # =========================
+  # Tags matched against Sidebar.keysAndTags to highlight active sidebar item
   sidebarTags:
     - '{5}/{6}'
     - 'namespace-details'
@@ -115,11 +123,14 @@ spec:
     # =========================
     # Main content tabs
     # =========================
+    # antdTabs — tabbed main section (Details, YAML, Events)
     - type: antdTabs
       data:
+        # Tab selected by default when the page loads
         defaultActiveKey: details
-        # Sync selected tab with location hash; allow middle-click / open tab in a new browser tab.
+        # Persist the active tab key in the URL hash for bookmarking and refresh
         syncActiveKeyWithHash: true
+        # Show "Open in new tab" context action on each tab header
         allowOpenInNewBrowserTab: true
         id: tabs-root
         items:
@@ -130,6 +141,7 @@ spec:
           - key: details
             label: Details
             children:
+              # antdFlex — Details tab content stack
               - type: antdFlex
                 data:
                   id: details-stack

@@ -1,23 +1,23 @@
 # in-Cloud Web Chart
 
-Helm chart для развёртывания **in-Cloud Web UI** в Kubernetes.
+Helm chart for deploying **in-Cloud Web UI** to Kubernetes.
 
-## Обзор
+## Overview
 
-Chart разворачивает до четырёх контейнеров в одном Pod:
+The chart deploys up to four containers in a single Pod:
 
-| Контейнер | Назначение | Порт по умолчанию |
-|-----------|------------|-------------------|
+| Container | Purpose | Default port |
+|-----------|---------|--------------|
 | **web** | Frontend UI (OpenAPI UI) | 8080 |
-| **nginx** | Обратный прокси, маршрутизация запросов к кластерам | 8081 |
-| **bff** | Backend-for-Frontend — прокси к Kubernetes API | 8082 |
-| **moduleExample** | Пример плагина (опционально, отключён по умолчанию) | 8083 |
+| **nginx** | Reverse proxy, routing requests to clusters | 8081 |
+| **bff** | Backend-for-Frontend — proxy to the Kubernetes API | 8082 |
+| **moduleExample** | Example plugin (optional, disabled by default) | 8083 |
 
-Опционально подключаются **oauth2-proxy** и **Dex** для аутентификации через OIDC.
+**oauth2-proxy** and **Dex** can optionally be enabled for OIDC authentication.
 
-Chart устанавливает **CRD** группы `front.in-cloud.io/v1alpha1` для кастомизации UI — навигация, фабрики, боковые панели, кастомные колонки/формы и др.
+The chart installs **CRDs** in the `front.in-cloud.io/v1alpha1` group for UI customization — navigation, factories, sidebars, custom columns/forms, and more.
 
-## Архитектура
+## Architecture
 
 ```
                          ┌─────────┐
@@ -54,56 +54,56 @@ Chart устанавливает **CRD** группы `front.in-cloud.io/v1alpha
                    └──────────────┘
 ```
 
-### Маршрутизация nginx
+### nginx routing
 
-| Путь | Назначение |
-|------|------------|
-| `/clusterlist`, `/api/clusters` | JSON-список кластеров |
-| `/api/clusters/<name>/*` | Проксирование к API указанного кластера |
-| `/k8s/*` | Проксирование к `kubernetes.default.svc:443` (WebSocket) |
-| `/openapi-bff/*` | Проксирование к BFF-контейнеру |
-| `/openapi-bff-ws/*` | WebSocket-проксирование к BFF |
-| `/openapi-ui/*` | Проксирование к Web-контейнеру (SPA) |
-| `/openapi-ui-plugin/*` | Проксирование к плагину (если включён) |
-| `/dex/*` | Проксирование к Dex (если включён) |
-| `/oauth2/*` | Проксирование к oauth2-proxy (если включён) |
+| Path | Purpose |
+|------|---------|
+| `/clusterlist`, `/api/clusters` | JSON list of clusters |
+| `/api/clusters/<name>/*` | Proxying to the specified cluster API |
+| `/k8s/*` | Proxying to `kubernetes.default.svc:443` (WebSocket) |
+| `/openapi-bff/*` | Proxying to the BFF container |
+| `/openapi-bff-ws/*` | WebSocket proxying to BFF |
+| `/openapi-ui/*` | Proxying to the Web container (SPA) |
+| `/openapi-ui-plugin/*` | Proxying to the plugin (if enabled) |
+| `/dex/*` | Proxying to Dex (if enabled) |
+| `/oauth2/*` | Proxying to oauth2-proxy (if enabled) |
 | `/healthcheck` | Health-check endpoint |
 
-## Требования
+## Requirements
 
 - Kubernetes `>= 1.22`
 - Helm `>= 3.8`
-- (Опционально) доступ к приватному container registry через `imagePullSecrets`
+- (Optional) access to a private container registry via `imagePullSecrets`
 
-## Быстрый старт
+## Quick start
 
-### Установка из OCI-реестра
+### Installation from OCI registry
 
 ```bash
 helm upgrade --install incloud-web oci://registry-1.docker.io/prorobotech/incloud-web-chart --version 0.0.0-feature-CLOUD-484-440fb5a \
   --namespace incloud --create-namespace
 ```
 
-### Установка из локальной директории
+### Installation from a local directory
 
 ```bash
 helm dependency update .
 helm install incloud-web . --namespace incloud --create-namespace
 ```
 
-### Рендер манифестов без установки
+### Render manifests without installing
 
 ```bash
 helm template incloud-web . --namespace incloud
 ```
 
-### Обновление релиза
+### Upgrade release
 
 ```bash
 helm upgrade incloud-web . --namespace incloud
 ```
 
-### С включённой аутентификацией (oauth2-proxy + Dex)
+### With authentication enabled (oauth2-proxy + Dex)
 
 ```bash
 helm install incloud-web . \
@@ -112,123 +112,123 @@ helm install incloud-web . \
   --set dex.enabled=true
 ```
 
-## Зависимости
+## Dependencies
 
-| Chart | Версия | Репозиторий | Условие |
-|-------|--------|-------------|---------|
+| Chart | Version | Repository | Condition |
+|-------|---------|------------|-----------|
 | oauth2-proxy | 7.18.0 | https://oauth2-proxy.github.io/manifests | `oauth2-proxy.enabled` |
 | dex | 0.23.1 | https://charts.dexidp.io | `dex.enabled` |
 
-Архивы зависимостей включены в `charts/`. При необходимости обновить:
+Dependency archives are included under `charts/`. To update them if needed:
 
 ```bash
 helm dependency update .
 ```
 
-## Конфигурация
+## Configuration
 
-Полная конфигурация задаётся через `values.yaml` (~1186 строк). Ниже приведены основные параметры.
+Full configuration is defined in `values.yaml` (~1186 lines). Below are the main parameters.
 
-### Глобальные параметры
+### Global parameters
 
-| Параметр | Тип | По умолчанию | Описание |
-|----------|-----|-------------|----------|
-| `nameOverride` | string | `""` | Переопределение имени chart |
-| `fullnameOverride` | string | `""` | Переопределение полного имени релиза |
-| `replicaCount` | int | `1` | Количество реплик Pod |
-| `imagePullSecrets` | list | `[]` | Секреты для доступа к приватным registry |
-| `priorityClassName` | string | `"system-cluster-critical"` | Priority class для Pod |
-| `basePrefix` | string | `"openapi-ui"` | Базовый URL-префикс приложения |
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| `nameOverride` | string | `""` | Override chart name |
+| `fullnameOverride` | string | `""` | Override full release name |
+| `replicaCount` | int | `1` | Number of Pod replicas |
+| `imagePullSecrets` | list | `[]` | Secrets for private registries |
+| `priorityClassName` | string | `"system-cluster-critical"` | Priority class for the Pod |
+| `basePrefix` | string | `"openapi-ui"` | Base URL prefix for the application |
 
 ### ServiceAccount
 
-| Параметр | Тип | По умолчанию | Описание |
-|----------|-----|-------------|----------|
-| `serviceAccount.create` | bool | `true` | Создавать ли ServiceAccount |
-| `serviceAccount.name` | string | `""` | Имя ServiceAccount (по умолчанию: `<release>-<chart>`) |
-| `serviceAccount.annotations` | object | `{}` | Аннотации ServiceAccount |
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| `serviceAccount.create` | bool | `true` | Whether to create a ServiceAccount |
+| `serviceAccount.name` | string | `""` | ServiceAccount name (default: `<release>-<chart>`) |
+| `serviceAccount.annotations` | object | `{}` | ServiceAccount annotations |
 
 ### Pod
 
-| Параметр | Тип | По умолчанию | Описание |
-|----------|-----|-------------|----------|
-| `podAnnotations` | object | `{}` | Аннотации Pod |
-| `podLabels` | object | `{}` | Дополнительные лейблы Pod |
-| `podSecurityContext.enabled` | bool | `true` | Включить pod-level security context |
-| `podSecurityContext.fsGroup` | int | `101` | Group ID для монтируемых томов |
-| `nodeSelector` | object | `{}` | Селектор узлов |
-| `tolerations` | list | `[]` | Tolerations для Pod |
-| `topologySpreadConstraints` | list | `[]` | Ограничения распределения по топологии |
-| `podDisruptionBudget.minAvailable` | int | `1` | Минимум доступных Pod (PDB) |
-| `strategy.rollingUpdate.maxUnavailable` | int | `1` | Стратегия обновления |
-| `strategy.rollingUpdate.maxSurge` | int | `1` | Стратегия обновления |
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| `podAnnotations` | object | `{}` | Pod annotations |
+| `podLabels` | object | `{}` | Additional Pod labels |
+| `podSecurityContext.enabled` | bool | `true` | Enable pod-level security context |
+| `podSecurityContext.fsGroup` | int | `101` | Group ID for mounted volumes |
+| `nodeSelector` | object | `{}` | Node selector |
+| `tolerations` | list | `[]` | Pod tolerations |
+| `topologySpreadConstraints` | list | `[]` | Topology spread constraints |
+| `podDisruptionBudget.minAvailable` | int | `1` | Minimum available Pods (PDB) |
+| `strategy.rollingUpdate.maxUnavailable` | int | `1` | Update strategy |
+| `strategy.rollingUpdate.maxSurge` | int | `1` | Update strategy |
 
 ### Service
 
-| Параметр | Тип | По умолчанию | Описание |
-|----------|-----|-------------|----------|
-| `service.enabled` | bool | `true` | Создавать ли Service |
-| `service.type` | string | `"ClusterIP"` | Тип Service |
-| `service.ports` | list | (см. values.yaml) | Порты: web-http:8080, nginx-http:8081, bff-http:8082 |
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| `service.enabled` | bool | `true` | Whether to create a Service |
+| `service.type` | string | `"ClusterIP"` | Service type |
+| `service.ports` | list | (see values.yaml) | Ports: web-http:8080, nginx-http:8081, bff-http:8082 |
 
 ### Expose (Ingress / Istio)
 
-| Параметр | Тип | По умолчанию | Описание |
-|----------|-----|-------------|----------|
-| `expose.enabled` | bool | `false` | Включить внешний доступ |
-| `expose.resourceType` | string | `"ingress"` | Тип ресурса: `ingress` или `istio` |
-| `expose.tls.certSource` | string | `"none"` | Источник TLS: `certmanager`, `secret`, `none` |
-| `externalDomain` | string | `"127.0.0.1"` | Внешний домен для Ingress/Istio |
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| `expose.enabled` | bool | `false` | Enable external access |
+| `expose.resourceType` | string | `"ingress"` | Resource type: `ingress` or `istio` |
+| `expose.tls.certSource` | string | `"none"` | TLS source: `certmanager`, `secret`, `none` |
+| `externalDomain` | string | `"127.0.0.1"` | External domain for Ingress/Istio |
 
-### Контейнер: bff
+### Container: bff
 
-| Параметр | Тип | По умолчанию | Описание |
-|----------|-----|-------------|----------|
-| `bff.enabled` | bool | `true` | Включить BFF-контейнер |
-| `bff.image.repository` | string | `"prorobotech/openapi-ui-k8s-bff"` | Репозиторий образа |
-| `bff.image.tag` | string | `"release-1.4.0-d4bbcaa2"` | Тег образа |
-| `bff.containerPort` | int | `8082` | Порт контейнера |
-| `bff.resources` | object | (см. values.yaml) | Requests: 100m CPU / 128Mi; Limits: 1 CPU / 1Gi |
-| `bff.securityContext.enabled` | bool | `true` | Включить security context |
-| `bff.livenessProbe.enabled` | bool | `true` | Включить liveness probe |
-| `bff.readinessProbe.enabled` | bool | `false` | Включить readiness probe |
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| `bff.enabled` | bool | `true` | Enable BFF container |
+| `bff.image.repository` | string | `"prorobotech/openapi-ui-k8s-bff"` | Image repository |
+| `bff.image.tag` | string | `"release-1.4.0-d4bbcaa2"` | Image tag |
+| `bff.containerPort` | int | `8082` | Container port |
+| `bff.resources` | object | (see values.yaml) | Requests: 100m CPU / 128Mi; Limits: 1 CPU / 1Gi |
+| `bff.securityContext.enabled` | bool | `true` | Enable security context |
+| `bff.livenessProbe.enabled` | bool | `true` | Enable liveness probe |
+| `bff.readinessProbe.enabled` | bool | `false` | Enable readiness probe |
 
-### Контейнер: web
+### Container: web
 
-| Параметр | Тип | По умолчанию | Описание |
-|----------|-----|-------------|----------|
-| `web.enabled` | bool | `true` | Включить web-контейнер |
-| `web.image.repository` | string | `"prorobotech/openapi-ui"` | Репозиторий образа |
-| `web.image.tag` | string | `"release-1.4.0-06f1ede4"` | Тег образа |
-| `web.containerPort` | int | `8080` | Порт контейнера |
-| `web.resources` | object | (см. values.yaml) | Requests: 100m CPU / 128Mi; Limits: 200m CPU / 256Mi |
-| `web.securityContext.enabled` | bool | `true` | Включить security context |
-| `web.livenessProbe.enabled` | bool | `true` | Включить liveness probe |
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| `web.enabled` | bool | `true` | Enable web container |
+| `web.image.repository` | string | `"prorobotech/openapi-ui"` | Image repository |
+| `web.image.tag` | string | `"release-1.4.0-06f1ede4"` | Image tag |
+| `web.containerPort` | int | `8080` | Container port |
+| `web.resources` | object | (see values.yaml) | Requests: 100m CPU / 128Mi; Limits: 200m CPU / 256Mi |
+| `web.securityContext.enabled` | bool | `true` | Enable security context |
+| `web.livenessProbe.enabled` | bool | `true` | Enable liveness probe |
 
-### Контейнер: nginx
+### Container: nginx
 
-| Параметр | Тип | По умолчанию | Описание |
-|----------|-----|-------------|----------|
-| `nginx.enabled` | bool | `true` | Включить nginx-контейнер |
-| `nginx.image.repository` | string | `"nginxinc/nginx-unprivileged"` | Репозиторий образа |
-| `nginx.image.tag` | string | `"1.29-alpine"` | Тег образа |
-| `nginx.containerPort` | int | `8081` | Порт контейнера |
-| `nginx.resources` | object | (см. values.yaml) | Requests: 50m CPU / 64Mi; Limits: 200m CPU / 256Mi |
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| `nginx.enabled` | bool | `true` | Enable nginx container |
+| `nginx.image.repository` | string | `"nginxinc/nginx-unprivileged"` | Image repository |
+| `nginx.image.tag` | string | `"1.29-alpine"` | Image tag |
+| `nginx.containerPort` | int | `8081` | Container port |
+| `nginx.resources` | object | (see values.yaml) | Requests: 50m CPU / 64Mi; Limits: 200m CPU / 256Mi |
 
-### Контейнер: moduleExample (плагин)
+### Container: moduleExample (plugin)
 
-| Параметр | Тип | По умолчанию | Описание |
-|----------|-----|-------------|----------|
-| `moduleExample.enabled` | bool | `false` | Включить пример плагина |
-| `moduleExample.image.repository` | string | `"prorobotech/openapi-ui-plugin-example"` | Репозиторий образа |
-| `moduleExample.image.tag` | string | `"master-a1a1bddb"` | Тег образа |
-| `moduleExample.containerPort` | int | `8083` | Порт контейнера |
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| `moduleExample.enabled` | bool | `false` | Enable example plugin |
+| `moduleExample.image.repository` | string | `"prorobotech/openapi-ui-plugin-example"` | Image repository |
+| `moduleExample.image.tag` | string | `"master-a1a1bddb"` | Image tag |
+| `moduleExample.containerPort` | int | `8083` | Container port |
 
-### Кластеры
+### Clusters
 
-| Параметр | Тип | По умолчанию | Описание |
-|----------|-----|-------------|----------|
-| `clusters` | list | (см. ниже) | Список Kubernetes-кластеров для UI |
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| `clusters` | list | (see below) | List of Kubernetes clusters for the UI |
 
 ```yaml
 clusters:
@@ -239,117 +239,117 @@ clusters:
     api: 127.0.0.1
 ```
 
-### Навигация
+### Navigation
 
-| Параметр | Тип | По умолчанию | Описание |
-|----------|-----|-------------|----------|
-| `navigation.name` | string | `"navigation"` | Имя Navigation CR |
-| `navigation.baseFactoriesMappingEnabled` | bool | `true` | Включить маппинг фабрик |
-| `navigation.baseFactoriesMapping` | object | (см. values.yaml) | Маппинг base-factory → детальные фабрики |
-| `navigation.instances.enabled` | bool | `true` | Селектор instances |
-| `navigation.namespaces.enabled` | bool | `true` | Селектор namespaces |
-| `navigation.projects.enabled` | bool | `true` | Селектор projects |
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| `navigation.name` | string | `"navigation"` | Navigation CR name |
+| `navigation.baseFactoriesMappingEnabled` | bool | `true` | Enable factory mapping |
+| `navigation.baseFactoriesMapping` | object | (see values.yaml) | Mapping base-factory → detail factories |
+| `navigation.instances.enabled` | bool | `true` | Instances selector |
+| `navigation.namespaces.enabled` | bool | `true` | Namespaces selector |
+| `navigation.projects.enabled` | bool | `true` | Projects selector |
 
-### Боковые панели (Sidebars)
+### Sidebars
 
-| Параметр | Тип | По умолчанию | Описание |
-|----------|-----|-------------|----------|
-| `sidebars.cluster` | object | (см. values.yaml) | Cluster-level sidebar: Home, Workloads, Networking, Storage, Compute, User Management, Administration |
-| `sidebars.namespaced` | object | (см. values.yaml) | Namespace-level sidebar (аналогичная структура) |
-| `sidebars.cluster.customItems` | list | `[]` | Кастомные пункты меню для cluster sidebar |
-| `sidebars.namespaced.customItems` | list | `[]` | Кастомные пункты меню для namespaced sidebar |
-| `sidebars.keysAndTags` | object | (см. values.yaml) | Маппинг ресурсов K8s на API endpoints |
-| `sidebars.extrakeysAndTags` | object | `{}` | Дополнительный маппинг ресурсов |
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| `sidebars.cluster` | object | (see values.yaml) | Cluster-level sidebar: Home, Workloads, Networking, Storage, Compute, User Management, Administration |
+| `sidebars.namespaced` | object | (see values.yaml) | Namespace-level sidebar (similar structure) |
+| `sidebars.cluster.customItems` | list | `[]` | Custom menu items for cluster sidebar |
+| `sidebars.namespaced.customItems` | list | `[]` | Custom menu items for namespaced sidebar |
+| `sidebars.keysAndTags` | object | (see values.yaml) | Mapping K8s resources to API endpoints |
+| `sidebars.extrakeysAndTags` | object | `{}` | Additional resource mapping |
 
-Каждая секция sidebar (workloads, networking, storage, compute, usermanagement, administration) поддерживает:
-- `enabled: true/false` — включение/отключение секции
-- `items` — объект с включённым/отключённым ресурсом (напр. `pods: true`)
-- `extraItems` — список дополнительных пунктов меню
+Each sidebar section (workloads, networking, storage, compute, usermanagement, administration) supports:
+- `enabled: true/false` — enable/disable the section
+- `items` — object with enabled/disabled resources (e.g. `pods: true`)
+- `extraItems` — list of additional menu items
 
-### Управление стоковыми ресурсами
+### Stock resource management
 
-| Параметр | Тип | По умолчанию | Описание |
-|----------|-----|-------------|----------|
-| `defaultWebResources.breadcrumbs.default.*` | bool | `true` | Включение/отключение стоковых breadcrumbs |
-| `defaultWebResources.customcolumnsoverride.*` | bool | `true` | Включение/отключение стоковых CCO |
-| `defaultWebResources.factory.default.*` | bool | `true` | Включение/отключение стоковых фабрик |
-| `customWebResources.customcolumnsoverride` | object | `{}` | Переопределения кастомных CCO |
-| `customWebResources.navigation` | object | `{}` | Переопределения кастомной навигации |
-| `customWebResources.factory` | object | (см. values.yaml) | Переопределения кастомных фабрик |
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| `defaultWebResources.breadcrumbs.default.*` | bool | `true` | Enable/disable stock breadcrumbs |
+| `defaultWebResources.customcolumnsoverride.*` | bool | `true` | Enable/disable stock CCO |
+| `defaultWebResources.factory.default.*` | bool | `true` | Enable/disable stock factories |
+| `customWebResources.customcolumnsoverride` | object | `{}` | Custom CCO overrides |
+| `customWebResources.navigation` | object | `{}` | Custom navigation overrides |
+| `customWebResources.factory` | object | (see values.yaml) | Custom factory overrides |
 
-### Мониторинг
+### Monitoring
 
-| Параметр | Тип | По умолчанию | Описание |
-|----------|-----|-------------|----------|
-| `monitoring.promqlUrl` | string | (см. values.yaml) | URL PromQL API |
-| `monitoring.grafanaDatasource` | string | (см. values.yaml) | ID datasource в Grafana |
-| `monitoring.grafanaBaseUrl` | string | (см. values.yaml) | Базовый URL Grafana |
-| `monitoring.grafanaDashboardPaths` | object | (см. values.yaml) | Пути к дашбордам (podDetails, nodeDetails) |
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| `monitoring.promqlUrl` | string | (see values.yaml) | PromQL API URL |
+| `monitoring.grafanaDatasource` | string | (see values.yaml) | Grafana datasource ID |
+| `monitoring.grafanaBaseUrl` | string | (see values.yaml) | Grafana base URL |
+| `monitoring.grafanaDashboardPaths` | object | (see values.yaml) | Dashboard paths (podDetails, nodeDetails) |
 
-### Аутентификация (oauth2-proxy)
+### Authentication (oauth2-proxy)
 
-| Параметр | Тип | По умолчанию | Описание |
-|----------|-----|-------------|----------|
-| `oauth2-proxy.enabled` | bool | `false` | Включить oauth2-proxy |
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| `oauth2-proxy.enabled` | bool | `false` | Enable oauth2-proxy |
 | `oauth2-proxy.config.clientID` | string | `"clientid"` | OAuth Client ID |
 | `oauth2-proxy.config.clientSecret` | string | `"clientsecret"` | OAuth Client Secret |
-| `oauth2-proxy.config.cookieSecret` | string | (см. values.yaml) | Секрет шифрования cookie |
+| `oauth2-proxy.config.cookieSecret` | string | (see values.yaml) | Cookie encryption secret |
 
-> **Внимание:** Значения `clientID`, `clientSecret` и `cookieSecret` по умолчанию являются примерами. В production-среде обязательно замените их на реальные секреты.
+> **Note:** Default values for `clientID`, `clientSecret`, and `cookieSecret` are examples. In production, replace them with real secrets.
 
-### Аутентификация (Dex)
+### Authentication (Dex)
 
-| Параметр | Тип | По умолчанию | Описание |
-|----------|-----|-------------|----------|
-| `dex.enabled` | bool | `false` | Включить Dex IdP |
-| `dex.config.issuer` | string | (см. values.yaml) | URL издателя |
-| `dex.config.staticClients` | list | (см. values.yaml) | Статические клиенты OIDC |
-| `dex.config.staticPasswords` | list | (см. values.yaml) | Статические пользователи (только для dev) |
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| `dex.enabled` | bool | `false` | Enable Dex IdP |
+| `dex.config.issuer` | string | (see values.yaml) | Issuer URL |
+| `dex.config.staticClients` | list | (see values.yaml) | Static OIDC clients |
+| `dex.config.staticPasswords` | list | (see values.yaml) | Static users (dev only) |
 
 ## CRD
 
-Chart устанавливает Custom Resource Definitions группы `front.in-cloud.io/v1alpha1`:
+The chart installs Custom Resource Definitions in the `front.in-cloud.io/v1alpha1` group:
 
-| CRD | Описание |
-|-----|----------|
-| `breadcrumbs` | Хлебные крошки навигации |
-| `breadcrumbsinsides` | Вложенные хлебные крошки |
-| `cfomappings` | Маппинг кастомных форм |
-| `clusters` | Конфигурация кластеров |
-| `customcolumnsoverrides` | Кастомизация колонок таблиц |
-| `customformsoverrides` | Кастомизация форм |
-| `customformsprefills` | Предзаполнение форм |
-| `factories` | Фабрики ресурсов (шаблоны UI для создания/просмотра) |
-| `marketplacepanels` | Панели маркетплейса |
-| `navigations` | Навигационные меню |
-| `sidebars` | Боковые панели |
-| `tableurimappings` | Маппинг URI таблиц |
+| CRD | Description |
+|-----|-------------|
+| `breadcrumbs` | Navigation breadcrumbs |
+| `breadcrumbsinsides` | Nested breadcrumbs |
+| `cfomappings` | Custom form mapping |
+| `clusters` | Cluster configuration |
+| `customcolumnsoverrides` | Table column customization |
+| `customformsoverrides` | Form customization |
+| `customformsprefills` | Form prefills |
+| `factories` | Resource factories (UI templates for create/view) |
+| `marketplacepanels` | Marketplace panels |
+| `navigations` | Navigation menus |
+| `sidebars` | Sidebars |
+| `tableurimappings` | Table URI mapping |
 
 ## RBAC
 
-Chart создаёт следующие ClusterRole (при `rbac.create: true`):
+The chart creates the following ClusterRoles (when `rbac.create: true`):
 
-| Role | Label aggregation | Описание |
-|------|-------------------|----------|
-| `front-in-cloud-admin` | `aggregate-to-admin: "true"` | Полный доступ к ресурсам `front.in-cloud.io` |
-| `front-in-cloud-edit` | `aggregate-to-edit: "true"` | Чтение и запись ресурсов `front.in-cloud.io` |
-| `front-in-cloud-view` | `aggregate-to-view: "true"` | Чтение ресурсов `front.in-cloud.io` |
+| Role | Label aggregation | Description |
+|------|-------------------|-------------|
+| `front-in-cloud-admin` | `aggregate-to-admin: "true"` | Full access to `front.in-cloud.io` resources |
+| `front-in-cloud-edit` | `aggregate-to-edit: "true"` | Read/write `front.in-cloud.io` resources |
+| `front-in-cloud-view` | `aggregate-to-view: "true"` | Read `front.in-cloud.io` resources |
 
-Также создаётся `ClusterRoleBinding`, привязывающий `front-in-cloud-view` к `system:authenticated`.
+A `ClusterRoleBinding` is also created, binding `front-in-cloud-view` to `system:authenticated`.
 
-## Структура проекта
+## Project structure
 
 ```
 in-cloud-web-chart/
-├── Chart.yaml                          # Метаданные chart v1.4.0 и зависимости
-├── values.yaml                         # Конфигурация по умолчанию (~1186 строк)
+├── Chart.yaml                          # Chart metadata v1.4.0 and dependencies
+├── values.yaml                         # Default configuration (~1186 lines)
 ├── LICENSE                             # MIT
-├── .helmignore                         # Исключения при упаковке
-├── charts/                             # Архивы зависимостей
+├── .helmignore                         # Packaging exclusions
+├── charts/                             # Dependency archives
 │   ├── dex-0.23.1.tgz
 │   └── oauth2-proxy-7.18.0.tgz
 ├── .github/workflows/
-│   └── helm-release.yaml               # CI: lint, package, push в OCI registry
+│   └── helm-release.yaml               # CI: lint, package, push to OCI registry
 ├── crds/                               # 12 Custom Resource Definitions
 │   ├── breadcrumbs.front.in-cloud.io.yaml
 │   ├── clusters.front.in-cloud.io.yaml
@@ -359,62 +359,62 @@ in-cloud-web-chart/
 │   ├── sidebars.front.in-cloud.io.yaml
 │   └── ...
 ├── docs/
-│   └── PROJECT.md                      # Документация проекта
+│   └── PROJECT.md                      # Project documentation
 └── templates/
-    ├── NOTES.txt                       # Сообщение после helm install
-    ├── _helpers.tpl                    # Вспомогательные шаблоны
+    ├── NOTES.txt                       # Post-install message
+    ├── _helpers.tpl                    # Helper templates
     ├── deployment.yaml                 # Deployment (bff + web + nginx + moduleExample)
-    ├── configmap.yaml                  # Конфигурация nginx
+    ├── configmap.yaml                  # nginx configuration
     ├── service.yaml                    # Service
     ├── serviceaccount.yaml             # ServiceAccount
     ├── poddisruptionbudget.yaml        # PodDisruptionBudget
     ├── expose.yaml                     # Ingress / Istio Gateway + VirtualService
-    ├── certificate-expose.yaml         # TLS-сертификат для внешнего доступа
-    ├── certificate-internal.yaml       # TLS-сертификат для внутренних компонентов
-    ├── extra-manifests.yaml            # Дополнительные объекты из extraObjects
+    ├── certificate-expose.yaml         # TLS certificate for external access
+    ├── certificate-internal.yaml       # TLS certificate for internal components
+    ├── extra-manifests.yaml            # Extra objects from extraObjects
     ├── clusters/
     │   └── infra.yaml                  # Cluster CR
-    ├── rbac/                           # ClusterRole и ClusterRoleBinding
-    ├── navigations/                    # Navigation и Fallback Navigation CR
-    ├── sidebars/                       # Sidebar CR (cluster + namespaced) и .tpl хелперы
-    ├── breadcrumbs/fallback/           # Fallback-шаблоны (factory, form, search, table)
+    ├── rbac/                           # ClusterRole and ClusterRoleBinding
+    ├── navigations/                    # Navigation and Fallback Navigation CR
+    ├── sidebars/                       # Sidebar CR (cluster + namespaced) and .tpl helpers
+    ├── breadcrumbs/fallback/           # Fallback templates (factory, form, search, table)
     ├── factory/
-    │   ├── _helpers/                   # ~40 .tpl хелперов для фабрик
-    │   ├── base/                       # Базовые фабрики (5 шаблонов)
-    │   └── default/                    # Детальные фабрики ресурсов (~20 шаблонов)
+    │   ├── _helpers/                   # ~40 .tpl helpers for factories
+    │   ├── base/                       # Base factories (5 templates)
+    │   └── default/                    # Resource detail factories (~20 templates)
     ├── customcolumnsoverride/
-    │   ├── _helpers/                   # ~10 .tpl хелперов для CCO
-    │   ├── default/                    # Стоковые CCO (~30 шаблонов)
-    │   └── factory/                    # CCO для фабрик (~20 шаблонов)
-    ├── customformoverride/             # Кастомизация форм
-    └── customformprefill/              # Предзаполнение форм
+    │   ├── _helpers/                   # ~10 .tpl helpers for CCO
+    │   ├── default/                    # Stock CCO (~30 templates)
+    │   └── factory/                    # Factory CCO (~20 templates)
+    ├── customformoverride/             # Form customization
+    └── customformprefill/              # Form prefills
 ```
 
 ## CI/CD
 
 GitHub Actions workflow (`.github/workflows/helm-release.yaml`):
 
-| Событие | Поведение |
-|---------|-----------|
-| Push в `release/*` | Версия chart: `<release-name>-<short-sha>` |
-| Push в `feature/*` | Версия chart: `0.0.0-feature-<name>-<short-sha>` |
-| Push в `hotfix/*` | Аналогично feature |
-| Push тега `v*.*.*` | Версия из Chart.yaml |
+| Event | Behavior |
+|-------|----------|
+| Push to `release/*` | Chart version: `<release-name>-<short-sha>` |
+| Push to `feature/*` | Chart version: `0.0.0-feature-<name>-<short-sha>` |
+| Push to `hotfix/*` | Same as feature |
+| Push tag `v*.*.*` | Version from Chart.yaml |
 
-Шаги pipeline:
+Pipeline steps:
 1. Checkout
-2. Вычисление версии из имени ветки (yq перезаписывает `Chart.yaml`)
+2. Compute version from branch name (yq rewrites `Chart.yaml`)
 3. `helm lint`
-4. `helm package` + `helm push` в `oci://registry-1.docker.io/prorobotech`
+4. `helm package` + `helm push` to `oci://registry-1.docker.io/prorobotech`
 
-## Лицензия
+## License
 
 [MIT](LICENSE) — PRO Robotech, 2026.
 
-## Ссылки
+## Links
 
 - [OpenAPI UI](https://github.com/PRO-Robotech/openapi-ui)
 - [OpenAPI UI K8s BFF](https://github.com/PRO-Robotech/openapi-ui-k8s-bff)
 - [in-Cloud Web Chart](https://github.com/PRO-Robotech/incloud-web-chart)
-- [Документация](https://in-cloud.io/docs/tech-docs/introduction/)
+- [Documentation](https://in-cloud.io/docs/tech-docs/introduction/)
 - [Telegram](https://t.me/in_cloud_en)

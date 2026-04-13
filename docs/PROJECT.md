@@ -1,101 +1,101 @@
-# InCloud Web — документация Helm-чарта
+# InCloud Web — Helm chart documentation
 
-## Назначение
+## Purpose
 
-Репозиторий содержит Helm chart **incloud-web-chart** для развёртывания веб-интерфейса InCloud в Kubernetes: три контейнера в одном Pod — **nginx** (точка входа и reverse proxy), **web** (SPA/UI), **bff** (backend-for-frontend к API кластера и CRD `front.in-cloud.io`).
+This repository contains the **incloud-web-chart** Helm chart for deploying the InCloud web interface to Kubernetes: three containers in one Pod — **nginx** (entry point and reverse proxy), **web** (SPA/UI), **bff** (backend-for-frontend to the cluster API and `front.in-cloud.io` CRDs).
 
-Версия chart: см. `Chart.yaml` (`version`). Версия приложения: `appVersion` и теги образов в `values.yaml`.
+Chart version: see `Chart.yaml` (`version`). Application version: `appVersion` and image tags in `values.yaml`.
 
-## Требования
+## Requirements
 
-| Компонент | Версия |
+| Component | Version |
 |-----------|--------|
-| Kubernetes | ≥ 1.22 (`kubeVersion` в `Chart.yaml`) |
+| Kubernetes | ≥ 1.22 (`kubeVersion` in `Chart.yaml`) |
 | Helm | ≥ 3.8 |
 
-Опционально: секреты для приватного registry (`imagePullSecrets`), Cert-Manager для TLS (`expose.tls`, `internalTLS`), Istio или Ingress-контроллер для внешнего доступа.
+Optional: secrets for a private registry (`imagePullSecrets`), Cert-Manager for TLS (`expose.tls`, `internalTLS`), Istio or an Ingress controller for external access.
 
-## Архитектура
+## Architecture
 
-### Поток трафика
+### Traffic flow
 
-1. Внешний клиент → Service (порты 8080 web, 8081 nginx, 8082 bff) или Ingress/Istio при `expose.enabled`.
-2. **nginx** слушает основной внешний порт приложения (по умолчанию 8081 в Pod, маппинг в Service — см. `service.ports`).
-3. Маршрутизация задаётся в `templates/configmap.yaml` (данные ConfigMap `*-nginx-config`):
-   - `/clusterlist`, `/api/clusters` — JSON со списком кластеров из `values.clusters`;
-   - `/api/clusters/<name>` — прокси к API выбранного кластера;
-   - `/k8s` — прокси к `https://kubernetes.default.svc:443` (с опциональной проверкой через oauth2-proxy);
+1. External client → Service (ports 8080 web, 8081 nginx, 8082 bff) or Ingress/Istio when `expose.enabled`.
+2. **nginx** listens on the main external application port (default 8081 in the Pod; Service mapping — see `service.ports`).
+3. Routing is defined in `templates/configmap.yaml` (ConfigMap data `*-nginx-config`):
+   - `/clusterlist`, `/api/clusters` — JSON with the cluster list from `values.clusters`;
+   - `/api/clusters/<name>` — proxy to the selected cluster’s API;
+   - `/k8s` — proxy to `https://kubernetes.default.svc:443` (with optional verification via oauth2-proxy);
    - `/openapi-bff`, `/openapi-bff-ws/` — BFF;
-   - `BASEPREFIX` (по умолчанию `/openapi-ui`) — статика и UI через контейнер **web**.
+   - `BASEPREFIX` (default `/openapi-ui`) — static assets and UI via the **web** container.
 
-### Зависимости Helm (опционально)
+### Helm dependencies (optional)
 
-В `Chart.yaml` объявлены сабчарты:
+Subcharts are declared in `Chart.yaml`:
 
-- **oauth2-proxy** — аутентификация перед UI и BFF (`condition: oauth2-proxy.enabled`);
-- **dex** — OIDC-провайдер (`condition: dex.enabled`).
+- **oauth2-proxy** — authentication in front of the UI and BFF (`condition: oauth2-proxy.enabled`);
+- **dex** — OIDC provider (`condition: dex.enabled`).
 
-Перед установкой с включёнными зависимостями выполните:
+Before installing with dependencies enabled, run:
 
 ```bash
 helm dependency build
 ```
 
-### CRD
+### CRDs
 
-Каталог `crds/` содержит манифесты CustomResourceDefinition для домена `front.in-cloud.io` (навигация, фабрики, breadcrumbs, marketplace, переопределения колонок/форм и т.д.). Установка CRD при `helm install` зависит от политики Helm (`--skip-crds` при необходимости).
+The `crds/` directory holds CustomResourceDefinition manifests for the `front.in-cloud.io` domain (navigation, factories, breadcrumbs, marketplace, column/form overrides, etc.). Whether CRDs are installed on `helm install` depends on Helm policy (`--skip-crds` when needed).
 
 ### RBAC
 
-Шаблоны в `templates/rbac/` задают ClusterRole с агрегацией к стандартным ролям и правами на API-группу `front.in-cloud.io`. Детали — в файлах `admin.yaml`, `edit.yaml`, `view.yaml`, `crb.yaml`.
+Templates under `templates/rbac/` define a ClusterRole with aggregation to standard roles and permissions on the `front.in-cloud.io` API group. Details are in `admin.yaml`, `edit.yaml`, `view.yaml`, `crb.yaml`.
 
-### Дополнительные объекты
+### Extra objects
 
-`values.extraObjects` — список произвольных YAML-объектов с подстановкой через `tpl` (`templates/extra-manifests.yaml`).
+`values.extraObjects` — a list of arbitrary YAML objects rendered with `tpl` (`templates/extra-manifests.yaml`).
 
-## Установка
+## Installation
 
-### Локальный chart
+### Local chart
 
 ```bash
-helm dependency build   # если нужны oauth2-proxy / dex
+helm dependency build   # if oauth2-proxy / dex are needed
 helm install incloud-web . -n <namespace> -f my-values.yaml
 ```
 
-### Проверка без установки
+### Dry run (no install)
 
 ```bash
 helm template incloud-web . -n default --set oauth2-proxy.enabled=false --set dex.enabled=false
 ```
 
-### Образы
+### Images
 
-По умолчанию в `values.yaml`: `prorobotech/openapi-ui`, `prorobotech/openapi-ui-k8s-bff`, `nginxinc/nginx-unprivileged`. Теги и registry нужно согласовать с политикой окружения.
+Defaults in `values.yaml`: `prorobotech/openapi-ui`, `prorobotech/openapi-ui-k8s-bff`, `nginxinc/nginx-unprivileged`. Tags and registry should align with your environment’s policy.
 
-## Ключевые параметры конфигурации
+## Key configuration parameters
 
-| Область | Параметры |
+| Area | Parameters |
 |---------|-----------|
-| Реплики и планирование | `replicaCount`, `nodeSelector`, `tolerations`, `affinity`, `topologySpreadConstraints`, `priorityClassName` |
-| Сервис | `service.*` — порты и тип |
-| Внешний доступ | `expose.*` — Ingress или Istio, TLS |
-| Кластеры для UI | `clusters` — список имён и endpoints API |
-| Внешний URL | `externalDomain`, `externalDomainPort` — редирект с `/` и схемы в nginx |
-| Контейнеры | `bff`, `web`, `nginx` — образы, `env`, ресурсы, пробы |
-| TLS между компонентами | `internalTLS` — cert-manager, секреты или отключено |
+| Replicas and scheduling | `replicaCount`, `nodeSelector`, `tolerations`, `affinity`, `topologySpreadConstraints`, `priorityClassName` |
+| Service | `service.*` — ports and type |
+| External access | `expose.*` — Ingress or Istio, TLS |
+| Clusters for UI | `clusters` — names and API endpoints |
+| External URL | `externalDomain`, `externalDomainPort` — redirect from `/` and schemes in nginx |
+| Containers | `bff`, `web`, `nginx` — images, `env`, resources, probes |
+| TLS between components | `internalTLS` — cert-manager, secrets, or disabled |
 
-Подробная таблица значений — в корневом `README.md` (при расхождении с `values.yaml` ориентируйтесь на актуальный `values.yaml`).
+A detailed values table is in the root `README.md` (if it diverges from `values.yaml`, treat the current `values.yaml` as source of truth).
 
 ## CI/CD
 
-Workflow `.github/workflows/helm-release.yaml`: при push в ветки и теги вида `v*.*.*` выполняется `helm package` и публикация OCI-артефакта в `registry-1.docker.io` (организация `prorobotech`).
+Workflow `.github/workflows/helm-release.yaml`: on push to branches and tags matching `v*.*.*`, `helm package` runs and an OCI artifact is published to `registry-1.docker.io` (organization `prorobotech`).
 
-## Безопасность (рекомендации эксплуатации)
+## Security (operational recommendations)
 
-- В `values.yaml` для oauth2-proxy/dex по умолчанию заданы **учебные** секреты и пароли — заменить перед продакшеном.
-- Для продакшена включить `cookie-secure`, отключить `ssl-insecure-skip-verify` у oauth2-proxy, настроить HTTPS и корректные `redirect-url` / `issuer`.
-- Readiness-пробы у контейнеров по умолчанию **выключены** — для корректной работы балансировки имеет смысл включить там, где endpoint `/ready` реализован.
+- In `values.yaml`, oauth2-proxy/dex defaults use **sample** secrets and passwords — replace before production.
+- For production, enable `cookie-secure`, disable `ssl-insecure-skip-verify` on oauth2-proxy, configure HTTPS and correct `redirect-url` / `issuer`.
+- Readiness probes for containers are **off** by default — for correct load balancing, enable them where the `/ready` endpoint is implemented.
 
 ---
 
-*Документ сгенерирован по состоянию репозитория; при изменении chart сверяйте с `Chart.yaml` и `values.yaml`.*
+*This document reflects the state of the repository; when the chart changes, verify against `Chart.yaml` and `values.yaml`.*

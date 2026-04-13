@@ -7,6 +7,12 @@
 {{- $podBuiltinResource := $podCtx.resource -}}
 {{- $podPermissionContext := $podCtx.permissionContext -}}
 {{- $podEndpoint := $podCtx.endpoint -}}
+# ============================================================================
+# Factory: pod-details
+# ----------------------------------------------------------------------------
+# Detail page for Pods.
+# Toggled via: customWebResources.factory["pod-details"].enabled (default: true)
+# ============================================================================
 apiVersion: front.in-cloud.io/v1alpha1
 kind: Factory
 metadata:
@@ -15,6 +21,7 @@ metadata:
 spec:
   key: pod-details
 
+  # Indexes into urlsToFetch whose responses are available via reqsJsonPath[N] in the component tree
   effectiveReqIndexes:
     - 0
 
@@ -155,8 +162,11 @@ spec:
     - type: antdTabs
       data:
         id: tabs-root
+        # Tab selected by default when the page loads
         defaultActiveKey: details
+        # Persist the active tab key in the URL hash for bookmarking and refresh
         syncActiveKeyWithHash: true
+        # Show "Open in new tab" context action on each tab header
         allowOpenInNewBrowserTab: true
         items:
 
@@ -274,6 +284,7 @@ spec:
           # =========================
           # MONITORING TAB
           # =========================
+          # When customWebResources.factory["pod-details"].enableMonitoringTab is true
           {{- if (index .Values.customWebResources.factory "pod-details").enableMonitoringTab }}
           - key: monitoring
             label: Monitoring
@@ -290,6 +301,7 @@ spec:
           # =========================
           # AQUA SECURITY TAB (optional)
           # =========================
+          # When customWebResources.factory["node-details"].enableConfigReportsAquaTab is true
           {{- if (index .Values.customWebResources.factory "node-details").enableConfigReportsAquaTab }}
           - key: reports
             label: Reports

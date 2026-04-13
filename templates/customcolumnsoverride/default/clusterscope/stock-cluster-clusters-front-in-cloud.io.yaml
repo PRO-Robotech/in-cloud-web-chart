@@ -1,3 +1,9 @@
+# ============================================================================
+# CustomColumnsOverride: stock-cluster-clusters-front-in-cloud.io
+# ----------------------------------------------------------------------------
+# Table columns for Cluster (front.in-cloud.io) (cluster-scoped).
+# Toggled via: customWebResources.customcolumnsoverride["stock-cluster-clusters-front-in-cloud.io"]
+# ============================================================================
 apiVersion: front.in-cloud.io/v1alpha1
 kind: CustomColumnsOverride
 metadata:

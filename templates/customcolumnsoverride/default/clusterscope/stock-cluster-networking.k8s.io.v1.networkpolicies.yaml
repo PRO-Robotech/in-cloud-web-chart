@@ -3,9 +3,13 @@
 {{- $customCco := index $customCcoResources "stock-cluster-networking.k8s.io.v1.networkpolicies" -}}
 {{- if eq (include "in-cloud.web.cco.isEnabled" (dict "config" $customCco)) "true" }}
 ---
-# =================================================
-# CustomColumnsOverride definition
-# =================================================
+# ============================================================================
+# CustomColumnsOverride: stock-cluster-networking.k8s.io.v1.networkpolicies
+# ----------------------------------------------------------------------------
+# Table columns for NetworkPolicy (cluster-scoped).
+# Toggled via:
+# customWebResources.customcolumnsoverride["stock-cluster-networking.k8s.io.v1.networkpolicies"]
+# ============================================================================
 apiVersion: front.in-cloud.io/v1alpha1
 kind: CustomColumnsOverride
 metadata:

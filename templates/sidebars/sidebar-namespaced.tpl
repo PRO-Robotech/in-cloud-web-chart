@@ -1,4 +1,14 @@
-# return [] if sidebebar items are empty
+{{/*
+============================================================================
+Helm: sidebar-namespaced.tpl (named templates)
+----------------------------------------------------------------------------
+Renders namespace-scoped menuItems; {cluster} and {namespace} are replaced in links.
+Cluster-scoped resources (no namespace in the API) use paths without {namespace}:
+Nodes, PersistentVolumes, StorageClasses, CRDs, ClusterRoles, ClusterRoleBindings.
+builtin-table vs api-table: same as sidebar-cluster.tpl (short names vs GVR paths).
+Named templates below return [] when the generated menu would be empty.
+============================================================================
+*/}}
 {{ define "incloud-web-chart.sidebar.menu.items.namespaced" }}
 {{- if (include "incloud-web-chart.sidebar.menu.items.namespaced-items" . | trim) }}
 {{ include "incloud-web-chart.sidebar.menu.items.namespaced-items" . }}
@@ -132,6 +142,7 @@
 {{- with $sidebars.storage }}
   {{- if .enabled }}
 - children:
+    {{/* PV is cluster-scoped: link uses {cluster} only (no {namespace}). */}}
     {{- if .items.persistentvolumes }}
     - key: persistentvolumes
       label: PersistentVolumes
@@ -142,6 +153,7 @@
       label: PersistentVolumeClaims
       link: /{{ $.Values.basePrefix }}/{cluster}/{namespace}/builtin-table/persistentvolumeclaims
     {{- end }}
+    {{/* StorageClass is cluster-scoped. */}}
     {{- if .items.storageclasses }}
     - key: storageclasses
       label: StorageClasses
@@ -158,6 +170,7 @@
 {{- with $sidebars.compute }}
   {{- if .enabled }}
 - children:
+    {{/* Nodes are cluster-scoped (no {namespace} segment). */}}
     {{- if .items.nodes }}
     - key: nodes
       label: Nodes
@@ -195,6 +208,7 @@
       label: RoleBindings
       link: /{{ $.Values.basePrefix }}/{cluster}/{namespace}/api-table/rbac.authorization.k8s.io/v1/rolebindings
     {{- end }}
+    {{/* ClusterRole* are cluster-scoped RBAC APIs. */}}
     {{- if .items.clusterroles }}
     - key: clusterroles
       label: ClusterRoles
@@ -231,6 +245,7 @@
       label: ResourceQuotas
       link: /{{ $.Values.basePrefix }}/{cluster}/{namespace}/builtin-table/resourcequotas
     {{- end }}
+    {{/* CRD is a cluster-scoped API definition. */}}
     {{- if .items.customresourcedefinitions }}
     - key: customresourcedefinitions
       label: CustomResourceDefinitions

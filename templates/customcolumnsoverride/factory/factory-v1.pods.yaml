@@ -3,9 +3,12 @@
 {{- $customCco := index $customCcoResources "factory-v1.pods" -}}
 {{- if eq (include "in-cloud.web.cco.isEnabled" (dict "config" $customCco)) "true" }}
 ---
-# =================================================
-# CustomColumnsOverride definition
-# =================================================
+# ============================================================================
+# CustomColumnsOverride: factory-v1.pods
+# ----------------------------------------------------------------------------
+# Embedded table columns for Pods within Factory detail pages.
+# Toggled via: customWebResources.customcolumnsoverride["factory-v1.pods"]
+# ============================================================================
 apiVersion: front.in-cloud.io/v1alpha1
 kind: CustomColumnsOverride
 metadata:
@@ -61,6 +64,9 @@ spec:
     # =================================================
     - name: Memory
       type: factory
+      {{/*
+        additionalReqsData[0]: kubelet pod metrics summary — per-container memory usage for this pod
+      */}}
       {{ include "in-cloud.web.cco.props.memory" (dict
           "value" "{reqsJsonPath[0]['.additionalReqsData.0.items[?(@.metadata.name==\"{reqsJsonPath[0][\".metadata.name\"]}\")].containers[*].usage.memory']['-']}"
         ) | nindent 6
@@ -70,6 +76,7 @@ spec:
     # =================================================
     - name: CPU
       type: factory
+      {{/* additionalReqsData[0]: same kubelet pod metrics — per-container CPU usage */}}
       {{ include "in-cloud.web.cco.props.cpu" (dict
           "value" "{reqsJsonPath[0]['.additionalReqsData.0.items[?(@.metadata.name==\"{reqsJsonPath[0][\".metadata.name\"]}\")].containers[*].usage.cpu']['-']}"
         ) | nindent 6

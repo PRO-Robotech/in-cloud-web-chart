@@ -1,4 +1,15 @@
-# return [] if sidebebar items are empty
+{{/*
+============================================================================
+Helm: sidebar-cluster.tpl (named templates)
+----------------------------------------------------------------------------
+Renders cluster-scoped sidebar menuItems (nested key/label/link); included from
+sidebars/fallback-clusterscoped.yaml. Placeholder {cluster} matches URL index {2}
+in paths like /openapi-ui/{2}/… (segment after the UI base prefix).
+Route kinds: builtin-table — curated tables by short resource name; api-table —
+Kubernetes group/version/resource segments for the API browser.
+Named templates below return [] when the generated menu would be empty.
+============================================================================
+*/}}
 {{ define "incloud-web-chart.sidebar.menu.items.cluster" }}
 {{- if (include "incloud-web-chart.sidebar.menu.items.cluster-items" . | trim) }}
 {{ include "incloud-web-chart.sidebar.menu.items.cluster-items" . }}
@@ -11,7 +22,6 @@
 {{ $sidebars := .Values.sidebars.cluster }}
 {{ $projRes := .Values.projectResource }}
 {{ $instRes := .Values.instanceResource }}
-
 
 {{- with $sidebars.home }}
   {{- if .enabled }}

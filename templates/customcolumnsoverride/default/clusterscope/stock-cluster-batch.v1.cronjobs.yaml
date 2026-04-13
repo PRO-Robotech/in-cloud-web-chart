@@ -3,9 +3,12 @@
 {{- $customCco := index $customCcoResources "stock-cluster-batch.v1.cronjobs" -}}
 {{- if eq (include "in-cloud.web.cco.isEnabled" (dict "config" $customCco)) "true" }}
 ---
-# =================================================
-# CustomColumnsOverride definition
-# =================================================
+# ============================================================================
+# CustomColumnsOverride: stock-cluster-batch.v1.cronjobs
+# ----------------------------------------------------------------------------
+# Table columns for CronJob (cluster-scoped).
+# Toggled via: customWebResources.customcolumnsoverride["stock-cluster-batch.v1.cronjobs"]
+# ============================================================================
 apiVersion: front.in-cloud.io/v1alpha1
 kind: CustomColumnsOverride
 metadata:

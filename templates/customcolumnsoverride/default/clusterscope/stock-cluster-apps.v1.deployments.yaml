@@ -3,9 +3,12 @@
 {{- $customCco := index $customCcoResources "stock-cluster-apps.v1.deployments" -}}
 {{- if eq (include "in-cloud.web.cco.isEnabled" (dict "config" $customCco)) "true" }}
 ---
-# =================================================
-# CustomColumnsOverride definition
-# =================================================
+# ============================================================================
+# CustomColumnsOverride: stock-cluster-apps.v1.deployments
+# ----------------------------------------------------------------------------
+# Table columns for Deployment (cluster-scoped).
+# Toggled via: customWebResources.customcolumnsoverride["stock-cluster-apps.v1.deployments"]
+# ============================================================================
 apiVersion: front.in-cloud.io/v1alpha1
 kind: CustomColumnsOverride
 metadata:

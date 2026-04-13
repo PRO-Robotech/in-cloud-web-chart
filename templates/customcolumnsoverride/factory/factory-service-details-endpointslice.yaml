@@ -3,9 +3,12 @@
 {{- $customCco := index $customCcoResources "factory-service-details-endpointslice" -}}
 {{- if eq (include "in-cloud.web.cco.isEnabled" (dict "config" $customCco)) "true" }}
 ---
-# =================================================
-# CustomColumnsOverride definition
-# =================================================
+# ============================================================================
+# CustomColumnsOverride: factory-service-details-endpointslice
+# ----------------------------------------------------------------------------
+# Embedded table columns for EndpointSlice targets (Service details) within Factory detail pages.
+# Toggled via: customWebResources.customcolumnsoverride["factory-service-details-endpointslice"]
+# ============================================================================
 apiVersion: front.in-cloud.io/v1alpha1
 kind: CustomColumnsOverride
 metadata:

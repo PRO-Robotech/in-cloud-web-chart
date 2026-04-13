@@ -1,8 +1,22 @@
+# ============================================================================
+# CFOMapping: default
+# ----------------------------------------------------------------------------
+# Maps Kubernetes API combinations (apiGroup + apiVersion + plural) to
+# CustomFormsOverride (CFO) resource names so the UI picks the form for a GVR.
+# The platform loads the CFOMapping whose metadata.name matches
+# CUSTOMIZATION_CFOMAPPING_RESOURCE_NAME (often "default", see values.yaml);
+# there is no separate on/off flag — omit the variable or
+# point to another name and the corresponding resource.
+# ============================================================================
 apiVersion: front.in-cloud.io/v1alpha1
 kind: CFOMapping
 metadata:
   name: default
 spec:
+  # Mapping key: "default-<apiGroup>/<apiVersion>/<plural>" → CFO resource name
+  # (analogous to group/version/plural in K8s; core/v1 has an empty group).
+  # Value — metadata.name of the target CustomFormsOverride; usually matches
+  # that CFO's customizationId.
   mappings:
     default-/v1/secrets: "default-/v1/secrets"
     default-/v1/configmaps: "default-/v1/configmaps"

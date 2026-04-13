@@ -1,15 +1,27 @@
+# ============================================================================
+# CustomFormsOverride: default-apps.v1.daemonsets
+# ----------------------------------------------------------------------------
+# Base CFO for DaemonSet: hides Pod template metadata and operational fields.
+# Deployed with the chart; activated when mapped to "default-/apps/v1/daemonsets".
+# Workloads have more hidden paths (incl. template.metadata) than ConfigMap/Secret;
+# the form is heavy — raw YAML is enabled (forceViewMode: Manual).
+# ============================================================================
 ---
 apiVersion: front.in-cloud.io/v1alpha1
 kind: CustomFormsOverride
 metadata:
   name: default-apps.v1.daemonsets
 spec:
+  # Edit via raw YAML rather than auto-generated form from the schema.
   forceViewMode: Manual
+  # Must match the entry in cfo-mapping.yaml for this GVR.
   customizationId: "default-/apps/v1/daemonsets"
   hidden:
     {{ include "incloud-web-chart.customformoverride.hidden.metadata.system" . | nindent 4 }}
     {{ include "incloud-web-chart.customformoverride.hidden.metadata.api" . | nindent 4 }}
     {{ include "incloud-web-chart.customformoverride.hidden.status" . | nindent 4 }}
     {{ include "incloud-web-chart.customformoverride.hidden.template.metadata.system" . | nindent 4 }}
+  # Empty schema: do not override form fields on top of API (merge + hidden suffice).
   schema: {}
+  # merge: merge with the original API OpenAPI schema rather than replacing it.
   strategy: merge

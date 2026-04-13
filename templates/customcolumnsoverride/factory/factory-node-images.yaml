@@ -3,9 +3,12 @@
 {{- $customCco := index $customCcoResources "factory-node-images" -}}
 {{- if eq (include "in-cloud.web.cco.isEnabled" (dict "config" $customCco)) "true" }}
 ---
-# =================================================
-# CustomColumnsOverride definition
-# =================================================
+# ============================================================================
+# CustomColumnsOverride: factory-node-images
+# ----------------------------------------------------------------------------
+# Embedded table columns for container images (Node details) within Factory detail pages.
+# Toggled via: customWebResources.customcolumnsoverride["factory-node-images"]
+# ============================================================================
 apiVersion: front.in-cloud.io/v1alpha1
 kind: CustomColumnsOverride
 metadata:
@@ -26,6 +29,8 @@ spec:
     - name: Size
       type: factory
       jsonPath: .sizeBytes
+      # memory partial: human-readable byte size from row .sizeBytes only (not kubelet
+      # additionalReqsData)
       {{ include "in-cloud.web.cco.props.memory" (dict
           "value" "{reqsJsonPath[0]['.sizeBytes']['-']}"
         ) | nindent 6

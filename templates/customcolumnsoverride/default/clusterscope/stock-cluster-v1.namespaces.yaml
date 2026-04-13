@@ -1,8 +1,11 @@
 {{- if (index .Values.defaultWebResources.customcolumnsoverride "stock-cluster-v1_namespaces") }}
 ---
-# =================================================
-# CustomColumnsOverride definition
-# =================================================
+# ============================================================================
+# CustomColumnsOverride: stock-cluster-v1.namespaces
+# ----------------------------------------------------------------------------
+# Table columns for Namespace (cluster-scoped).
+# Toggled via: defaultWebResources.customcolumnsoverride["stock-cluster-v1_namespaces"]
+# ============================================================================
 apiVersion: front.in-cloud.io/v1alpha1
 kind: CustomColumnsOverride
 metadata:

@@ -3,9 +3,12 @@
 {{- $customCco := index $customCcoResources "stock-namespace-apps.v1.statefulsets" -}}
 {{- if eq (include "in-cloud.web.cco.isEnabled" (dict "config" $customCco)) "true" }}
 ---
-# =================================================
-# CustomColumnsOverride definition
-# =================================================
+# ============================================================================
+# CustomColumnsOverride: stock-namespace-apps.v1.statefulsets
+# ----------------------------------------------------------------------------
+# Table columns for StatefulSet (namespaced).
+# Toggled via: customWebResources.customcolumnsoverride["stock-namespace-apps.v1.statefulsets"]
+# ============================================================================
 apiVersion: front.in-cloud.io/v1alpha1
 kind: CustomColumnsOverride
 metadata:

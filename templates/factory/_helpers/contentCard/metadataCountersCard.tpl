@@ -1,5 +1,5 @@
 {{- define "in-cloud.web.contentCard.metadataCounters" -}}
-# Content card with metadata counters (labels and annotations)
+# Metadata counters: label/annotation counts with edit affordances (endpoint + permissionContext).
 - type: ContentCard
   data:
     id: metadata-card
@@ -17,6 +17,7 @@
           rowGap: 10
           marginBottom: 16px
       children:
+        {{/* endpoint: BFF proxy URL for PATCH on metadata; permissionContext: RBAC for edit */}}
         {{ include "in-cloud.web.aggregatedCounterCard.labels" (dict
           "endpoint" .endpoint
           "permissionContext" .permissionContext
@@ -28,7 +29,7 @@
 {{- end -}}
 
 {{- define "in-cloud.web.contentCard.nodeMetadataCounters" -}}
-# Content card with Node metadata counters (labels, annotations, taints, images)
+# Node metadata counters: labels, annotations, taints, images (same endpoint/permission pattern).
 - type: ContentCard
   data:
     id: metadata-card
@@ -46,6 +47,7 @@
           rowGap: 10
           marginBottom: 16px
       children:
+        {{/* endpoint: BFF proxy URL for PATCH; permissionContext: RBAC for edit */}}
         {{ include "in-cloud.web.aggregatedCounterCard.labels" (dict
           "endpoint" .endpoint
           "permissionContext" .permissionContext
@@ -58,6 +60,10 @@
           "endpoint" .endpoint
           "permissionContext" .permissionContext
         ) | nindent 8 }}
+        {{/*
+          fieldSelector / k8sResourceToFetch: resolve Node object for image list; permissionContext:
+          RBAC
+        */}}
         {{ include "in-cloud.web.aggregatedCounterCard.images" (dict
           "fieldSelector" .fieldSelector
           "k8sResourceToFetch" .k8sResourceToFetch

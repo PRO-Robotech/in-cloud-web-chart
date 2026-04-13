@@ -18,6 +18,12 @@ spec:
       schema:
         openAPIV3Schema:
           type: object
+          description: >-
+            MarketplacePanel defines an entry in the marketplace / service catalog UI
+            within the openapi-ui application. Each panel represents a resource type
+            (typically a CRD) that users can browse, create, or manage through a
+            catalog-style interface. The UI fetches MarketplacePanel CRs using the
+            MARKETPLACE_KIND and MARKETPLACE_PLURAL environment variables.
           required: [spec]
           properties:
             apiVersion:
@@ -28,36 +34,64 @@ spec:
               type: object
             spec:
               type: object
+              description: Marketplace panel entry configuration.
               required:
                 - name
                 - type
-                # - apiGroup
-                # - apiVersion
                 - plural
               properties:
                 name:
                   type: string
+                  description: >-
+                    Display name for the marketplace panel (e.g., "PostgreSQL Cluster",
+                    "Redis Instance"). Shown as the panel title in the catalog UI.
                 description:
                   type: string
+                  description: >-
+                    Human-readable description of the resource. Shown below the panel title
+                    in the catalog listing.
                 type:
                   type: string
+                  description: >-
+                    Resource type category. "crd" indicates a Kubernetes Custom Resource
+                    with an OpenAPI schema (form is auto-generated). "nonCrd" indicates
+                    a non-CRD resource or a resource that requires custom handling.
                   # enum: ["crd", "nonCrd"]
                 apiGroup:
                   type: string
+                  description: >-
+                    API group of the Kubernetes resource (e.g., "postgresql.cnpg.io").
+                    Required for CRD-type panels to resolve the resource schema.
                 apiVersion:
                   type: string
+                  description: >-
+                    API version of the resource (e.g., "v1", "v1alpha1").
+                    Required for CRD-type panels.
                 plural:
                   type: string
+                  description: >-
+                    Plural resource name used in API paths (e.g., "clusters", "redisfailovers").
                 disabled:
                   type: boolean
+                  description: >-
+                    When true, the panel is shown in the catalog but the "Create" action
+                    is disabled. Useful for read-only or informational entries.
                 hidden:
                   type: boolean
+                  description: >-
+                    When true, the panel is completely hidden from the catalog UI.
+                    Useful for temporarily removing entries without deleting the CR.
                 tags:
                   type: array
+                  description: >-
+                    List of tags for filtering and categorization in the catalog
+                    (e.g., ["database", "postgresql", "production"]).
                   items:
                     type: string
                 icon:
                   type: string
+                  description: >-
+                    Base64-encoded SVG or image URL used as the panel icon in the catalog.
       subresources:
         status: {}
       additionalPrinterColumns:

@@ -1,3 +1,7 @@
+{{/*
+  Node-specific detail cards: overview, identifiers, and addresses (pods/terminal/taints may be
+  composed elsewhere).
+*/}}
 {{- define "in-cloud.web.contentCard.nodeInfo" -}}
 # Content card with runtime and OS information about the Node
 - type: ContentCard
@@ -92,6 +96,7 @@
                         text: Node address
                     - type: ArrayOfObjectsToKeyValues
                       data:
+                        {{/* Which parallel fetch result (reqsJsonPath index) to read */}}
                         reqIndex: 0
                         jsonPathToArray: .items.0.status.addresses
                         keyFieldName: type

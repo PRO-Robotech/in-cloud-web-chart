@@ -3,15 +3,19 @@
 {{- $customCco := index $customCcoResources "stock-cluster-v1.pods" -}}
 {{- if eq (include "in-cloud.web.cco.isEnabled" (dict "config" $customCco)) "true" }}
 ---
-# =================================================
-# CustomColumnsOverride definition
-# =================================================
+# ============================================================================
+# CustomColumnsOverride: stock-cluster-v1.pods
+# ----------------------------------------------------------------------------
+# Table columns for Pod (cluster-scoped).
+# Toggled via: customWebResources.customcolumnsoverride["stock-cluster-v1.pods"]
+# ============================================================================
 apiVersion: front.in-cloud.io/v1alpha1
 kind: CustomColumnsOverride
 metadata:
   # Name of this CustomColumnsOverride resource
   name: stock-cluster-v1.pods
 spec:
+  # additionalReqsData: Pod metrics (containers[*].usage.cpu/memory) for Memory and CPU columns.
   # Table columns rendered in the resource list
   additionalPrinterColumns:
     # =================================================

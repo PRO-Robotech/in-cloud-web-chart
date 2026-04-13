@@ -3,9 +3,13 @@
 {{- $customCco := index $customCcoResources "stock-cluster-apps.v1.replicationcontroller" -}}
 {{- if eq (include "in-cloud.web.cco.isEnabled" (dict "config" $customCco)) "true" }}
 ---
-# =================================================
-# CustomColumnsOverride definition
-# =================================================
+# ============================================================================
+# CustomColumnsOverride: stock-cluster-apps.v1.replicationcontroller
+# ----------------------------------------------------------------------------
+# Table columns for ReplicationController (cluster-scoped).
+# Toggled via:
+# customWebResources.customcolumnsoverride["stock-cluster-apps.v1.replicationcontroller"]
+# ============================================================================
 apiVersion: front.in-cloud.io/v1alpha1
 kind: CustomColumnsOverride
 metadata:

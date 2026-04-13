@@ -68,8 +68,10 @@ data:
         proxy_set_header Host $host;
         proxy_read_timeout 86400s;
         proxy_send_timeout 86400s;
-        proxy_buffering off;           # avoid buffering for watch/WS
-        proxy_request_buffering off;   # avoid request buffering
+        # avoid buffering for watch/WS
+        proxy_buffering off;
+        # avoid request buffering
+        proxy_request_buffering off;
 
         # Remove /k8s prefix and proxy to apiserver service
         rewrite /k8s/(.*) /$1 break;

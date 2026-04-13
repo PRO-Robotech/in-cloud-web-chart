@@ -17,6 +17,7 @@
 {{- if hasKey . "withResponsive" }}
 {{- $withResponsive = .withResponsive }}
 {{- end }}
+# AntD grid layout: runtime facts column + selectors/labels column.
 - type: antdRow
   data:
     gutter: [24, 0]

@@ -7,6 +7,12 @@
 {{- $replicasetApiResource := $replicasetCtx.resource -}}
 {{- $replicasetPermissionContext := $replicasetCtx.permissionContext -}}
 {{- $replicasetEndpoint := $replicasetCtx.endpoint -}}
+# ============================================================================
+# Factory: replicaset-details
+# ----------------------------------------------------------------------------
+# Detail page for ReplicaSets.
+# Toggled via: customWebResources.factory["replicaset-details"].enabled (default: true)
+# ============================================================================
 apiVersion: front.in-cloud.io/v1alpha1
 kind: Factory
 metadata:
@@ -15,6 +21,7 @@ metadata:
 spec:
   key: replicaset-details
 
+  # Indexes into urlsToFetch whose responses are available via reqsJsonPath[N] in the component tree
   effectiveReqIndexes:
     - 0
 
@@ -109,6 +116,7 @@ spec:
               }}
 
 
+              # Rolling restart of Pods (rollout restart)
               {{- include "in-cloud.web.action.rolloutRestart" (dict
                   "endpoint" $replicasetEndpoint
                   "permissionContext" $replicasetPermissionContext
@@ -129,8 +137,11 @@ spec:
     - type: antdTabs
       data:
         id: tabs-root
+        # Tab selected by default when the page loads
         defaultActiveKey: details
+        # Persist the active tab key in the URL hash for bookmarking and refresh
         syncActiveKeyWithHash: true
+        # Show "Open in new tab" context action on each tab header
         allowOpenInNewBrowserTab: true
         items:
 
@@ -245,6 +256,7 @@ spec:
           # =========================
           # AQUA SECURITY TAB (optional)
           # =========================
+          # When customWebResources.factory["node-details"].enableConfigReportsAquaTab is true
           {{- if (index .Values.customWebResources.factory "node-details").enableConfigReportsAquaTab }}
           - key: reports
             label: Reports

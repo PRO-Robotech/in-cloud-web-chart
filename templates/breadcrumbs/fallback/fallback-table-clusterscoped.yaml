@@ -1,3 +1,9 @@
+# ============================================================================
+# Breadcrumb: fallback-table-clusterscoped-api, fallback-table-clusterscoped-builtin
+# ----------------------------------------------------------------------------
+# Table (list) pages, cluster scope: api crumb uses {4}/{5}/{6}; builtin uses {4} (label v1/{4}).
+# Override by deploying Breadcrumb CRs with the same spec.id values tied to your routes.
+# ============================================================================
 ---
 apiVersion: front.in-cloud.io/v1alpha1
 kind: Breadcrumb
@@ -5,7 +11,9 @@ metadata:
   name: fallback-table-clusterscoped-api
 spec:
   id: "fallback-table-clusterscoped-api"
+  # Single crumb: the collection identity for the current list view.
   breadcrumbItems:
+    # api: group/version/resource segments from the URL ({4}/{5}/{6}).
     - key: api
       label: "{4}/{5}/{6}"
 ---
@@ -16,5 +24,6 @@ metadata:
 spec:
   id: "fallback-table-clusterscoped-builtin"
   breadcrumbItems:
+    # api: built-in table key ({4}) with a fixed v1 label prefix for display.
     - key: api
       label: "v1/{4}"

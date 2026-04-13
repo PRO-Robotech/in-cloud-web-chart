@@ -1,7 +1,16 @@
+# ============================================================================
+# Cluster: default
+# ----------------------------------------------------------------------------
+# Registers the infrastructure target (displayName "infra") in the UI cluster list
+# so users can open cluster-scoped routes; it does not provision the cluster.
+# Tied to Helm release metadata; override or add Cluster CRs for other kube contexts.
+# ============================================================================
 apiVersion: front.in-cloud.io/v1alpha1
 kind: Cluster
 metadata:
   name: default
 spec:
+  # Shown in the UI selector (human-readable; not the Kubernetes metadata.name).
   displayName: infra
+  # Surfaced as the app/chart version for this catalog entry.
   version: "{{ .Chart.Version }}"
