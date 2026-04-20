@@ -153,6 +153,13 @@ spec:
         - name: {{ .Values.bff.name }}
           image: "{{ .Values.bff.image.repository }}:{{ .Values.bff.image.tag }}"
           imagePullPolicy: {{ .Values.bff.image.pullPolicy }}
+          {{- $mfPlugins := dict }}
+          {{- if .Values.moduleRbac.enabled }}
+          {{- $_ := set $mfPlugins "plugin-rbac" (dict "name" "plugin-rbac" "entry" "/openapi-ui-plugin-rbac/assets/remoteEntry.js" "exposedModule" "./App") }}
+          {{- end }}
+          {{- if .Values.moduleSgroups.enabled }}
+          {{- $_ := set $mfPlugins "plugin-sgroups" (dict "name" "plugin-sgroups" "entry" "/openapi-ui-plugin-sgroups/assets/remoteEntry.js" "exposedModule" "./App") }}
+          {{- end }}
 
           # Ports
           ports:
@@ -166,7 +173,9 @@ spec:
           # Env
           {{- with .Values.bff.env }}
           env:
-            {{- include "incloud-web.env" . | nindent 12 }}
+            {{- include "incloud-web.env" (omit . "MF_PLUGINS_JSON") | nindent 12 }}
+            - name: MF_PLUGINS_JSON
+              value: {{ $mfPlugins | toJson | quote }}
           {{- end }}
           {{- with .Values.bff.envFrom }}
           envFrom:
@@ -436,6 +445,61 @@ spec:
 
           terminationMessagePath: {{ .Values.moduleRbac.terminationMessagePath | quote }}
           terminationMessagePolicy: {{ .Values.moduleRbac.terminationMessagePolicy | quote }}
+        {{- end }}
+
+        # -------------------- Module Sgroups Container --------------------
+        {{- if .Values.moduleSgroups.enabled }}
+        - name: {{ .Values.moduleSgroups.name }}
+          image: "{{ .Values.moduleSgroups.image.repository }}:{{ .Values.moduleSgroups.image.tag }}"
+          imagePullPolicy: {{ .Values.moduleSgroups.image.pullPolicy }}
+
+          # Ports
+          ports:
+            - name: http
+              containerPort: {{ .Values.moduleSgroups.containerPort }}
+              protocol: TCP
+            {{- with .Values.moduleSgroups.extraContainerPorts }}
+            {{- toYaml . | nindent 12 }}
+            {{- end }}
+
+          # Env
+          {{- with .Values.moduleSgroups.env }}
+          env:
+            {{- include "incloud-web.env" . | nindent 12 }}
+          {{- end }}
+          {{- with .Values.moduleSgroups.envFrom }}
+          envFrom:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+
+          # Probes (enabled-gated, 'enabled' key stripped)
+          {{- if .Values.moduleSgroups.livenessProbe.enabled }}
+          livenessProbe:
+            {{- omit .Values.moduleSgroups.livenessProbe "enabled" | toYaml | nindent 12 }}
+          {{- end }}
+          {{- if .Values.moduleSgroups.readinessProbe.enabled }}
+          readinessProbe:
+            {{- omit .Values.moduleSgroups.readinessProbe "enabled" | toYaml | nindent 12 }}
+          {{- end }}
+
+          # Security context (enabled-gated, 'enabled' key stripped)
+          {{- if .Values.moduleSgroups.securityContext.enabled }}
+          securityContext:
+            {{- omit .Values.moduleSgroups.securityContext "enabled" | toYaml | nindent 12 }}
+          {{- end }}
+
+          # Resources / mounts
+          {{- with .Values.moduleSgroups.resources }}
+          resources:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- with .Values.moduleSgroups.volumeMounts }}
+          volumeMounts:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+
+          terminationMessagePath: {{ .Values.moduleSgroups.terminationMessagePath | quote }}
+          terminationMessagePolicy: {{ .Values.moduleSgroups.terminationMessagePolicy | quote }}
         {{- end }}
 
       # Extra raw PodSpec fields (if provided)

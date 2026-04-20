@@ -12,6 +12,8 @@ The chart deploys up to four containers in a single Pod:
 | **nginx** | Reverse proxy, routing requests to clusters | 8081 |
 | **bff** | Backend-for-Frontend — proxy to the Kubernetes API | 8082 |
 | **moduleExample** | Example plugin (optional, disabled by default) | 8083 |
+| **moduleRbac** | RBAC plugin (optional) | 8084 |
+| **moduleSgroups** | Security groups plugin (optional) | 8085 |
 
 **oauth2-proxy** and **Dex** can optionally be enabled for OIDC authentication.
 
@@ -64,7 +66,9 @@ The chart installs **CRDs** in the `front.in-cloud.io/v1alpha1` group for UI cus
 | `/openapi-bff/*` | Proxying to the BFF container |
 | `/openapi-bff-ws/*` | WebSocket proxying to BFF |
 | `/openapi-ui/*` | Proxying to the Web container (SPA) |
-| `/openapi-ui-plugin/*` | Proxying to the plugin (if enabled) |
+| `/openapi-ui-plugin/*` | Proxying to the example plugin (if enabled) |
+| `/openapi-ui-plugin-rbac/*` | Proxying to the RBAC plugin (if enabled) |
+| `/openapi-ui-plugin-sgroups/*` | Proxying to the sgroups plugin (if enabled) |
 | `/dex/*` | Proxying to Dex (if enabled) |
 | `/oauth2/*` | Proxying to oauth2-proxy (if enabled) |
 | `/healthcheck` | Health-check endpoint |
@@ -224,6 +228,24 @@ Full configuration is defined in `values.yaml` (~1186 lines). Below are the main
 | `moduleExample.image.tag` | string | `"master-a1a1bddb"` | Image tag |
 | `moduleExample.containerPort` | int | `8083` | Container port |
 
+### Container: moduleRbac (plugin)
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| `moduleRbac.enabled` | bool | `true` | Enable RBAC plugin |
+| `moduleRbac.image.repository` | string | `"prorobotech/openapi-ui-plugin-rbac"` | Image repository |
+| `moduleRbac.image.tag` | string | `"master-9bbda9e2"` | Image tag |
+| `moduleRbac.containerPort` | int | `8084` | Container port |
+
+### Container: moduleSgroups (plugin)
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| `moduleSgroups.enabled` | bool | `true` | Enable security groups plugin |
+| `moduleSgroups.image.repository` | string | `"prorobotech/sgroups-ui"` | Image repository |
+| `moduleSgroups.image.tag` | string | `"main-ab1de19d"` | Image tag |
+| `moduleSgroups.containerPort` | int | `8085` | Container port |
+
 ### Clusters
 
 | Parameter | Type | Default | Description |
@@ -363,7 +385,7 @@ in-cloud-web-chart/
 └── templates/
     ├── NOTES.txt                       # Post-install message
     ├── _helpers.tpl                    # Helper templates
-    ├── deployment.yaml                 # Deployment (bff + web + nginx + moduleExample)
+    ├── deployment.yaml                 # Deployment (bff + web + nginx + optional plugin containers)
     ├── configmap.yaml                  # nginx configuration
     ├── service.yaml                    # Service
     ├── serviceaccount.yaml             # ServiceAccount

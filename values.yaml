@@ -534,7 +534,7 @@ bff:
   # Container image configuration
   image:
     repository: prorobotech/openapi-ui-k8s-bff
-    tag: release-1.4.0-f3141e30
+    tag: release-1.5.0-16dcf035
     pullPolicy: IfNotPresent
 
   # Networking configuration for the container
@@ -559,7 +559,7 @@ bff:
     BASE_NAVIGATION_RESOURCE_PLURAL: "navigations"
     BASE_NAVIGATION_RESOURCE_NAME: "fallback"
     WS_LOG_BLACKLIST_PATHS: '["error.config.headers.authorization","headers.authorization","headers.cookie"]'
-    MF_PLUGINS_JSON: '{"plugin-rbac":{"name":"plugin-rbac","entry":"/openapi-ui-plugin-rbac/assets/remoteEntry.js","exposedModule":"./App"}}'
+    MF_PLUGINS_JSON: '{"plugin-rbac":{"name":"plugin-rbac","entry":"/openapi-ui-plugin-rbac/assets/remoteEntry.js","exposedModule":"./App"},"plugin-sgroups":{"name":"plugin-sgroups","entry":"/openapi-ui-plugin-sgroups/assets/remoteEntry.js","exposedModule":"./App"}}'
     # MF_PLUGINS_JSON: '{"plugin-example":{"name":"plugin-example","entry":"http://127.0.0.1:8081/openapi-ui-plugin/assets/remoteEntry.js","exposedModule":"./App"}}'
 
   envFrom: []
@@ -637,7 +637,7 @@ web:
   # Container image configuration
   image:
     repository: prorobotech/openapi-ui
-    tag: release-1.4.0-da9d53bc
+    tag: release-1.5.0-7b189f9f
     pullPolicy: IfNotPresent
 
   # Networking configuration for the container
@@ -952,6 +952,89 @@ moduleRbac:
     PORT: "8084"
     CORS_ALLOWED_ORIGINS: "https://demo.in-cloud.io"
     BASEPREFIX: /openapi-ui-plugin-rbac
+
+  envFrom: []
+
+  # Resource requests and limits for CPU, memory and ephemeral storage
+  resources:
+    limits:
+      cpu: 100m
+      memory: 128Mi
+      ephemeral-storage: 50Mi
+    requests:
+      cpu: 100m
+      memory: 128Mi
+      ephemeral-storage: 50Mi
+
+  # Security context for the container runtime
+  securityContext:
+    enabled: true
+    allowPrivilegeEscalation: false
+    capabilities:
+      drop:
+        - ALL
+    privileged: false
+    readOnlyRootFilesystem: false
+    runAsGroup: 0
+    runAsNonRoot: true
+    runAsUser: 101
+
+  # Liveness probe to monitor container health
+  livenessProbe:
+    enabled: false
+    # httpGet:
+    #   path: /healthcheck
+    #   port: 8080
+    #   scheme: HTTP
+    # initialDelaySeconds: 3
+    # periodSeconds: 10
+    # timeoutSeconds: 2
+    # successThreshold: 1
+    # failureThreshold: 3
+
+  # Readiness probe to control traffic routing only when ready
+  readinessProbe:
+    enabled: false
+    # httpGet:
+    #   path: /ready
+    #   port: 8080
+    #   scheme: HTTP
+    # initialDelaySeconds: 3
+    # periodSeconds: 10
+    # timeoutSeconds: 2
+    # successThreshold: 1
+    # failureThreshold: 3
+
+  # Additional volumes that can be mounted into the container
+  volumeMounts: []
+
+  # Termination message configuration
+  terminationMessagePath: /dev/termination-log
+  terminationMessagePolicy: File
+
+moduleSgroups:
+  # Main toggle for enabling or disabling the moduleSgroups service
+  enabled: true
+
+  # Basic identification settings for the moduleSgroups container
+  name: module-sgroups
+
+  # Container image configuration
+  image:
+    repository: prorobotech/sgroups-ui
+    tag: main-ab1de19d
+    pullPolicy: IfNotPresent
+
+  # Networking configuration for the container
+  extraContainerPorts: []
+  # Networking configuration for the container
+  containerPort: 8085
+
+  # Environment variables that configure moduleSgroups behavior and integration with Kubernetes API
+  env:
+    PORT: "8085"
+    CORS_ALLOWED_ORIGINS: "https://demo.in-cloud.io"
+    BASEPREFIX: /openapi-ui-plugin-sgroups
 
   envFrom: []
 
