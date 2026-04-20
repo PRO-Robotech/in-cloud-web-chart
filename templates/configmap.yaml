@@ -101,6 +101,13 @@ data:
       }
       {{ end }}
 
+      {{ if $.Values.moduleSgroups.enabled }}
+      # Proxy /openapi-ui-plugin-sgroups to backend (Sgroups module container)
+      location /openapi-ui-plugin-sgroups {
+          proxy_pass http://127.0.0.1:{{ $.Values.moduleSgroups.containerPort }};
+      }
+      {{ end }}
+
       # WebSocket proxy for BFF (e.g., event streams)
       location /openapi-bff-ws/ {
       {{ if $oauth.enabled }}
