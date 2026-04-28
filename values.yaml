@@ -1022,7 +1022,7 @@ moduleSgroups:
   # Container image configuration
   image:
     repository: prorobotech/sgroups-ui
-    tag: main-830d9b7e
+    tag: main-e195fd11
     pullPolicy: IfNotPresent
 
   # Networking configuration for the container
