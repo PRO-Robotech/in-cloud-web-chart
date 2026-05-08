@@ -55,11 +55,6 @@ data:
 
       # Proxy /k8s requests to Kubernetes API server
       location /k8s {
-      {{ if $oauth.enabled }}
-          auth_request {{ $.Values.web.env.LOGIN_URL }};
-          error_page 401 = {{ $oauthPrefix }}/sign_in;
-      {{ end }}
-
         # --- WebSocket / streaming essentials ---
         proxy_http_version 1.1;
         proxy_set_header Upgrade $http_upgrade;
@@ -80,10 +75,6 @@ data:
 
       # Proxy /openapi-bff to backend (BFF container)
       location /openapi-bff {
-      {{ if $oauth.enabled }}
-          auth_request {{ $.Values.web.env.LOGIN_URL }};
-          error_page 401 = {{ $oauthPrefix }}/sign_in;
-      {{ end }}
           proxy_pass http://127.0.0.1:{{ $.Values.bff.containerPort }};
       }
 
@@ -110,11 +101,6 @@ data:
 
       # WebSocket proxy for BFF (e.g., event streams)
       location /openapi-bff-ws/ {
-      {{ if $oauth.enabled }}
-          auth_request {{ $.Values.web.env.LOGIN_URL }};
-          error_page 401 = {{ $oauthPrefix }}/sign_in;
-      {{ end }}
-
           proxy_http_version 1.1;
           proxy_set_header Upgrade $http_upgrade;
           proxy_set_header Connection $connection_upgrade;
@@ -133,7 +119,7 @@ data:
       # Default route: serve frontend app from Web container
       location {{ .Values.web.env.BASEPREFIX }} {
       {{ if $oauth.enabled }}
-        auth_request {{ $.Values.web.env.LOGIN_URL }};
+        auth_request {{ $oauthPrefix }}/auth;
         error_page 401 = {{ $oauthPrefix }}/sign_in;
       {{ end }}
 
