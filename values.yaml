@@ -939,7 +939,7 @@ moduleRbac:
   # Container image configuration
   image:
     repository: prorobotech/openapi-ui-plugin-rbac
-    tag: master-4a1af780
+    tag: master-36a1d113
     pullPolicy: IfNotPresent
 
   # Networking configuration for the container
