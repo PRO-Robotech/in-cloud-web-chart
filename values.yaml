@@ -637,7 +637,7 @@ web:
   # Container image configuration
   image:
     repository: prorobotech/openapi-ui
-    tag: release-1.5.0-3b482d3f
+    tag: release-1.5.0-74a285a1
     pullPolicy: IfNotPresent
 
   # Networking configuration for the container
@@ -939,7 +939,7 @@ moduleRbac:
   # Container image configuration
   image:
     repository: prorobotech/openapi-ui-plugin-rbac
-    tag: master-36a1d113
+    tag: master-1d0dd97f
     pullPolicy: IfNotPresent
 
   # Networking configuration for the container
@@ -1022,7 +1022,7 @@ moduleSgroups:
   # Container image configuration
   image:
     repository: prorobotech/sgroups-ui
-    tag: main-391a697a
+    tag: main-0e2b3853
     pullPolicy: IfNotPresent
 
   # Networking configuration for the container
